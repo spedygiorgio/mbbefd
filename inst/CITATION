@@ -1,0 +1,12 @@
+citHeader("To cite package mbbefd in publications use:")
+
+citEntry(entry="Manual",
+         title = "MBBEFD: an R package to work with MBBEFD distribution and associated exposure curves",
+         author = person(first="Giorgio Alfredo", last="Spedicato"),
+         month="02",
+         year="2015",
+         note="R package version 0.6",
+         textVersion = "Giorgio Alfredo Spedicato. 
+		 MBBEFD: an R package to work with MBBEFD distribution and associated exposure curve"
+         )
+    

@@ -1,8 +1,8 @@
 Package: mbbefd
 Type: Package
 Title: Maxwell Bolzano Bose Einstein Fermi Dirac Distribution and Exposure Curve
-Version: 0.6
-Date: 2015-02-13
+Version: 0.6.0.1
+Date: 2015-03-01
 Author: Giorgio Spedicato
 Maintainer: Giorgio Spedicato <spedicato_giorgio@yahoo.it>
 Description: It contains the definition of Maxwell Bolzano Bose Einstein Fermi Dirac (MBBEFD) distribution (distribution, density, quantile, random generation functions) as well as MBBEFD exposure curve, used in actuarial application to price reinsurance contracts. The vignette shows code snippets to fit the distribution to empirical data.

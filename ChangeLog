@@ -1,4 +1,10 @@
 ChangeLog
+-Version 0.6.0.1
+01-03-2015
+Added to GitHub
+-Version 0.6.0
+16-02-2015
+Rcpp introduced
 -Version 0.5.0.1
 14-01-2015
 Inserted missing packages for LATEX

@@ -84,7 +84,7 @@ The paper is structured as follows: Section~\ref{sec:review} discusses review th
 
 \section{Exposure curve review}\label{sec:review}
 
-Within actuarial jargon, an exposure curve is a distribution that shows the ratio between the expected limited loss at various limits and the expected unlimited loss. They are usually to rate large commercial risks' exposures and non-proportional reinsurance treaties. In mathematical notation, if $IV$ is the insured value and $d$ the ratio of loss $x$ to $IV$ the exposure curve $G\left( d \right)$ is defined as Equation~\ref{eq:expoCurve} displays.
+Within actuarial jargon, an exposure curve is a distribution that shows the ratio between the expected limited loss at various limits and the expected unlimited loss. They are usually to rate exposures from large commercial risks and in non-proportional reinsurance treaties for non - life business. In mathematical notation, if $IV$ is the insured value and $d$ the ratio of loss $x$ to $IV$ the exposure curve $G\left( d \right)$ is defined as Equation~\ref{eq:expoCurve} displays.
 
 \begin{equation}
 G\left( d \right) = \frac{{E\left[ {\min \left( {d*IV,x} \right)} \right]}}{{E\left[ x \right]}} = \frac{{\int_0^{d*IV} {\left( {1 - F\left( x \right)} \right)dx} }}{{\int_0^\infty  {x*f\left( x \right)dx} }} = \frac{{\int_0^{d*IV} {S\left( x \right)dx} }}{{\int_0^\infty  {S\left( x \right)dx} }}
@@ -253,7 +253,7 @@ distribution function, starting from known values of $p=\frac{1}{g}$ The algorit
   \item Compare $E\left[ x^2 \right]$ to the empirical moment. Repeat the process modifying $p$ until the theoretical second moment is close to the empirical one enough (the second moment is an increasing function of p).
 \end{enumerate}
 
-Fitting a MBBEFD distribution is not easy. The result is sensible to initial values and appears to be instable.  We have applied the first three steps of this process in order to obtain initial estimates of $a$ and $b$ to feed the Maximum Likelihood estimation process using \pkg{fitdistrplus} package, \cite{fitdistrplus}. We show two example one using both artificial data or real one (from package \pkg{copula}, \cite{copulaR}).
+Fitting a MBBEFD distribution is not easy. The result is sensible to initial values and appears to be instable.  We have applied the first three steps of this process in order to obtain initial estimates of $a$ and $b$ to feed the Maximum Likelihood estimation process using \pkg{fitdistrplus} package, \cite{fitdistrplusR}. We show two example one using both artificial data or real one (from package \pkg{copula}, \cite{copulaR}).
 
 
 <<fitting, keep.source=TRUE>>=

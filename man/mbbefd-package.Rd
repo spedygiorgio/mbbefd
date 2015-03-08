@@ -14,7 +14,7 @@ as well as MBBEFD exposure curve. The vignette shows code snippets to fit the di
 Package: \tab mbbefd\cr
 Type: \tab Package\cr
 Version: \tab 0.6.1\cr
-Date: \tab 2015-03-07\cr
+Date: \tab 2015-03-08\cr
 License: \tab GPL 2\cr
 }
 }

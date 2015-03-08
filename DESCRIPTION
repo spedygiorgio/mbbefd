@@ -2,7 +2,7 @@ Package: mbbefd
 Type: Package
 Title: Maxwell Bolzano Bose Einstein Fermi Dirac Distribution and Exposure Curve
 Version: 0.6.1
-Date: 2015-03-07
+Date: 2015-03-08
 Author: Giorgio Spedicato
 Maintainer: Giorgio Spedicato <spedicato_giorgio@yahoo.it>
 Description: It contains the definition of Maxwell Bolzano Bose Einstein Fermi

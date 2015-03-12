@@ -1,5 +1,6 @@
 #exportPattern("^[[:alpha:]]+")
 export(mbbefdExposure,rmbbefd,dmbbefd,pmbbefd,qmbbefd,swissRe,g2a,dG)
+export(dMBBEFD, pMBBEFD, qMBBEFD, gMBBEFD)
 #export(g2a)
 importFrom(Rcpp,sourceCpp)
 useDynLib(mbbefd)

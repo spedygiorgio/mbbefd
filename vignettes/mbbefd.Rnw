@@ -49,11 +49,10 @@
 %% The address of (at least) one author should be given
 %% in the following format:
 \Address{
-  Giorgio Alfredo Spedicato\\
+  Giorgio Alfredo Spedicato, Ph.D C.Stat ACAS\\
   StatisticalAdvisor\\
-  Via Firenze 11
+  Paderno Dugnano\\
   20037 Italy\\
-  Telephone: +39/334/6634384\\
   E-mail: \email{spedicato\_giorgio@yahoo.it}\\
   URL: \url{www.statisticaladvisor.com}
 }
@@ -65,6 +64,7 @@
 %% end of declarations %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{document}
+
 
 <<setup,echo=FALSE, results=hide>>=
 	options(prompt = "R> ", continue = "+  ", width = 70, useFancyQuotes = FALSE)
@@ -82,29 +82,29 @@ The paper is structured as follows: Section~\ref{sec:review} discusses review th
 
 
 
-\section{Exposure curve review}\label{sec:review}
+\section{A theoretical review}\label{sec:review}
 
-Within actuarial jargon, an exposure curve is a distribution that shows the ratio between the expected limited loss at various limits and the expected unlimited loss. They are usually to rate large commercial risks' exposures and non-proportional reinsurance treaties. In mathematical notation, if $IV$ is the insured value and $d$ the ratio of loss $x$ to $IV$ the exposure curve $G\left( d \right)$ is defined as Equation~\ref{eq:expoCurve} displays.
+Within actuarial jargon, an exposure curve is a distribution that shows the ratio between the expected limited loss at various limits and the expected unlimited loss. They are usually to rate exposures from large commercial risks and in non-proportional reinsurance treaties for non - life business. In mathematical notation, if $IV$ is the insured value and $d$ the ratio of loss $x$ to $IV$ the exposure curve $G\left( d \right)$ is defined as Equation~\ref{eq:expoCurve} displays.
 
 \begin{equation}
 G\left( d \right) = \frac{{E\left[ {\min \left( {d*IV,x} \right)} \right]}}{{E\left[ x \right]}} = \frac{{\int_0^{d*IV} {\left( {1 - F\left( x \right)} \right)dx} }}{{\int_0^\infty  {x*f\left( x \right)dx} }} = \frac{{\int_0^{d*IV} {S\left( x \right)dx} }}{{\int_0^\infty  {S\left( x \right)dx} }}
 \label{eq:expoCurve}
 \end{equation}
 
-Whilst losses normally lie in the interval $0,\ldots, \infty$ for the rest of the paper it will be assumes $x$ to represent a normalized loss in the interval $0,\ldots, PML$, being $PML$ the so - called maximum probable loss (in other words, the maximum loss it is thought to can happen). Therefore $x$ would represent a percentage loss with respect to a maximum, i.e., a destruction rate.\\
-
+It can be shown that $G \left( 0 \right)=0$, $G\left( 1 \right)=1$, $dG \left( d \right) \ge 0$ and $ddG \left( d \right) \le 0$. Whilst losses normally lie in the interval $0,\ldots, \infty$, it will be assumes $x$ to represent a normalized loss in the interval $0,\ldots, PML$, being $PML$ the so - called maximum probable loss (in other words, the maximum loss it is thought to can happen) all along the paper. Therefore $x$ would represent a percentage loss with respect to a maximum, i.e., a destruction rate.\\
 
 \cite{bernegger1997tile} and \cite{mahler} provide a discussion on the actuarial theory regarding such curve. In particular, the curves discussed by \cite{bernegger1997tile} are of the form expressed by Equation~\ref{eq:expoCurve2}.
 
 \begin{equation}
 \left\{ \begin{array}{l}
 G\left( x \right) = \frac{{\ln \left( {a + {b^x}} \right) - \ln \left( {a + 1} \right)}}{{\ln \left( {a + b} \right) - \ln \left( {a + 1} \right)}}\\
-x \in \left[ {0,1} \right]
+x \in \left[ {0,1} \right]\\
+b > 0 \\
 \end{array} \right.
 \label{eq:expoCurve2}
 \end{equation}
 
-It can be shown that $G \left( 0 \right)=0$, $G\left( 1 \right)=1$, $dG \left( d \right) \ge 0$ and $ddG \left( d \right) \le 0$. Using some calculus on Equation~\ref{eq:expoCurve2} it can be shown that the expected value is equal to the reciprocal of exposure curve derivative at 0, Equation~\ref{eq:expectedValue}.\\
+Using some calculus on Equation~\ref{eq:expoCurve2} it can be shown that the expected value is equal to the reciprocal of exposure curve derivative at 0, Equation~\ref{eq:expectedValue}.\\
 
 \begin{equation}
   \mu = \frac{1}{dG \left( 0 \right) }
@@ -118,12 +118,59 @@ p = 1 - F\left( 1^{-}  \right) = \frac{1}{g} = \frac{dG\left( 1 \right)}{dG\left
 \label{eq:totalLoss}
 \end{equation}
 
-It is similarly possible to write expression for the Survival Function, $S \left( x \right)$, Equation~\ref{eq:survival} and the density, Equation~\ref{eq:density}.
+It is similarly possible to write expression for the Survival Function, $S \left( x \right)$. Equation~\ref{eq:survival} expresses the Survival Function for a generic exposure curve and Equation~\ref{eq:survival2} expresses the same for a MBBEFD distribution family. and the density, Equation~\ref{eq:density}.
 
 \begin{equation}
-S\left( x \right) = \frac{{G'\left( x \right)}}{{G'\left( 0 \right)}} = \frac{{\left( {a + 1} \right){b^x}}}{{a + {b^x}}}
+S\left( x \right) = \frac{{G'\left( x \right)}}{{G'\left( 0 \right)}}
 \label{eq:survival}
 \end{equation}
+
+\begin{equation}
+S\left( x \right) =  \frac{{\left( {a + 1} \right){b^x}}}{{a + {b^x}}}
+\label{eq:survival2}
+\end{equation}
+
+\begin{equation}
+f\left (  \right )=-S\left ( x \right )=-\frac{\left ( a+1 \right )*a*ln\left ( b^x \right )}{\left ( a+b^x \right )^2}
+\label{eq:density}
+\end{equation}
+
+The MBBEFD can be expressed using an alternative parametrization based on parameter $g=\frac{1}{p}$, the reciprocal of the total loss $p = S( 1 ) = \frac{ ( a+1 ) * b}{a + b}$. This equation allows to rewrite MBBEFD formulas using the $b$ and $g$ parameters, taking into account Equation~\ref{eq:bAndG}. Cleary, $g \ge 1$.
+
+\begin{equation}
+a=\frac{\left(g-1 \right )*b}{1-g*b}
+\label{eq:bAndG}
+\end{equation}
+
+Equation~\ref{eq:meanGandB} shows the mean as a function of $b$ and $g$.
+
+\begin{equation}
+E\left [ X \right ]=\frac{ln\left(g*b \right )}{ln\left(b \right )}*\frac{1-b}{1-g*b}
+\label{eq:meanGandB}
+\end{equation}
+
+The limits shown in Equation~\ref{eq:limits} follows using some calculus on Equation~\ref{eq:meanGandB}.
+
+\begin{equation}
+\left\{\begin{matrix}
+\frac{\partial \mu}{\partial g} \le 0\\
+\frac{\partial \mu}{\partial b} \le 0\\
+b\rightarrow 0, \mu \rightarrow 1\\ 
+b\rightarrow \infty, \mu \rightarrow p\\ 
+g\rightarrow 1, \mu \rightarrow 1\\ 
+g\rightarrow 0, \mu \rightarrow 0\\ 
+\end{matrix}\right.
+\label{eq:limits}
+\end{equation}
+
+
+Two special cases are defines:
+\begin{enumerate}
+
+\item $b*g=1$, $g>1$. The distribution is an Exponential, censored from above at 1. Its exposure curve is $G=\frac{1-b^x}{1-b^x}$.
+\item $b=1$,$g>1$. The distribution is a censored Pareto from above at 1. Its exposure curve is $G=\frac{ln( 1+( g-1 )*x)}{ln\left( g \right)}$.
+
+\end{enumerate}
 
 \section{The MBBEFD class and its related package}\label{sec:package}
 
@@ -253,7 +300,7 @@ distribution function, starting from known values of $p=\frac{1}{g}$ The algorit
   \item Compare $E\left[ x^2 \right]$ to the empirical moment. Repeat the process modifying $p$ until the theoretical second moment is close to the empirical one enough (the second moment is an increasing function of p).
 \end{enumerate}
 
-Fitting a MBBEFD distribution is not easy. The result is sensible to initial values and appears to be instable.  We have applied the first three steps of this process in order to obtain initial estimates of $a$ and $b$ to feed the Maximum Likelihood estimation process using \pkg{fitdistrplus} package, \cite{fitdistrplus}. We show two example one using both artificial data or real one (from package \pkg{copula}, \cite{copulaR}).
+Fitting a MBBEFD distribution is not easy. The result is sensible to initial values and appears to be instable.  We have applied the first three steps of this process in order to obtain initial estimates of $a$ and $b$ to feed the Maximum Likelihood estimation process using \pkg{fitdistrplus} package, \cite{fitdistrplusR}. We show two example one using both artificial data or real one (from package \pkg{copula}, \cite{copulaR}).
 
 
 <<fitting, keep.source=TRUE>>=

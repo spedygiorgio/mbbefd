@@ -1,8 +1,8 @@
 
 
-### check 
+### R version of d,p,q,r functions MBBEFD(a,b)
 
-dMBBEFD <- function(x, a, b)
+dmbbefdR <- function(x, a, b, log=FALSE)
 {
   if(a +1 >0 && b > 0 && a*(1-b) >= 0)
     return(rep(NaN, length(x)))
@@ -16,10 +16,12 @@ dMBBEFD <- function(x, a, b)
   
   res <- -a * (a+1) * b^x * log(b) / (a + b^x)^2 
   res[x == 1] <- (a+1) * b / (a+b)
+  if(log)
+    res <- log(res)
   return(res)  
 }  
 	
-pMBBEFD <- function(q, a, b)
+pmbbefdR <- function(q, a, b, lower.tail = TRUE, log.p = FALSE)
 {
   if(a +1 >0 && b > 0 && a*(1-b) >= 0)
     return(rep(NaN, length(q)))
@@ -28,40 +30,54 @@ pMBBEFD <- function(q, a, b)
   {
     res <- rep(0, length(q))
     res[q == 1] <- 1
-    return(res)
+  }else
+  {
+    res <- a * ( (a+1) / (a + b^q) - 1) 
+    res[q >= 1] <- (a+1) * b / (a+b)
+    res[q < 0] <- 0
   }
+  if(!lower.tail)
+    res <- 1-res
+  if(log.p)
+    res <- log(res)
   
-  res <- a * ( (a+1) / (a + b^q) - 1) 
-  res[q >= 1] <- (a+1) * b / (a+b)
-  res[q < 0] <- 0
   return(res)  
 }  
   
 	 
-qMBBEFD <- function(p, a, b)
+qmbbefdR <- function(p, a, b, lower.tail = TRUE, log.p = FALSE)
 {
   if(a +1 >0 && b > 0 && a*(1-b) >= 0)
     return(rep(NaN, length(p)))
+  
+  if(!lower.tail)
+    p <- 1-p
+  if(log.p) 
+    p <- exp(p) 
   
   if(a == 0 || b == 1) #Dirac
   {
     res <- rep(0, length(p))
     res[p > 0] <- 1
-    return(res)
+  }else
+  {
+    pab <- (a+1)*b/(a+b)
+    res <- log((1-p)*a/(a+p))/log(b)
+    res[p >= 1-pab] <- 1
+    res[p < 0 | p > 1] <- NaN
   }
   
-  pab <- (a+1)*b/(a+b)
-  
-  res <- log((1-p)*a/(a+p))/log(b)
-  res[p >= 1-pab] <- 1
-  res[p < 0 | p > 1] <- NaN
   return(res)  
 }  
 
   
+rmbbefdR <- function(n, a, b)
+{
+  qmbbefdR(runif(n, 0, 1), a, b)
+}
 	
 	
-gMBBEFD <- function(x, a, b)
+gmbbefdR <- function(x, a, b)
 {
   if(a +1 >0 && b > 0 && a*(1-b) >= 0)
     return(rep(NaN, length(x)))
@@ -71,16 +87,58 @@ gMBBEFD <- function(x, a, b)
     res <- x
     res[x < 0] <- 0
     res[x > 1] <- 1
-    return(res)
+  }else
+  {
+    res <- log((a+b^x)/(a+1))/log((a+b)/(a+1))  
+    res[x < 0] <- 0
+    res[x > 1] <- 1  
   }
-  
-  res <- log((a+b^x)/(a+1))/log((a+b)/(a+1))	
-  res[x < 0] <- 0
-  res[x > 1] <- 1
   res
 }
 	
-mMBBEFD <- function(a,b)
-	log((a+b)/(a+1))/log(b)*(a+1)
+mmbbefdR <- function(order, a, b)
+{
+  if(order == 1)
+    return(log((a+b)/(a+1))/log(b)*(a+1))
+  else
+    stop("not yet implemented.")
+}
 	
+	
+### R version of d,p,q,r functions MBBEFD(g,b)
+
+#TODO
 		
+
+dMBBEFDR <- function(x, g, b, log=FALSE)
+{
+  stop("not yet implemented.")
+}  
+
+pMBBEFDR <- function(q, g, b, lower.tail = TRUE, log.p = FALSE)
+{
+  stop("not yet implemented.") 
+}  
+
+
+qMBBEFDR <- function(p, g, b, lower.tail = TRUE, log.p = FALSE)
+{
+  stop("not yet implemented.")
+}  
+
+
+rMBBEFDR <- function(n, g, b)
+{
+  stop("not yet implemented.") 
+}
+
+
+gMBBEFDR <- function(x, g, b)
+{
+  stop("not yet implemented.")
+}
+
+mMBBEFDR <- function(order, g, b)
+{
+    stop("not yet implemented.")
+}

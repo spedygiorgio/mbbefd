@@ -3,11 +3,27 @@
 \alias{dmbbefd}
 \alias{qmbbefd}
 \alias{pmbbefd}
+
+\alias{dmbbefdR}
+\alias{pmbbefdR}
+\alias{qmbbefdR}
+\alias{rmbbefdR}
+\alias{gmbbefdR}
+\alias{mmbbefdR}
+
+\alias{dMBBEFDR}
+\alias{pMBBEFDR}
+\alias{qMBBEFDR}
+\alias{rMBBEFDR}
+\alias{gMBBEFDR}
+\alias{mMBBEFDR}
+
 \title{
-MBBEFD distribution definitions
+The MBBEFD distribution (two parametrizations)
 }
 \description{
-These functions perform probabilistic analysis as well as random sampling on the MBBEFD distribution
+These functions perform probabilistic analysis as well as random sampling on the MBBEFD distribution.
+
 }
 \usage{
 
@@ -18,38 +34,47 @@ dmbbefd(x, a, b, g)
 qmbbefd(p, a, b, g)
 
 pmbbefd(q, a, b, g)
+
+
+dmbbefdR(x, a, b, log=FALSE)
+pmbbefdR(q, a, b, lower.tail = TRUE, log.p = FALSE)
+qmbbefdR(p, a, b, lower.tail = TRUE, log.p = FALSE)
+rmbbefdR(n, a, b)
+gmbbefdR(x, a, b)
+mmbbefdR(order, a, b)
+
+dMBBEFDR(x, g, b, log=FALSE)
+pMBBEFDR(q, g, b, lower.tail = TRUE, log.p = FALSE)
+qMBBEFDR(p, g, b, lower.tail = TRUE, log.p = FALSE)
+rMBBEFDR(n, g, b)
+gMBBEFDR(x, g, b)
+mMBBEFDR(order, g, b)
 }
 
 \arguments{
-
-  \item{n}{
-Sample size
+\item{x, q}{
+vector of quantiles.
 }
-  \item{a}{
-a parameter
+\item{p}{
+vector of probabilities.
 }
-  \item{b}{
-b parameter
+\item{n}{
+number of observations. If \code{length(n) > 1}, the length is take to be the number required.
 }
-  \item{g}{
-g parameter (if a not given)
+\item{a, b, g}{
+shape parameters. For \code{.mbbefd} functions, \code{g} is computed from \code{a}.
 }
-
-  \item{x}{
-value of x
+\item{log, log.p}{
+logical; if \code{TRUE}, probabilities \code{p} are given as log(p).
 }
-
-  \item{p}{
-probability
+\item{lower.tail}{
+logical; if \code{TRUE} (default), probabilities are \en{P[X <= x]}, otherwise, \eqn{P[X> x]}.
 }
-
-  \item{q}{
-quantile
-}
+  
 
 }
 \details{
-it shall be remebered that \eqn{g=\frac{1}{p}=\frac{a+b}{\left(a+1\right)*b}}.
+it shall be remebered that \eqn{g=\frac{1}{p_1}=\frac{a+b}{\left(a+1\right)*b}}.
 }
 \value{
 A numeric value or a vector.
@@ -58,7 +83,8 @@ A numeric value or a vector.
 BERNEGGER, STEFAN. THE SWISS RE EXPOSURE CURVES AND THE MBBEFD DISTRIBUTION CLASS. Astin Bulletin (1997): 99.
 }
 \author{
-Giorgio Spedicato
+Giorgio Spedicato,
+Dutang Christophe
 }
 \seealso{
 \code{\link{swissRe}}, \code{\link{mbbefdExposure}}

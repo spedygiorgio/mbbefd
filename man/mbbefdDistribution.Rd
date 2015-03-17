@@ -1,4 +1,5 @@
-\name{rmbbefd}
+\name{mbbefd-distr}
+\alias{mbbefd-distr}
 \alias{rmbbefd}
 \alias{dmbbefd}
 \alias{qmbbefd}
@@ -8,15 +9,17 @@
 \alias{pmbbefdR}
 \alias{qmbbefdR}
 \alias{rmbbefdR}
-\alias{gmbbefdR}
+\alias{ecmbbefdR}
 \alias{mmbbefdR}
+\alias{tlmbbefdR}
 
 \alias{dMBBEFDR}
 \alias{pMBBEFDR}
 \alias{qMBBEFDR}
 \alias{rMBBEFDR}
-\alias{gMBBEFDR}
+\alias{ecMBBEFDR}
 \alias{mMBBEFDR}
+\alias{tlMBBEFDR}
 
 \title{
 The MBBEFD distribution (two parametrizations)
@@ -40,15 +43,17 @@ dmbbefdR(x, a, b, log=FALSE)
 pmbbefdR(q, a, b, lower.tail = TRUE, log.p = FALSE)
 qmbbefdR(p, a, b, lower.tail = TRUE, log.p = FALSE)
 rmbbefdR(n, a, b)
-gmbbefdR(x, a, b)
+ecmbbefdR(x, a, b)
 mmbbefdR(order, a, b)
+tlmbbefdR(a, b)
 
 dMBBEFDR(x, g, b, log=FALSE)
 pMBBEFDR(q, g, b, lower.tail = TRUE, log.p = FALSE)
 qMBBEFDR(p, g, b, lower.tail = TRUE, log.p = FALSE)
 rMBBEFDR(n, g, b)
-gMBBEFDR(x, g, b)
+ecMBBEFDR(x, g, b)
 mMBBEFDR(order, g, b)
+tlMBBEFDR(g, b)
 }
 
 \arguments{

@@ -21,7 +21,7 @@ dmbbefdR <- function(x, a, b, log=FALSE)
   
   if(log)
     res <- log(res)
-  return(res)  
+  res  
 }  
 	
 pmbbefdR <- function(q, a, b, lower.tail = TRUE, log.p = FALSE)
@@ -47,7 +47,7 @@ pmbbefdR <- function(q, a, b, lower.tail = TRUE, log.p = FALSE)
   if(log.p)
     res <- log(res)
   
-  return(res)  
+  res
 }  
   
 	 
@@ -73,7 +73,7 @@ qmbbefdR <- function(p, a, b, lower.tail = TRUE, log.p = FALSE)
   }
   res[p < 0 | p > 1] <- NaN
   
-  return(res)  
+  res
 }  
 
   
@@ -85,7 +85,7 @@ rmbbefdR <- function(n, a, b)
 }
 	
 	
-gmbbefdR <- function(x, a, b)
+ecmbbefdR <- function(x, a, b)
 {
   if(!(a +1 >0 && b > 0 && a*(1-b) >= 0))
     return(rep(NaN, length(x)))
@@ -103,6 +103,7 @@ gmbbefdR <- function(x, a, b)
   res
 }
 	
+#moment
 mmbbefdR <- function(order, a, b)
 {
   if(!(a +1 >0 && b > 0 && a*(1-b) >= 0))
@@ -114,4 +115,11 @@ mmbbefdR <- function(order, a, b)
     stop("not yet implemented.")
 }
 	
-	
+#total loss
+tlmbbefdR <- function(a, b)
+{
+  if(!(a +1 >0 && b > 0 && a*(1-b) >= 0))
+    return(rep(NaN, length(x)))
+  (a+1)*b/(a+b)
+}
+

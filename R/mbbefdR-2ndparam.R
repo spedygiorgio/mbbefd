@@ -98,11 +98,11 @@ rMBBEFDR <- function(n, g, b)
 {
   if(!(g >= 1 && b >= 0))
     return(rep(NaN, n))
-  qMBBEFDR(runif(n, 0, 1), a, b) 
+  qMBBEFDR(runif(n, 0, 1), g, b) 
 }
 
 
-gMBBEFDR <- function(x, g, b)
+ecMBBEFDR <- function(x, g, b)
 {
   if(!(g >= 1 && b >= 0))
     return(rep(NaN, length(x)))
@@ -126,9 +126,20 @@ gMBBEFDR <- function(x, g, b)
   res
 }
 
+#moment
 mMBBEFDR <- function(order, g, b)
 {
   if(!(g >= 1 && b >= 0))
     return(rep(NaN, length(order)))
   0
 }
+
+
+#total loss
+tlMBBEFDR <- function(g, b)
+{
+  if(!(g >= 1 && b >= 0))
+    return(rep(NaN, length(order)))
+  1/g
+}
+

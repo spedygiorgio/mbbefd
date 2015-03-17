@@ -20,7 +20,7 @@ cbind(x, pmbbefd(x, 1/2, 1/2), pmbbefdR(x, 1/2, 1/2))
 cbind(x, pmbbefd(x, -1/3, 3/2), pmbbefdR(x, -1/3, 3/2))
 
 #still the exposure curve is correctly defined
-cbind(x, mbbefdExposure(x, -1/3, 1/2), gmbbefdR(x, -1/3, 1/2))
+cbind(x, mbbefdExposure(x, -1/3, 1/2), ecmbbefdR(x, -1/3, 1/2))
 
 
 #some deficiency at x=1

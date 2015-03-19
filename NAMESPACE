@@ -9,7 +9,15 @@ export(dMBBEFDR, pMBBEFDR, qMBBEFDR, rMBBEFDR, ecMBBEFDR, mMBBEFDR, tlMBBEFDR)
 #shifted truncated Pareto distribution (on the unit interval)
 export(dstpareto, pstpareto, qstpareto, rstpareto, ecstpareto)
 
-export(eecf, etl)
+export(etl)
+
+#eecf class
+export(eecf)
+S3method(summary, eecf)
+S3method(print, eecf)
+S3method(print, summary.eecf)
+S3method(plot, eecf)
+
 
 #export(g2a)
 importFrom(Rcpp,sourceCpp)

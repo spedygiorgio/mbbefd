@@ -1,4 +1,9 @@
 ChangeLog
+
+Version 0.6.2
+20-03-2015
+Christophe Dutang added as contributor.
+Introduced shifted truncated Pareto functions.
 Version 0.6.1
 07-03-2015
 Aligned distribution function parameters' to R usual ones: pmbbefd accepts  (q, a, b, g) and not  (x, a, b, g) anymore.

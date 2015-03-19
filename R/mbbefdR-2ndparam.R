@@ -139,7 +139,7 @@ mMBBEFDR <- function(order, g, b)
 tlMBBEFDR <- function(g, b)
 {
   if(!(g >= 1 && b >= 0))
-    return(rep(NaN, length(order)))
+    return(NaN)
   1/g
 }
 

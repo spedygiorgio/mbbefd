@@ -11,6 +11,9 @@ dmbbefdR <- function(x, a, b, log=FALSE)
   {
     res <- rep(0, length(x))
     res[x == 1] <- 1
+  }else if(is.infinite(a))
+  {
+    res <- -log(b)*b^x
   }else
   {
     res <- -a * (a+1) * b^x * log(b) / (a + b^x)^2 
@@ -32,12 +35,12 @@ pmbbefdR <- function(q, a, b, lower.tail = TRUE, log.p = FALSE)
   if(a == 0 || b == 1) #Dirac
   {
     res <- rep(0, length(q))
-    res[q == 1] <- 1
+  }else if(is.infinite(a))
+  {
+    res <- 1-b^q
   }else
   {
     res <- a * ( (a+1) / (a + b^q) - 1) 
-    res[q >= 1] <- (a+1) * b / (a+b)
-    res[q < 0] <- 0
   }
   res[q >= 1] <- 1
   res[q < 0] <- 0
@@ -65,6 +68,10 @@ qmbbefdR <- function(p, a, b, lower.tail = TRUE, log.p = FALSE)
   {
     res <- rep(0, length(p))
     res[p > 0] <- 1
+  }else if(is.infinite(a))
+  {
+    res <- log(1-p)/log(b)
+    res[p > 1-b] <- 1
   }else
   {
     pab <- (a+1)*b/(a+b)
@@ -93,6 +100,9 @@ ecmbbefdR <- function(x, a, b)
   if(a == 0 || b == 1) #Dirac
   {
     res <- x
+  }else if(is.infinite(a))
+  {
+    res <- (1-b^x)/(1-b)
   }else
   {
     res <- log((a+b^x)/(a+1))/log((a+b)/(a+1))  
@@ -119,7 +129,11 @@ mmbbefdR <- function(order, a, b)
 tlmbbefdR <- function(a, b)
 {
   if(!(a +1 >0 && b > 0 && a*(1-b) >= 0))
-    return(rep(NaN, length(x)))
-  (a+1)*b/(a+b)
+    return(NaN)
+  if(is.infinite(a))
+    res <- b
+  else
+    res <- (a+1)*b/(a+b)
+  res
 }
 

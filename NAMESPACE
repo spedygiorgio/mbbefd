@@ -9,6 +9,9 @@ export(dMBBEFDR, pMBBEFDR, qMBBEFDR, rMBBEFDR, ecMBBEFDR, mMBBEFDR, tlMBBEFDR)
 #shifted truncated Pareto distribution (on the unit interval)
 export(dstpareto, pstpareto, qstpareto, rstpareto, ecstpareto)
 
+#one-inflated shifted truncated Pareto distribution (on the unit interval)
+export(doistpareto, poistpareto, qoistpareto, roistpareto, eoicstpareto)
+
 export(etl)
 
 #eecf class

@@ -68,6 +68,13 @@ plot.eecf <- function(x, ..., ylab="Gn(x)", verticals = FALSE,
   if(missing(ylim))
     ylim <- c(0, 1)
   
+#   print(head(cbind(xx, yy)))
+#   print(dim(cbind(xx, yy)))
+#   print(sum(is.na(xx)))
+#   print(sum(is.infinite(xx)))
+#   print(sum(is.na(yy)))
+#   print(sum(is.infinite(yy)))
+#   
   #TO UPDATE : remove vertical lines
   plot(xx, yy, type = "s", ylab = ylab, main=main, ylim=ylim, ...)
   points(xx, yy, pch = pch)

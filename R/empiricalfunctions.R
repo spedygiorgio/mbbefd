@@ -53,7 +53,7 @@ print.summary.eecf <- function(x, ...)
   invisible(x)
 }
 
-plot.eecf <- function(x, ..., ylab="Gn(x)", verticals = FALSE,
+plot.eecf <- function(x, ..., ylab="Gn(x)", verticals = FALSE, do.points=TRUE,
                       col.01line = "gray70", pch = 19, main=NULL, ylim=NULL)
 {
   n <- environment(x)$"nobs"
@@ -77,7 +77,7 @@ plot.eecf <- function(x, ..., ylab="Gn(x)", verticals = FALSE,
 #   
   #TO UPDATE : remove vertical lines
   plot(xx, yy, type = "s", ylab = ylab, main=main, ylim=ylim, ...)
-  points(xx, yy, pch = pch)
+  if(do.points) points(xx, yy, pch = pch)
   abline(h = 1, col = col.01line, lty = 2)
   abline(a = 0, b = 1, col = col.01line, lty = 2)
   #terminates with invisible()

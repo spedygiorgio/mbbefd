@@ -6,15 +6,23 @@ export(mbbefdExposure,rmbbefd,dmbbefd,pmbbefd,qmbbefd,swissRe,g2a,dG)
 export(dmbbefdR, pmbbefdR, qmbbefdR, rmbbefdR, ecmbbefdR, mmbbefdR, tlmbbefdR)
 export(dMBBEFDR, pMBBEFDR, qMBBEFDR, rMBBEFDR, ecMBBEFDR, mMBBEFDR, tlMBBEFDR)
 
-#shifted truncated Pareto distribution (on the unit interval)
-export(dstpareto, pstpareto, qstpareto, rstpareto, ecstpareto)
+#finite-support distributions 
+importFrom(actuar, munif, levunif) #d,p,q,r in base R
+export(ecunif)
+importFrom(actuar, mbeta, levbeta) #d,p,q,r in base R
+export(ecbeta)
+export(dstpareto, pstpareto, qstpareto, rstpareto, ecstpareto, mstpareto)
 
-#one-inflated shifted truncated Pareto distribution (on the unit interval)
-export(doistpareto, poistpareto, qoistpareto, roistpareto, eoicstpareto)
+#one-inflated distributions (on the unit interval)
+export(doifun, poifun, qoifun, roifun, ecoifun, moifun)
+export(doiunif, poiunif, qoiunif, roiunif, ecoiunif, moiunif)
+export(doibeta, poibeta, qoibeta, roibeta, ecoibeta, moibeta)
+export(doistpareto, poistpareto, qoistpareto, roistpareto, ecoistpareto, moistpareto)
 
+#total loss
 export(etl)
 
-#eecf class
+#eecf class for exposure curve function
 export(eecf)
 S3method(summary, eecf)
 S3method(print, eecf)
@@ -25,3 +33,5 @@ S3method(plot, eecf)
 #export(g2a)
 importFrom(Rcpp,sourceCpp)
 useDynLib(mbbefd)
+
+

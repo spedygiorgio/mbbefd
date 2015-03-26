@@ -40,7 +40,7 @@ shape parameter.
 logical; if \code{TRUE}, probabilities \code{p} are given as log(p).
 }
 \item{lower.tail}{
-logical; if \code{TRUE} (default), probabilities are \en{P[X <= x]}, otherwise, \eqn{P[X> x]}.
+logical; if \code{TRUE} (default), probabilities are \eqn{P[X <= x]}, otherwise, \eqn{P[X> x]}.
 }
   
 

@@ -72,7 +72,7 @@ ecoifun <- function(x, ecfun, mfun, p1, ...)
 moifun <- function(order, mfun, p1, ...)
 {
   if(!(p1 >= 0 && p1 <= 1))
-    return(rep(NaN, length(x)))
+    return(rep(NaN, length(order)))
   
   if(order == 1)
   {

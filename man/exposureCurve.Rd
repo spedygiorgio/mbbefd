@@ -1,6 +1,8 @@
 \name{mbbefdExposure}
 \alias{mbbefdExposure}
 \alias{dG}
+\alias{ecbeta}
+\alias{ecunif}
 
 \title{
 MBBEFD exposure curves and its derivative
@@ -12,6 +14,10 @@ An exposure curve is defined between x between 0 and 1 and represents the ratio 
 \usage{
 mbbefdExposure(x, a, b, g)
 dG(x, a, b, g)
+
+ecbeta(x, shape1, shape2)
+ecunif(x, min = 0, max =1)
+
 }
 \arguments{
 
@@ -27,9 +33,18 @@ b parameter
   \item{g}{
 g parameter, used if a not given.
 }
+\item{shape1, shape2}{
+parameters for the beta distribution.
+}
+\item{min, max}{
+parameters for the uniform distribution.
+}
 }
 \details{
 g parameter is the inverse of total loss probability and it is used if a not given.
+
+\code{ecbeta}, \code{ecunif} is the theoretical exposure curve function for beta and uniform distribution.
+
 }
 \value{
 A numeric value

@@ -69,6 +69,9 @@ number of observations. If \code{length(n) > 1}, the length is take to be the nu
 \item{a, b, g}{
 shape parameters. For \code{.mbbefd} functions, \code{g} is computed from \code{a}.
 }
+\item{order}{
+order of the raw moment.
+}
 \item{log, log.p}{
 logical; if \code{TRUE}, probabilities \code{p} are given as log(p).
 }

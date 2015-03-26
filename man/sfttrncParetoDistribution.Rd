@@ -3,6 +3,7 @@
 \alias{pstpareto}
 \alias{qstpareto}
 \alias{rstpareto}
+\alias{mstpareto}
 \alias{ecstpareto}
 
 \title{
@@ -18,6 +19,7 @@ dstpareto(x, a, log=FALSE)
 pstpareto(q, a, lower.tail = TRUE, log.p = FALSE)
 qstpareto(p, a, lower.tail = TRUE, log.p = FALSE)
 rstpareto(n, a)
+mstpareto(order, a)
 ecstpareto(x, a)
 
 
@@ -32,6 +34,9 @@ vector of probabilities.
 }
 \item{n}{
 number of observations. If \code{length(n) > 1}, the length is take to be the number required.
+}
+\item{order}{
+order of the raw moment.
 }
 \item{a}{
 shape parameter. 
@@ -62,7 +67,10 @@ Dutang Christophe
 \code{\link{mbbefd-distr}}, \code{\link{mbbefdExposure}}
 }
 \examples{
-#TODO
+
+dstpareto(0:4/4, 2)
+
+pstpareto(0:4/4, 1/2)
 
 }
 

@@ -16,7 +16,7 @@ eecf(x)
 }
 
 \arguments{
-\item{x, q}{
+\item{x}{
 numeric vector of the observations for \code{eecf}; for the methods, an object of class \code{"eecf"}.
 }
 

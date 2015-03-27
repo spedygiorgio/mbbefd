@@ -48,7 +48,7 @@ pMBBEFDR <- function(q, g, b, lower.tail = TRUE, log.p = FALSE)
     res <- 1-1/(1+(g-1)*q)
   }else
   {
-    res <- 1- (1-b)/((g-1)*b^q+1-g*b)
+    res <- 1- (1-b)/((g-1)*b^(1-q) + 1-g*b)
   }
   res[q >= 1] <- 1
   res[q < 0] <- 0
@@ -77,16 +77,18 @@ qMBBEFDR <- function(p, g, b, lower.tail = TRUE, log.p = FALSE)
     res[p > 0] <- 1
   }else if(g == 1/b && b < 1) #bg=1
   {
-    res <- log(1-p)/log(b)
-    res[p > 1-b] <- 1
+    res <- rep(1, length(p))
+    res[p < 1-b] <- log(1-p[p < 1-b])/log(b)
   }else if(g > 1 && b == 1) #b=1
   {
-    res <- p/((1-p)*(g-1))
-    res[p > 1-1/g] <- 1
+    res <- rep(1, length(p))
+    p2 <- p[p < 1-1/g]
+    res[p < 1-1/g] <- p2/((1-p2)*(g-1))
   }else
   {
-    res <- 1- log((g*b-1)/(g-1) + (1-b)/((1-p)*(g-1)))/log(b)
-    res[p > 1-1/g] <- 1
+    res <- rep(1, length(p))
+    p2 <- p[p < 1-1/g]
+    res[p < 1-1/g] <- 1- log((g*b-1)/(g-1) + (1-b)/((1-p2)*(g-1)))/log(b)
   }
   res[p < 0 | p > 1] <- NaN
   
@@ -131,7 +133,24 @@ mMBBEFDR <- function(order, g, b)
 {
   if(!(g >= 1 && b >= 0))
     return(rep(NaN, length(order)))
-  0
+  if(order == 1)
+  {
+    if(g == 1 || b == 0) #Dirac
+    {
+      res <- 1
+    }else if(g == 1/b && b < 1) #bg=1
+    {
+      res <- (b-1)/log(b)
+    }else if(g > 1 && b == 1) #b=1
+    {
+      res <- log(g)/(g-1)
+    }else
+    {
+      res <- log(g*b)*(1-b)/(log(b)*(1-g*b) )
+    }
+    return(res)
+  }else
+    stop("not yet implemented.")
 }
 
 

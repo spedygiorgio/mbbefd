@@ -70,13 +70,14 @@ qmbbefdR <- function(p, a, b, lower.tail = TRUE, log.p = FALSE)
     res[p > 0] <- 1
   }else if(is.infinite(a))
   {
-    res <- log(1-p)/log(b)
-    res[p > 1-b] <- 1
+    res <- rep(1, length(p))
+    res[p < 1-b] <- log(1-p[p < 1-b])/log(b)
   }else
   {
     pab <- (a+1)*b/(a+b)
-    res <- log((1-p)*a/(a+p))/log(b)
-    res[p >= 1-pab] <- 1
+    res <- rep(1, length(p))
+    p2 <- p[p < 1-pab]
+    res[p < 1-pab] <- log((1-p2)*a/(a+p2))/log(b)
   }
   res[p < 0 | p > 1] <- NaN
   
@@ -121,7 +122,10 @@ mmbbefdR <- function(order, a, b)
   
   if(order == 1)
     return(log((a+b)/(a+1))/log(b)*(a+1))
-  else
+  else if(order == 2)
+  {
+    2*(a+1)/log(b)*(log(a+b) - gendilog(a,b))
+  }else
     stop("not yet implemented.")
 }
 	

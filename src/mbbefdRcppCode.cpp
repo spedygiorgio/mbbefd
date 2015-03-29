@@ -23,7 +23,7 @@ double g2a(double g, double b) {
   return out;
 }
 
-// [[Rcpp::export]]
+// [[Rcpp::export(.dmbbefdC)]]
 double dmbbefdC(double x, double a, double b) {
   double out;
   if (x<1)
@@ -33,7 +33,22 @@ double dmbbefdC(double x, double a, double b) {
   return out;
 }
 
-// [[Rcpp::export]]
+//' inverse CDF function
+//' 
+//' \code{f4Sampler} returns the x known the probability level x and distribution parameters a and b
+//' 
+//' @param x: the probability
+//' @param a: parameter of the mbbefd density function
+//' @param b: parameter of the mbbefd density function
+//' 
+//' @return a real value
+//' 
+//' @example
+//' 
+//' f4Sampler(x=.2, a=.2, b=.05)
+
+
+// [[Rcpp::export(.f4Sampler)]]
 double f4Sampler(double x, double a, double b) {
   double out;
   if (x >= 1-(a+1)*b/(a+b))

@@ -1,5 +1,7 @@
 ChangeLog
-
+Version 0.6.3
+29-03-2015
+Fixed some calls to Rcpp code.
 Version 0.6.2
 20-03-2015
 Christophe Dutang added as contributor.

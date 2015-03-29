@@ -13,13 +13,13 @@ as well as MBBEFD exposure curve. The vignette shows code snippets to fit the di
 \tabular{ll}{
 Package: \tab mbbefd\cr
 Type: \tab Package\cr
-Version: \tab 0.6.1\cr
-Date: \tab 2015-03-08\cr
+Version: \tab 0.6.3\cr
+Date: \tab 2015-03-29\cr
 License: \tab GPL 2\cr
 }
 }
 \author{
-Giorgio Spedicato
+Giorgio Alfredo Spedicato[cre, aut] and Christophe Dutang [ctb]
 Maintainer:  Giorgio Spedicato <spedicato_giorgio@yahoo.it>
 }
 \references{

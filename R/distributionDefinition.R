@@ -57,8 +57,8 @@ pmbbefd<-function(q,a,b,g)
   return(out)
 }
 
-#random generation function
-.f4Random<-function(x,a,b) ifelse( ( x>= 1-(a+1)*b/(a+b) ),1,log( (a*(1-x)) / (a+x) ) /log(b))  
+#random generation function (now using the Rcpp version)
+#.f4Random<-function(x,a,b) ifelse( ( x>= 1-(a+1)*b/(a+b) ),1,log( (a*(1-x)) / (a+x) ) /log(b))  
 
 
 #inverse distribution funtcion (quantile)
@@ -66,7 +66,8 @@ qmbbefd<-function(p,a,b,g)
 {
   if(missing(a)) a<-g2a(g=g,b=b)
   if(p>1||p<0) stop("Error! p should lie between 0 and 1")
-  out<- .f4Random(x = p,a=a,b=b)
+  #out<- .f4Random(x = p,a=a,b=b) #this s the R native version
+  out<- .f4Sampler(x = p,a=a,b=b) #now using the Rcpp version instead
   #p > 1 - prob total loss would make to exceed 1. So it will return one.
   out<-ifelse(out>1, 1,out)
   return(out)
@@ -79,6 +80,7 @@ dmbbefd<-function(x,a,b,g)
   if(missing(a)) a<-g2a(g=g,b=b)
   if(x>1||x<0) stop("Error! x should lie between 0 and 1")
   out <-  -(((a+1)*a*log(b)*b^x)/((a+b^x)^2))*(x<1)+(x==1)*(a+1)*b/(a+b)
+  #out <- .dmbbefdC(x=x,a=a,b=b) #TODO: check why it does not work
   return(out)
 }
 
@@ -93,7 +95,7 @@ rmbbefd<-function(n,a,b,g)
   if(missing(a)) a<-g2a(g=g,b=b)
   out<-numeric(n)
   u<-runif(n=n,min=0,max=1)
-  out<-sapply(u,f4Sampler,a=a,b=b) #using the Rcpp function
+  out<-sapply(u,.f4Sampler,a=a,b=b) #using the Rcpp function
   return(out)
 }
 

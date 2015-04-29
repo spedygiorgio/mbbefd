@@ -1,9 +1,11 @@
 %\documentclass{jss}
-\documentclass[nojss]{jss}
+\documentclass[article, nojss]{jss}
 \usepackage[OT1]{fontenc}
-%\usepackage[latin1]{inputenc}
+\usepackage[utf8]{inputenc}
 \usepackage{graphicx}
-\usepackage{amsmath}
+%symbole math de l'American Mathematical Society (AMS)
+\usepackage{amsfonts,amssymb,amsmath,amsthm}
+
 
 %\usepackage{cite}
 \usepackage{draftwatermark}
@@ -23,11 +25,12 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% almost as usual
-\author{Giorgio Alfredo Spedicato, Ph.D C.Stat ACAS}
-\title{The \pkg{mbbefd} Package: A Package for handling MBBEFD exposure curves in \proglang{R}}
+\author{Giorgio Alfredo Spedicato\\ Ph.D C.Stat ACAS \And Christophe Dutang\\ University of Le Mans city}
+\title{The \pkg{mbbefd} Package: A Package for handling destruction rates in \proglang{R} including
+MBBEFD distributions}
 
 %% for pretty printing and a nice hypersummary also set:
-\Plainauthor{Giorgio Alfredo Spedicato, Ph.D C.Stat ACAS} %% comma-separated
+\Plainauthor{Giorgio Alfredo Spedicato, Christophe Dutang} %% comma-separated
 \Plaintitle{The mbbefd Package: A Package for handling MBBEFD exposure curves in R} %% without formatting
 \Shorttitle{The mbbefd package} %% a short title (if necessary)
 %% an abstract and keywords
@@ -63,144 +66,396 @@
 
 %% end of declarations %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+\newcommand{\ind}{1\!\!1}
+%sets
+\newcommand{\R}{\mathbb R}
+\newcommand{\N}{\mathbb N}
+\newcommand{\calD}{\mathcal D}
+
+%system
+\newcommand{\systL}{\left\{\begin{array}{ll}}
+\newcommand{\systR}{\end{array}\right.}
+\newcommand{\matL}{\left(\begin{matrix}}
+\newcommand{\matR}{\end{matrix}\right)}
+\newcommand{\detL}{\left|\begin{matrix}}
+\newcommand{\detR}{\end{matrix}\right|}
+
+
+
+\newcommand{\Sconcordance}[1]{%
+  \ifx\pdfoutput\undefined%
+  \csname newcount\endcsname\pdfoutput\fi%
+  \ifcase\pdfoutput\special{#1}%
+  \else%
+   \begingroup%
+     \pdfcompresslevel=0%
+     \immediate\pdfobj stream{#1}%
+     \pdfcatalog{/SweaveConcordance \the\pdflastobj\space 0 R}%
+   \endgroup%
+  \fi}
+  
 \begin{document}
+\SweaveOpts{concordance=TRUE}
 
 
-<<setup,echo=FALSE, results=hide>>=
-	options(prompt = "R> ", continue = "+  ", width = 70, useFancyQuotes = FALSE)
-	set.seed(123)
-@
+
 
 \maketitle
 
 
+<<setup,echo=FALSE, results=hide>>=
+  options(prompt = "R> ", continue = "+  ", width = 70, useFancyQuotes = FALSE)
+	set.seed(123)
+@
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Introduction}
 
-The \pkg{mbbefd} package provides function to use Maxwell-Bolzano, Bose-Einstein, Fermi-Dirac probability distributions, introduced by \citep{bernegger1997tile}, within \proglang{R} statistical software \citep{rSoftware}.\\ Such kind of distributions are widely used in the pricing of non-life reinsurance contracts and yet they are not present in any R package.\\
+The \pkg{mbbefd} package provides function to use Maxwell-Bolzano, Bose-Einstein, Fermi-Dirac probability distributions, introduced by \cite{bernegger97}, within \proglang{R} statistical software \citep{rSoftware}.\\ Such kind of distributions are widely used in the pricing of non-life reinsurance contracts and yet they are not present in any R package.\\
 
 The paper is structured as follows: Section~\ref{sec:review} discusses review the theory (mathematics and actuarial application) of MBBEFD distributions, Section~\ref{sec:package} shows the package's features, applied examples are shown in Section~\ref{sec:examples} while the issue of fitting MBBEFD curves to empirical data is discussed in Section~\ref{sec:fitting}.\\
 
 
 
-\section{A theoretical review}\label{sec:review}
-
-Within actuarial jargon, an exposure curve is a distribution that shows the ratio between the expected limited loss at various limits and the expected unlimited loss. They are usually to rate exposures from large commercial risks and in non-proportional reinsurance treaties for non - life business. In mathematical notation, if $IV$ is the insured value and $d$ the ratio of loss $x$ to $IV$ the exposure curve $G\left( d \right)$ is defined as Equation~\ref{eq:expoCurve} displays.
-
-\begin{equation}
-G\left( d \right) = \frac{{E\left[ {\min \left( {d*IV,x} \right)} \right]}}{{E\left[ x \right]}} = \frac{{\int_0^{d*IV} {\left( {1 - F\left( x \right)} \right)dx} }}{{\int_0^\infty  {x*f\left( x \right)dx} }} = \frac{{\int_0^{d*IV} {S\left( x \right)dx} }}{{\int_0^\infty  {S\left( x \right)dx} }}
-\label{eq:expoCurve}
-\end{equation}
-
-It can be shown that $G \left( 0 \right)=0$, $G\left( 1 \right)=1$, $dG \left( d \right) \ge 0$ and $ddG \left( d \right) \le 0$. Whilst losses normally lie in the interval $0,\ldots, \infty$, it will be assumes $x$ to represent a normalized loss in the interval $0,\ldots, PML$, being $PML$ the so - called maximum probable loss (in other words, the maximum loss it is thought to can happen) all along the paper. Therefore $x$ would represent a percentage loss with respect to a maximum, i.e., a destruction rate.\\
-
-\cite{bernegger1997tile} and \cite{mahler} provide a discussion on the actuarial theory regarding such curve. In particular, the curves discussed by \cite{bernegger1997tile} are of the form expressed by Equation~\ref{eq:expoCurve2}.
-
-\begin{equation}
-\left\{ \begin{array}{l}
-G\left( x \right) = \frac{{\ln \left( {a + {b^x}} \right) - \ln \left( {a + 1} \right)}}{{\ln \left( {a + b} \right) - \ln \left( {a + 1} \right)}}\\
-x \in \left[ {0,1} \right]\\
-b > 0 \\
-\end{array} \right.
-\label{eq:expoCurve2}
-\end{equation}
-
-Using some calculus on Equation~\ref{eq:expoCurve2} it can be shown that the expected value is equal to the reciprocal of exposure curve derivative at 0, Equation~\ref{eq:expectedValue}.\\
-
-\begin{equation}
-  \mu = \frac{1}{dG \left( 0 \right) }
-  \label{eq:expectedValue}
-\end{equation}
-
-The probability of a total loss, $p$, is expressed by Equation~\ref{eq:totalLoss}.
-
-\begin{equation}
-p = 1 - F\left( 1^{-}  \right) = \frac{1}{g} = \frac{dG\left( 1 \right)}{dG\left( 0 \right)} = \frac{\left( a + 1 \right)*b}{a + b}
-\label{eq:totalLoss}
-\end{equation}
-
-It is similarly possible to write expression for the Survival Function, $S \left( x \right)$. Equation~\ref{eq:survival} expresses the Survival Function for a generic exposure curve and Equation~\ref{eq:survival2} expresses the same for a MBBEFD distribution family. and the density, Equation~\ref{eq:density}.
-
-\begin{equation}
-S\left( x \right) = \frac{{G'\left( x \right)}}{{G'\left( 0 \right)}}
-\label{eq:survival}
-\end{equation}
-
-\begin{equation}
-S\left( x \right) =  \frac{{\left( {a + 1} \right){b^x}}}{{a + {b^x}}}
-\label{eq:survival2}
-\end{equation}
-
-\begin{equation}
-f\left (  \right )=-S\left ( x \right )=-\frac{\left ( a+1 \right )*a*ln\left ( b^x \right )}{\left ( a+b^x \right )^2}
-\label{eq:density}
-\end{equation}
-
-The MBBEFD can be expressed using an alternative parametrization based on parameter $g=\frac{1}{p}$, the reciprocal of the total loss $p = S( 1 ) = \frac{ ( a+1 ) * b}{a + b}$. This equation allows to rewrite MBBEFD formulas using the $b$ and $g$ parameters, taking into account Equation~\ref{eq:bAndG}. Cleary, $g \ge 1$.
-
-\begin{equation}
-a=\frac{\left(g-1 \right )*b}{1-g*b}
-\label{eq:bAndG}
-\end{equation}
-
-Equation~\ref{eq:meanGandB} shows the mean as a function of $b$ and $g$.
-
-\begin{equation}
-E\left [ X \right ]=\frac{ln\left(g*b \right )}{ln\left(b \right )}*\frac{1-b}{1-g*b}
-\label{eq:meanGandB}
-\end{equation}
-
-The limits shown in Equation~\ref{eq:limits} follows using some calculus on Equation~\ref{eq:meanGandB}.
-
-\begin{equation}
-\left\{\begin{matrix}
-\frac{\partial \mu}{\partial g} \le 0\\
-\frac{\partial \mu}{\partial b} \le 0\\
-b\rightarrow 0, \mu \rightarrow 1\\ 
-b\rightarrow \infty, \mu \rightarrow p\\ 
-g\rightarrow 1, \mu \rightarrow 1\\ 
-g\rightarrow 0, \mu \rightarrow 0\\ 
-\end{matrix}\right.
-\label{eq:limits}
-\end{equation}
+%______________________________________________________
+\section{Exposure curves}
+We first present the exposure curve of a random variable.
+The exposure curve naturally arises in the insurance context when considering $d$ as the normalized 
+deductible and $X$ the normalized loss. 
+That is respectively the ratio of the deductible value on the maximum possible loss
+and the loss value on the maximum possible loss.
+This quantity is even more appealing in the reinsurance context where the deductible is
+the priority and the maximum possible loss is the sum of the priority and
+the limit of the reinsurance treaty, see \cite{bernegger97} and \cite{mahler}.
 
 
-Two special cases are defines:
-\begin{enumerate}
+%---
+\subsection{Definition}
+Let $X$ be a random variable valued in the unit interval $I=[0,1]$ with distribution function $F_X$.
+The exposure curve function of $X$ is defined as the ratio of the limited expected value and the expectation
+$$
+G_X(d) = \frac{E(\min(X,d))}{E(X)}, 
+$$
+for $d\in [0,1]$.
+Since $X$ is a positive random variable, we have
+$$
+G_X(d) = \frac{\int_0^d (1-F_X(x))dx }{\int_0^1 (1-F_X(x))dx }.
+$$
+Note that the exposure curve is a concave function for $d\in]0,1[$. 
 
-\item $b*g=1$, $g>1$. The distribution is an Exponential, censored from above at 1. Its exposure curve is $G=\frac{1-b^x}{1-b^x}$.
-\item $b=1$,$g>1$. The distribution is a censored Pareto from above at 1. Its exposure curve is $G=\frac{ln( 1+( g-1 )*x)}{ln\left( g \right)}$.
+There is a direct link between the distribution function and the exposure curve.
+Since 
+$$
+F_X(x) = \left(1- \frac{G_X'(x)}{G_X'(0)}\right)\ind_{[0,1[}(x) + \ind_{[1,+\infty[}(x),
+$$
+defining the exposure curve or the distribution function is equivalent.
+The exposure curve is also a concave increasing function, see e.g.~\cite{antal03}.
 
-\end{enumerate}
+%---
+\subsection{Examples}
 
-\section{The MBBEFD class and its related package}\label{sec:package}
+\subsubsection{Uniform distribution}
+\label{sec:unif}
 
-<<load, keep.source=TRUE>>=
+The most trivial example of exposure curve is obtained for the uniform distribution on $I$.
+We consider $F_X(x)=x$ leading to
+$$
+G_X(d) 
+= d(2-d).
+$$
+
+%---
+\subsubsection{Example: beta distribution}
+\label{sec:beta}
+
+A more interesting example is obtained for the Beta distribution on $I$ 
+(e.g.~\cite{kotzjohnsonbalak94v2})
+for which the density is $f_X(x) = x^{a-1}(1-x)^{b-1}/\beta(a,b)$ for $x\in ]0,1[$ and $a,b>0$
+where $\beta(.,.)$ denotes the 
+beta function, see e.g.~\cite{nist10}.
+The distribution function is obtained in terms of the incomplete beta ratio function 
+$F_X(x) = \beta(x;a,b)/\beta(a,b) = I(x;a,b)$.
+We get
+$$
+G_X(d) %= \frac{1 - I(d;a,b) \frac{b}{a+b} - \frac{d^a(1-d)^b}{(a+b)\beta(a,b)} }{a/(a+b)}
+= \frac{a+b}{a} - I(d;a,b) \frac{b}{a} - \frac{d^a(1-d)^b}{a\beta(a,b)},
+$$
+where $\beta(.;.,.)$ denotes the incomplete beta function.
+
+
+
+%---
+\subsection{Empirical exposure curve}
+We recall that the empirical cumulative distribution of a sample $X_1,\dots, X_n$ is 
+the following step function
+$$
+F_n(t) = \frac{1}{n} \sum_{i=1}^n \ind_{X_i\leq t}.
+$$
+Similarly, we define the empirical exposure curve function as
+$$
+G_n(t) = \frac{\frac{1}{n} \sum_{i=1}^n \min(X_i, t)}{\frac{1}{n} \sum_{i=1}^n X_i}.
+$$
+
+%---
+\subsection{Use case}
+The uniform and the beta distributions are already implemented in \proglang{R} 
+with \code{d,p,q,runif} and  \code{d,p,q,rbeta} functions.
+We add a new function computing the exposure curve as well as for the non-parametric version $G_n$.
+
+<<load:ec, keep.source=TRUE>>=
 library(mbbefd)
+ecunif(0:4/4)
+ecbeta(0:4/4, 3, 2)
+eecf(rbeta(100, 3, 2))
 @
 
 
-The \code{mbbefdExposure} function evaluates the exposure curve for a given destruction rate $x$, given either $a$ and $b$, or $b$ and $g$. Figure~\ref{fig:G1} displays the destruction rate by level of x, for an exposure cuve of parameters $a=0.2$ and $b=0.04$
 
-<<figureBackoffice, echo=FALSE, results=hide>>=
-x<-seq(0,1,by=0.01)
-y<-sapply(x,mbbefdExposure,a=0.2,b=0.04)
+%______________________________________________________
+\section{One-inflated distributions}\label{sec:oidistr:generic}
+
+%---
+\subsection{Characterizations}\label{sec:oidistr:generic:charac}
+Let us consider a continuous distribution function $F_0$ of a random variable $X_0$. 
+The corresponding distribution function of the one-inflated random variable $X_1$ is 
+$$
+F_1(x) = (1-p_1) F_0(x) + p_1 \ind_{[1,+\infty[}(x).
+$$
+There is no density but an improper density $(1-p)F_0'(x)$ and a probability mass $p_1$ at $x=1$.
+
+
+%---
+\subsection{The one-inflated beta distribution}
+We consider the one-inflated beta distribution.
+Using Section \ref{sec:beta}, we obtain the following distribution function
+$$
+F_X(x) = 
+\systL
+0 & \text{if } x<0 \\
+I(x;a,b)(1-p_1) & \text{if } 0\leq x <1 \\
+1 & \text{if } x\geq 1
+\systR
+$$
+where $I(x;a,b)$ denotes the incomplete beta ratio function.
+This leads to a non-null probability at $x=1$, $P(X=1)=p_1$.
+The improper density function is 
+$$
+\tilde f_X(x) = (1-p_1) \frac{x^{a-1}(1-x)^{b-1}}{\beta(a,b)}.
+$$
+The expectation is
+$$
+E(X) 
+= p_1 + (1-p_1)\frac{a}{a+b}.
+$$
+The exposure curve is 
+$$
+G_X(d) =  
+\frac{(1-p_1) \left(1 - I(d;a,b) \frac{b}{a+b} - \frac{d^a(1-d)^b}{(a+b)\beta(a,b)}\right) + p_1d
+}{p_1 + (1-p_1)\frac{a}{a+b}}.
+$$
+
+
+%---
+\subsection{Use case}
+Classical one-inflated distributions are implemented in the package:
+<<oinfl, keep.source=TRUE>>=
+doibeta(0:4/4, 3, 2, 1/2)
+poibeta(0:4/4, 3, 2, 1/2)
 @
 
 
-\begin{figure}
-\begin{center}
-<<label=drateplot,fig=TRUE,echo=FALSE>>=
-plot(x, y, type="l",lwd=2,col="steelblue",xlab="normalized loss",
-     ylab="exposure curve",main="MBBEFD Exposure Curve for a=0.2, b=0.04")
-@
-\caption{Exposure curve example}
-\label{fig:G1}
-\end{center}
-\end{figure}
+
+%______________________________________________________
+\section{The MBBEFD distribution, first parametrization}
+
+We denote this first parametrization by $MBBEFD(a,b)$.
+We define the parameter domain $\calD_{a,b}$ as 
+\begin{equation}
+\calD_{a,b} = \{(a,b)\in\R^2, a+1>0, a(1-b)>0, b>0\}
+\cup \{(a,b), a=+\infty, b<1\}.
+\label{eq:paramdomain:mbbefd:ab}
+\end{equation}
+Let us note that this domain includes two particular sets $\calD_{a,1}=\{(a,1), a+1>0\}$ and $\calD_{0,b}=\{(0,b), b>0\}$.
+
+%---
+\subsection{Characterization by the exposure curve}
+The MBBEFD distribution is defined by the following exposure curve for $(a,b)\in\calD_{a,b}$
+\begin{equation}
+\forall x\in I,~
+G_X(x) = 
+\systL
+\frac{\ln(\frac{a+b^x}{a+1})}{\ln(\frac{a+b}{a+1})} & \text{if } a(1-b) >0 \\
+\frac{1-b^x}{1-b} & \text{if } a=+\infty \text{ and } b<1 \\
+x & \text{if } a=0 \text{ or } b=1. \\
+\systR
+\label{expcurve:mbbefd:ab}
+\end{equation}
+The two special cases of $a(1-b)=0$ 
+correspond to $\calD_{a,1}$ and $\calD_{0,b}$.
+Note that the denominator is a normalizing constant to ensure the term belongs to $[0,1]$.
 
 
 
-\section{Applied examples}\label{sec:examples}
+%---
+\subsection{Distribution, density and quantile functions}
+Differentiating $G_X$, we obtain the following distribution function
+ for $(a,b)\in\calD_{a,b}$
+\begin{equation}
+\forall x\in I,~
+F_X(x) = 
+\systL
+\left(1-\frac{(a+1)b^x}{a+b^x}\right)\ind_{[0,1[}(x) + \ind_{[1,+\infty[}(x) & \text{if } a(1-b) >0 \\
+(1-b^x)\ind_{[0,1[}(x) + \ind_{[1,+\infty[}(x) & \text{if } a=+\infty \text{ and } b<1 \\
+\ind_{[1,+\infty[}(x) & \text{if } a=0 \text{ or } b=1. \\
+\systR
+\label{cdf:mbbefd:ab}
+\end{equation}
+Note that the MBBEFD distribution is a mixed-type distribution with mass probability at $x=1$
+\begin{equation}
+P(X=1)  = \frac{(a+1)b}{a+b} = p_{a,b},
+\label{mass0:mbbefd:ab}
+\end{equation}
+which equals to 1 when $a(1-b)=0$. In other words, for $\calD_{a,1}$ and $\calD_{0,b}$, $X$ has a Dirac distribution at $x=1$.
+When $a=+\infty$, the total loss probability is $P(X=1)=b$.
+
+For $a(1-b)>0$, the improper density function is 
+\begin{equation}
+\tilde f_X(x) 
+\systL
+-\frac{a(a+1)b^x\ln(b)}{(a+b^x)^2}\ind_{[0,1[}(x) & \text{if } a(1-b) >0 \\
+-\ln(b)b^x\ind_{[0,1[}(x)  & \text{if } a=+\infty \text{ and } b<1 \\
+0 & \text{if } a=0 \text{ or } b=1. \\
+\systR
+\label{impd:mbbefd:ab}
+\end{equation}
+The quantile function is 
+\begin{equation}
+\forall p\in [0,1],~
+q_X(p) = 
+\systL
+\frac{\ln\left(\frac{(1-p)a}{a+p}\right)}{\ln(b)} \ind_{[0,1-p_{a,b}[}(p) + \ind_{[1-p_{a,b},1]}(p)  & \text{if } a(1-b) >0 \\
+\frac{\ln(1-p)}{\ln(b)}\ind_{[0,1-b[}(p) + \ind_{[1-b,1]}(p)   & \text{if } a=+\infty \text{ and } b<1 \\
+\ind_{]0,1]}(p) & \text{if } a=0 \text{ or } b=1. \\
+\systR
+\label{q:mbbefd:ab}
+\end{equation}
+
+
+%---
+\subsection{Moments}
+Using the definition of the exposure curve, we have
+$E(X) = 1/G_X'(0).$
+The expectation for $MBBEFD(a,b)$ is
+$$
+E(X)=\frac{\ln(\frac{a+b}{a+1})}{\ln(b)} (a+1).
+$$
+When $a=0$ or $b=1$, the expectation is simply $E(X)=1$.
+
+
+
+%______________________________________________________
+\section{The MBBEFD distribution, second parametrization}
+
+%---
+\subsection{Parameter domain}
+
+For fitting purposes and for verifying parameter constraints, 
+\cite{bernegger97} proposed a second parametrization $MBBEFD(g,b)$.
+Using the following parameter $g=1/p_{a,b}$, it is possible to reformulate the $MBBEFD(a,b)$.
+That is
+$$
+g= \frac{a+b}{(a+1)b}
+\Leftrightarrow
+a=\frac{(g-1)b}{1-gb}.
+$$
+So $g\geq 1$ guarantees that $\frac{a+b}{(a+1)b}\in [0,1]$, in addition to $b>0$.
+The special case $g=1$ leading to a Dirac distribution at $x=1$ corresponds to $a(1-b)=0$ in the previous parametrization.
+The parameter domain is
+$$
+\widetilde{\calD}_{g,b}= \left\{
+(g,b)\in\R^2, b>0, g\geq 1
+\right\}.
+$$
+
+
+%---
+\subsection{Characterization by the exposure curve}
+
+The exposure curve is defined for $x\in[0,1]$ as
+\begin{equation}
+G_X(x)=
+\systL
+\frac{\ln(\frac{(g-1)b}{1-b}+\frac{1-gb}{1-b}b^x)}{\ln(gb)} & \text{ if } g>1, b\neq 1, b\neq 1/g \\
+\frac{\ln(1+(g-1)x)}{\ln( g)} & \text{ if } g>1, b= 1 \\
+\frac{1-b^x}{1-b} & \text{ if } g>1, bg= 1 \\
+x & \text{ if } g=1 \text{ or } b= 0
+\systR
+\label{expcurve:mbbefd:gb}
+\end{equation}
+Note that the case $g>1, bg=1$ implies $g=1/b, b<1$.
+
+
+%---
+\subsection{Distribution, density and quantile functions}
+
+The resulting distribution function is
+\begin{equation}
+F_X(x)=
+\systL
+\left(1- \frac{1-b}{(g-1)b^{1-x}+1-gb}\right)\ind_{[0,1[}(x) + \ind_{[1,+\infty[}(x) & \text{ if } g>1, b\neq 1, b\neq 1/g \\
+\left(1- \frac{1}{1+(g-1)x}\right)\ind_{[0,1[}(x) + \ind_{[1,+\infty[}(x) & \text{ if } g>1, b= 1 \\
+(1-b^x)\ind_{[0,1[}(x) + \ind_{[1,+\infty[}(x) & \text{ if } g>1, bg= 1 \\
+\ind_{[1,+\infty[}(x) & \text{ if } g=1 \text{ or } b= 0
+\systR
+\label{cdf:mbbefd:gb}
+\end{equation}
+As in the previous parametrization, there is a non-null probability at $x=1$, 
+\begin{equation}
+P(X=1)  = 1/g.
+\label{mass0:mbbefd:gb}
+\end{equation}
+The improper density function is for $x\in ]0,1[$
+\begin{equation}
+\tilde f_X(x) = 
+\systL
+- \frac{(1-b)\ln(b)b^{1-x}}{((g-1)b^{1-x}+1-gb)^2}  & \text{ if } g>1, b\neq 1, b\neq 1/g \\
+\frac{g-1}{(1+(g-1)x)^2} & \text{ if } g>1, b= 1 \\
+-\ln(b) b^x  & \text{ if } g>1, bg= 1 \\
+0 & \text{ if } g=1 \text{ or } b= 0
+\systR
+\label{impd:mbbefd:gb}
+\end{equation}
+The quantile function is 
+\begin{equation}
+\forall p\in [0,1],~
+q_X(p) = 
+\systL
+\left(1-\frac{\ln\left(\frac{gb-1}{g-1} +\frac{1-b}{(1-p)(g-1)}\right)}{\ln(b)}  \right)
+\ind_{[0,1-1/g[}(p) + \ind_{[1-1/g,1]}(p) & \text{ if } g>1, b\neq 1, b\neq 1/g \\
+\frac{p}{(1-p)(g-1)}\ind_{[0,1-1/g[}(p) + \ind_{[1-1/g,1]}(p)  & \text{ if } g>1, b= 1 \\
+\frac{\ln(1-p)}{\ln(b)}\ind_{[0,1-1/g[}(p) + \ind_{[1-1/g,1]}(p) & \text{ if }  g>1, bg= 1 \\
+\ind_{]0,1]}(p) & \text{ if } g=1 \text{ or } b= 0
+\systR
+\label{q:mbbefd:gb}
+\end{equation}
+
+
+%---
+\subsection{Moments}
+Let us compute the first two moments.
+$$
+E(X) = 1/G_X'(0) = 
+\systL
+\frac{\ln(gb)(1-b)}{\ln(b)(1-gb)} & \text{ if } g>1, b\neq 1, b\neq 1/g \\
+\frac{\ln(g)}{g-1}  & \text{ if } g>1, b= 1 \\
+\frac{b-1}{\ln(b)} & \text{ if }  g>1, bg= 1 \\
+1 & \text{ if } g=1 \text{ or } b= 0
+\systR
+$$
+
+
+%______________________________________________________
+\section{Examples of MBBEFD curves}\label{sec:examples}
 The curve can be use to price property coverage and associate reinsurance treaties. Suppose a property expected loss to be 40K, MPL to be 2MLN. An XL coverage is available with a retention of 1Mln. The exposure curve that characterize the property is the usual one. Therefore the percentage of loss net and ceded is determined as it follows
 
 <<example1, keep.source=TRUE>>=
@@ -290,7 +545,7 @@ integrate(dmbbefd,lower=0, upper=1, a=0.2, b=0.04)
 \section{Fitting MBBEFD curves}\label{sec:fitting}
 
 
-\cite{Bernegger} suggests an iterative process, based on the method of moments, in order to estimate the parameter of the 
+\cite{bernegger97} suggests an iterative process, based on the method of moments, in order to estimate the parameter of the 
 distribution function, starting from known values of $p=\frac{1}{g}$ The algoritm outilined is:
 
 \begin{enumerate}

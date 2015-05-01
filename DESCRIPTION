@@ -1,9 +1,9 @@
 Package: mbbefd
 Type: Package
 Title: Maxwell Boltzmann Bose Einstein Fermi Dirac Distribution and Destruction Rate Modelling
-Version: 0.6.3
-Date: 2015-03-29
-Author: Giorgio Spedicato [aut, cre] and Christophe Dutang [ctb]
+Version: 0.6.4
+Date: 2015-04-30
+Author: Giorgio Spedicato [aut, cre] and Christophe Dutang [aut]
 Maintainer: Giorgio Spedicato <spedicato_giorgio@yahoo.it>
 Description: R package providing new distributions (MBBEFD, shifted truncated Pareto,..) as well as functions to handle destruction rate models (exposure curve, benchmark exposures, fitting procedures,..).
 License: GPL-2

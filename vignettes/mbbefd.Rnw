@@ -113,12 +113,12 @@ MBBEFD distributions}
 
 The \pkg{mbbefd} package provides function to use Maxwell-Bolzano, Bose-Einstein, Fermi-Dirac probability distributions, introduced by \cite{bernegger97}, within \proglang{R} statistical software \citep{rSoftware}.\\ Such kind of distributions are widely used in the pricing of non-life reinsurance contracts and yet they are not present in any R package.\\
 
-The paper is structured as follows: Section~\ref{sec:review} discusses review the theory (mathematics and actuarial application) of MBBEFD distributions, Section~\ref{sec:package} shows the package's features, applied examples are shown in Section~\ref{sec:examples} while the issue of fitting MBBEFD curves to empirical data is discussed in Section~\ref{sec:fitting}.\\
+The paper is structured as follows: Section~\ref{sec:generalities} discusses review the theory (mathematics and actuarial application) of MBBEFD distributions, Section~\ref{sec:oidistr:generic} discusses one - inflated distributions, Section~\ref{sec:mbbefd2p} shows the MBBEFD second parametrization, Section~\ref{sec:package} introduces the package's features. Applied examples are shown in Section~\ref{sec:examples} while the issue of fitting MBBEFD curves to empirical data is discussed in Section~\ref{sec:fitting}.\\
 
 
 
 %______________________________________________________
-\section{Exposure curves}
+\section{Exposure curves}\label{sec:generalities}
 We first present the exposure curve of a random variable.
 The exposure curve naturally arises in the insurance context when considering $d$ as the normalized 
 deductible and $X$ the normalized loss. 
@@ -354,7 +354,7 @@ When $a=0$ or $b=1$, the expectation is simply $E(X)=1$.
 
 
 %______________________________________________________
-\section{The MBBEFD distribution, second parametrization}
+\section{The MBBEFD distribution, second parametrization}\label{sec:mbbefd2p}
 
 %---
 \subsection{Parameter domain}

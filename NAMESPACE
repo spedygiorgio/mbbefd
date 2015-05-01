@@ -10,6 +10,7 @@ export(dMBBEFDR, pMBBEFDR, qMBBEFDR, rMBBEFDR, ecMBBEFDR, mMBBEFDR, tlMBBEFDR)
 importFrom(actuar, munif, levunif) #d,p,q,r in base R
 export(ecunif)
 importFrom(actuar, mbeta, levbeta) #d,p,q,r in base R
+importFrom(gsl, dilog) #dilogarith function used somewere
 export(ecbeta)
 export(dstpareto, pstpareto, qstpareto, rstpareto, ecstpareto, mstpareto)
 

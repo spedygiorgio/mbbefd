@@ -11,6 +11,7 @@ bibliography: mbbefd.bib
 ---
 
 ```{r setup, echo=FALSE, message=FALSE, warning=FALSE}
+library("mbbefd")
 library("knitcitations")
 cleanbib()
 options("citation_format" = "pandoc")
@@ -305,21 +306,6 @@ $$
 The Swiss Re and Lloyd's curves can be approximate as a function of only 
 one parameter $c$, as shown by Bernegger.
 
-```{r mbbefd}
-mbbefdCurve <- function(x, C){
-  g <- exp((0.78 + 0.12*C)*C)
-  b <- exp(3.1 - 0.15*(1+C)*C) 
-  if(identical(g, 1) | identical(b, 0))
-    x
-  if(identical(b, 1) & g > 1)
-    log(1+(g-1)*x)/log(g)
-  if(identical(b*g, 1) & g>1)
-    (1-b^x)/(1-b)
-  else
-    log(((g-1)*b + (1-g*b)*b^x)/(1-b))/log(g*b)
-}
-```
-
 ```{r mbbefdPlot, fig.height=2.5, fig.width=5.5, echo=FALSE}
 n <- 100
 Deductible <-seq(0, 1, length=n)
@@ -327,11 +313,11 @@ dat <- data.frame(
   Deductible=rep(Deductible, 5),
   Curve=gl(5, n, ordered = TRUE,
            labels=c("Y1", "Y2", "Y3", "Y4", "Lloyd's")),
-  G = c(mbbefdCurve(Deductible, 1.5),
-        mbbefdCurve(Deductible, 2.0),
-        mbbefdCurve(Deductible, 3.0),
-        mbbefdCurve(Deductible, 4.0),
-        mbbefdCurve(Deductible, 5.0))  
+  G = c(mbbefdExposure(Deductible, b=swissRe(1.5)['b'], g=swissRe(1.5)['g']),
+        mbbefdExposure(Deductible, b=swissRe(2.0)['b'], g=swissRe(2.0)['g']),
+        mbbefdExposure(Deductible, b=swissRe(3.0)['b'], g=swissRe(3.0)['g']),
+        mbbefdExposure(Deductible, b=swissRe(4.0)['b'], g=swissRe(4.0)['g']),
+        mbbefdExposure(Deductible, b=swissRe(5.0)['b'], g=swissRe(5.0)['g']))  
 )
 xyplot(G ~ Deductible | Curve, data=dat, 
        as.table=TRUE, t="l", 
@@ -418,7 +404,7 @@ D <- 1.5e3*457/550
 L <- 5e3*457/550
 MPLoss <- 3.5e6
 retainedDed <- D/MPLoss*1000
-retainedLoss <- mbbefdCurve(retainedDed, 4)
+retainedLoss <- mbbefdExposure(retainedDed, b=swissRe(4)['b'], g=swissRe(4)['g'])
 prem <- 1194 * (1 - retainedLoss)
 ```
  
@@ -447,13 +433,13 @@ Therefore the reinsurance premium for this band is 1,194k $\cdot$ `r round((1-re
 Here I select the band with a maximum MPL of CHF 90m and a mean gross
 MPL of  CHF 81m. Because of the limit of CHF `r round(L, 1)` only that amount matters. From the exposure curve we can read
 of again the average proportion of loss paid by the cedant
-`r round(mbbefdCurve(D/L, 4),1)`%. 
+`r round(mbbefdExposure(D/L, b=swissRe(4)['b'], g=swissRe(4)['g']),1)`%. 
 
 To calculate the premium we first have to derive the proportion of
 premium that is attached to the risk below the limit: 4,155k/8,100k $\cdot$ 1,918k=`r round(4155/81000*1918,1)`k.
 
 Multiplying the premium with the reinsurer's share of the loss gives
-us a premium of CHF `r round(4155/81000*1918*(1-mbbefdCurve(D/L, 4)),1)`k.
+us a premium of CHF `r round(4155/81000*1918*(1-mbbefdExposure(D/L, b=swissRe(4)['b'], g=swissRe(4)['g'])),1)`k.
 
 ### Rate on Line
 For the overall portfolio we can calculate the rate on line, the loss cost
@@ -465,7 +451,11 @@ XL_ROL <- function(Deductible, Limit, MaxMPL,
   DedPerMPL <- Deductible / ifelse(MaxMPL < Deductible, Deductible, 
                                    ifelse(MaxMPL<Limit, MaxMPL, Limit))
   LossShare <- 1 - apply(cbind(DedPerMPL, C), 1, 
-                         function(x) mbbefdCurve(x[1], x[2]))
+                         function(x){ 
+                           mbbefdExposure(x[1], 
+                                          b=swissRe(x[2])['b'], 
+                                          g=swissRe(x[2])['g'])
+                           })
   NetPremium <- GrossPremium * ifelse(MaxMPL < Limit, 1, 
                                       Limit/MaxMPL)
   XL_Premium <- NetPremium * LossShare

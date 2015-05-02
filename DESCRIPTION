@@ -9,7 +9,7 @@ Description: R package providing new distributions (MBBEFD, shifted truncated Pa
 License: GPL-2
 Depends: R (>= 2.14), actuar, gsl
 ByteCompile: yes
-Suggests: testthat, copula, fitdistrplus
+Suggests: testthat, copula, fitdistrplus, pander, knitcitations, rmarkdown
 LinkingTo: Rcpp
 Imports: Rcpp
 URL: http://github.com/spedygiorgio/mbbefd

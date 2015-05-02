@@ -30,12 +30,16 @@ sigma <- sqrt(log(1 + CV^2))
 mu <- log(Mean) - sigma^2 / 2
 ```
 
+Exposure rating is a tool for insurance pricing that allocates premium to bands
+of damage ratios or severity of losses. First ideas were published in `r citep(bib['salzmann1963'])`. Exposure rating is often used to price excess
+of loss reinsurance. 
+
 # Loss Distribution
 First lets assume we have perfect information, i.e. we know the loss distribution for a certain risk.
 
 To keep it simple I assume the loss distribution is log-normal with
 a mean ($M$) of 65 and a coefficient of variation ($CV$) of 30%. 
-The corresponding log-normal parameters $\mu$ $\sigma$ can be derived via:
+The corresponding log-normal parameters $\mu$ and $\sigma$ can be derived via:
 
 $$
 \begin{aligned}
@@ -69,20 +73,21 @@ xyplot(Value ~ Loss | Type, data=dat, ylab="",
 ```
 
 
-In the insurance context the label *exceedance probability function* is often used for the survival function, as it describes the 
+In the insurance context the survival function is  often called *exceedance 
+probability function*, as it describes the 
 probability of exceeding a certain loss.
 
 # Expected Loss
 
-Let's define $X$ as the random variable that describes the loss.
-The expected loss (in plain English the probability weighted sum of the losses) is then:
+Let's define $X$ as the random variable that describes the ground up loss.
+The expected loss (in plain English the probability weighted sum of the losses) 
+is then:
 
 $$
 E[X] = \int_{-\infty}^\infty x\, f(x) dx
 $$
 
-Assuming losses are not negative ($P(X<0)=0$) 
-this simplifies to:
+Assuming losses are not negative ($P(X<0)=0$) this simplifies to:
 
 $$ 
 E[X] = \int_{0}^\infty x\, f(x) dx
@@ -203,7 +208,7 @@ to a limit of 80 is called an increased limit factor (ILF):
 Therefore we would expect the LEV to increase by `r round((ILF-1)*100,1)`% as
 the limit increases from 80 to 100.
 
-ILFs are often used for pricing casualty business.
+Note ILFs are often used for pricing casualty business.
 
 # Exposure curves
 
@@ -212,45 +217,47 @@ layer. However, often we will not have that level of information about
 the risk. 
 
 Instead, we will have to infer information from others risks that
-share similar loss characteristics as a function of the overall exposure. 
+share similar loss characteristics as a function of the overall exposure, 
+assuming that the relative loss size distribution is independent of individual characteristic of the risk.  
 
-But we will require a view on the expected full value loss cost for the overall
+Hence, we will require a view on the expected full value loss cost for the overall
 exposure. 
-
-Further we assume that the damage ratio is independent of the size 
-of the risk.
 
 ## Normalising loss experience using TIV and MPL
 
 To make risks more comparable we look at ratio of losses to the 
 underlying exposure, where the exposure is given as the 
 sum insured (SI), or better the total insured value (TIV), 
-or perhaps as the maximum probable loss (MPL). Other definitions are
-also popular, such as possible maximum loss (PML), estimate maximum loss (EML),
-or maximum foreseeable loss (MFL).
+or perhaps as the maximum probable loss (MPL). 
 
-Defining the 'right' exposure metric can be tricky.
+Other definitions and measures are also popular, such as possible maximum 
+loss (PML), estimate maximum loss (EML), or maximum foreseeable loss (MFL).
 
-While the TIV is straightforward to understand, the MPL is a little more
-challenging. Suppose we insure a big production plant, consisting of 
-several buildings, against fire. It is unlikely that a fire will destroy 
-the whole facility, instead it is believed that the distance between the 
-building will ensure that fires can be contained in a local area. Hence 
-the MPL might be only the highest value of any of those buildings. Instead using the loss amount as metric we use the degree of loss 
-as a % of the exposure metric.
+While the TIV and SI are straightforward to understand, the other metrics can 
+be little more challenging to assess. 
+
+Suppose we insure a big production plant with of several buildings against fire. 
+It is unlikely that a fire will destroy the whole facility, instead it is 
+believed that the distance between the building will ensure that fires can be 
+contained in a local area. Hence the MPL might be only the highest value of any 
+of those buildings. 
+
+Shifting from the metric from loss amounts to damage ratio (loss 
+as a % of the exposure metric) allows us to compare and benchmarks risks.
 
 ## Analysing deductibles
 
 Most insurance policies are written with a deductible, so that the
 insured will cover the first $X of the losses.
 
-Thus, the insurer needs to understand, by how much the claims burden is reduced 
+Thus, the reinsurer needs to understand, by how much the claims burden is reduced 
 for a given deductible. 
 
-From the previous section we have learned how to calculate the limited expected value, which is the loss cost to the insured.
+From the previous section we have learned how to calculate the limited expected 
+value, which is the loss cost to the insured.
 
-The exposure curve (or also called First Loss Curve) is defined as 
-the proportion of the LEV for a given deductible $d$ compared to 
+The exposure curve (or also called *first loss curve* or *original loss cure* ) 
+is defined as the proportion of the LEV for a given deductible $d$ compared to 
 the overall expected claims cost $E[X]$:
 
 $$
@@ -306,19 +313,22 @@ $$
 The Swiss Re and Lloyd's curves can be approximate as a function of only 
 one parameter $c$, as shown by Bernegger.
 
+
 ```{r mbbefdPlot, fig.height=2.5, fig.width=5.5, echo=FALSE}
+mbbefdCurve <- function(d, C){
+  mbbefdExposure(d, b=swissRe(C)['b'], g=swissRe(C)['g'])
+}
 n <- 100
-Deductible <-seq(0, 1, length=n)
+ded <-seq(0, 1, length=n)
 dat <- data.frame(
-  Deductible=rep(Deductible, 5),
-  Curve=gl(5, n, ordered = TRUE,
-           labels=c("Y1", "Y2", "Y3", "Y4", "Lloyd's")),
-  G = c(mbbefdExposure(Deductible, b=swissRe(1.5)['b'], g=swissRe(1.5)['g']),
-        mbbefdExposure(Deductible, b=swissRe(2.0)['b'], g=swissRe(2.0)['g']),
-        mbbefdExposure(Deductible, b=swissRe(3.0)['b'], g=swissRe(3.0)['g']),
-        mbbefdExposure(Deductible, b=swissRe(4.0)['b'], g=swissRe(4.0)['g']),
-        mbbefdExposure(Deductible, b=swissRe(5.0)['b'], g=swissRe(5.0)['g']))  
-)
+  Deductible = rep(ded, 5),
+  Curve = gl(5, n, ordered = TRUE,
+             labels=c("Y1", "Y2", "Y3", "Y4", "Lloyd's")),
+  G = c(mbbefdCurve(ded, 1.5), mbbefdCurve(ded, 2.0), 
+        mbbefdCurve(ded, 3.0), mbbefdCurve(ded, 4.0), 
+        mbbefdCurve(ded, 5.0))
+  )
+# Plot curves
 xyplot(G ~ Deductible | Curve, data=dat, 
        as.table=TRUE, t="l", 
        main="Swiss Re and Lloyd's Exposure Curves",
@@ -327,8 +337,8 @@ xyplot(G ~ Deductible | Curve, data=dat,
          panel.xyplot(x,y,...)
          panel.abline(a=0, b=1, lty=2)
        },
-       xlab="Deductible as % of MPL",
-       ylab="G", ylim=c(0,1), xlim=c(0,1),
+       xlab="Deductible as % of Exposure",
+       ylab="G(d)", ylim=c(0,1), xlim=c(0,1),
        par.settings = my.settings, 
        par.strip.text=list(col="white", font=2), 
        scales=list(alternating=1))
@@ -354,8 +364,8 @@ than larger risks, relative to the sum insured.
 
 # Example
 
-The following example data is taken from the earlier mentioned Swiss Re
-technical paper. 
+The following example data is taken from the earlier Swiss Re
+technical paper above. 
 
 It is the aim to find the risk premium for a per risk WXL cover 
 (fire only) with the limits
@@ -368,7 +378,8 @@ The total gross net premium income (GNPI) is CHF $95\,975,000$ in 2004,
 with an expected loss ratio of 55%. Therefore we have a view on the 
 mean expected loss cost.
 
-The risk profile given by the cedent is from the year 2002. However, instead of re-indexing the historical data to 2004, we back-index
+The risk profile given by the cedent is from the year 2002.
+However, instead of re-indexing the historical data to 2004, we back-index
 the data to 2002 with a factor of $457/550=`r round(457/550,2)`$:
 $$
 \mbox{CHF } `r format(3500000*457/550, big.mark=",")` 
@@ -407,17 +418,15 @@ retainedDed <- D/MPLoss*1000
 retainedLoss <- mbbefdExposure(retainedDed, b=swissRe(4)['b'], g=swissRe(4)['g'])
 prem <- 1194 * (1 - retainedLoss)
 ```
- 
 
- 
 In order to use the exposure curves we need the expected loss and the deductible as % of the MPL. We have to consider three scenarios:
 
-### Loss below deductible
+### Losses below deductible
 
 Losses with a maximum MPL below the deductible are not relevant and hence 
 no reinsurance premium needs to be calculated.
 
-### Loss above deductible, but below limit
+### Losses above deductible, but below limit
 
 As an example I use the band that has a maximum MPL of CHF 4m, 
 with a mean MPL gross loss of CH 3.5m and gross premium of CH 1.194m.
@@ -428,7 +437,7 @@ expected claims burden by `r round(retainedLoss*100,1)`%.
 
 Therefore the reinsurance premium for this band is 1,194k $\cdot$ `r round((1-retainedLoss*100),1)`% =`r round(prem,1)`k. 
 
-### Loss above limit
+### Losses above limit
 
 Here I select the band with a maximum MPL of CHF 90m and a mean gross
 MPL of  CHF 81m. Because of the limit of CHF `r round(L, 1)` only that amount matters. From the exposure curve we can read
@@ -436,14 +445,16 @@ of again the average proportion of loss paid by the cedant
 `r round(mbbefdExposure(D/L, b=swissRe(4)['b'], g=swissRe(4)['g']),1)`%. 
 
 To calculate the premium we first have to derive the proportion of
-premium that is attached to the risk below the limit: 4,155k/8,100k $\cdot$ 1,918k=`r round(4155/81000*1918,1)`k.
+premium that is attached to the risk below the limit: 4,155k/8,100k $\cdot$ 
+1,918k=`r round(4155/81000*1918,1)`k.
 
 Multiplying the premium with the reinsurer's share of the loss gives
 us a premium of CHF `r round(4155/81000*1918*(1-mbbefdExposure(D/L, b=swissRe(4)['b'], g=swissRe(4)['g'])),1)`k.
 
 ### Rate on Line
-For the overall portfolio we can calculate the rate on line, the loss cost
-of the layer compared to the total loss cost,using the expected loss ratio of 55%:
+
+For the overall portfolio we can calculate the rate on line, which is the loss cost
+of the layer compared to the total loss cost, using the expected loss ratio of 55%:
 
 ```{r SwissRe2}
 XL_ROL <- function(Deductible, Limit, MaxMPL, 

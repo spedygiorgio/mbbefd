@@ -306,12 +306,13 @@ These distributions are of the form
 
 $$
 G\left( x \right) = \frac{{\ln \left( {a + {b^x}} \right) - \ln \left( {a + 1} \right)}}{{\ln \left( {a + b} \right) - \ln \left( {a + 1} \right)}}
-\mbox{, with }
+\mbox{,  with }
 x \in \left[ {0,1} \right] \mbox{ and } b > 0 
 $$
 
 The Swiss Re and Lloyd's curves can be approximate as a function of only 
-one parameter $c$, as shown by Bernegger.
+one parameter $c$, as shown by Bernegger. See also the functions `swissRe` and
+`mbbefdExposure` as part of this package.
 
 
 ```{r mbbefdPlot, fig.height=2.5, fig.width=5.5, echo=FALSE}

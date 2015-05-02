@@ -13,9 +13,20 @@
 
 .G<-function(x,a,b,g)
 {
-  if(missing(a)) a<-g2a(g=g,b=b)
-  out<-(log(a+b^x)-log(a+1))/(log(a+b)-log(a+1))
-  return(out)
+  if(missing(a)){
+    # using b, g
+    if(identical(g, 1) | identical(b, 0))
+      x
+    if(identical(b, 1) & g > 1)
+      log(1+(g-1)*x)/log(g)
+    if(identical(b*g, 1) & g>1)
+      (1-b^x)/(1-b)
+    else
+      log(((g-1)*b + (1-g*b)*b^x)/(1-b))/log(g*b)  
+  }else{
+    # using a nd b 
+    (log(a+b^x)-log(a+1))/(log(a+b)-log(a+1))
+  }
 }
 
 #its derivative
@@ -34,16 +45,16 @@ dG<-function(x,a,b,g)
   return(out)
 }
 
-
 #the function to compute the exposure function
 
-mbbefdExposure<-function(x, a, b,g)
+mbbefdExposure<-function(x, a, b, g)
 {
-  if(missing(a)) a<-g2a(g=g,b=b)
   if(x>1||x<0) stop("Error! x should be between 0 and 1")  #check parameters coherence
   if(b<0) stop("b should be greater or equal 0")
-  out<-.G(x=x, a=a, b=b)
-  return(out)
+  if(missing(a)) 
+    .G(x, g=g,b=b)
+  else
+    .G(x=x, a=a, b=b)
 }
 
 ####################################

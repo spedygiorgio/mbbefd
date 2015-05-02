@@ -2,7 +2,7 @@
 title: "Introduction to Exposure Rating"
 author: "Markus Gesmann"
 date: '`r format(Sys.time(), "%d %B %Y")`'
-output: 
+output: pdf_document
 vignette: >
   %\VignetteIndexEntry{Introduction to Exposure Rating}
   %\VignetteEngine{knitr::rmarkdown}
@@ -266,7 +266,7 @@ $$
 
 For our example, using a log-normal distribution and a MPL of 200 we get:
 
-```{r ExposureCurve, dev.args=list(pointsize=8), fig.width=3.5, fig.width=5}
+```{r ExposureCurve, dev.args=list(pointsize=8), fig.height=2.75, fig.width=3.5}
 MPL <- 200
 ExpectedLoss <- 65
 Deductible <- seq(0, MPL, 1)

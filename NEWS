@@ -1,3 +1,3 @@
-Version 0.6.4
-30-04-2015
-Fixed some calls to Rcpp code.
+Version 0.7
+03-05-2015
+Markus Gessman added as contributor. New vignette on exposure rating added.

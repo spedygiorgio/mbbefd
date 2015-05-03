@@ -3,11 +3,9 @@ title: "Introduction to Exposure Rating"
 author: "Markus Gesmann"
 date: '`r format(Sys.time(), "%d %B %Y")`'
 output: pdf_document
-vignette: >
-  %\VignetteIndexEntry{Introduction to Exposure Rating}
-  %\VignetteEngine{knitr::rmarkdown}
-  \usepackage[utf8]{inputenc}
 bibliography: mbbefd.bib
+vignette: |
+  %\VignetteIndexEntry{Introduction to Exposure Rating} %\VignetteEngine{knitr::rmarkdown} \usepackage[utf8]{inputenc}
 ---
 
 ```{r setup, echo=FALSE, message=FALSE, warning=FALSE}

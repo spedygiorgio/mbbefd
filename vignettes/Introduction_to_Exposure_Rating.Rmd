@@ -31,8 +31,9 @@ mu <- log(Mean) - sigma^2 / 2
 ```
 
 Exposure rating is a tool for insurance pricing that allocates premium to bands
-of damage ratios or severity of losses. First ideas were published in `r citep(bib['salzmann1963'])`. Exposure rating is often used to price excess
-of loss reinsurance. 
+of damage ratios or severity of losses. First ideas were published in `r citep(bib['salzmann1963'])`. It is often used to price excess of loss reinsurance. 
+
+Exposure rating uses the loss experience of a similar portfolio of policies to estimate the expected losses of the portfolio to be covered. The method is often used as a benchmark when there is no sufficient credible claims history from the client.
 
 # Loss Distribution
 First lets assume we have perfect information, i.e. we know the loss distribution for a certain risk.
@@ -49,7 +50,7 @@ $$
 $$
 
 The following chart shows the corresponding probability density curve 
-$f(x)$, the cumulative distribution function $F(x)$ and the survival function $S(x)=1-F(x)$. 
+$f(x)$, cumulative distribution function $F(x)$ and survival function $S(x)=1-F(x)$. 
 
 ```{r, fig.height=2.5, fig.width=5.5, echo=FALSE, warning=FALSE}
 library(lattice)

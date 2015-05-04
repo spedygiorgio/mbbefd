@@ -11,21 +11,32 @@
 
 #exposure curve
 
-.G<-function(x,a,b,g)
+.G<-function(x, a, b, g)
 {
   if(missing(a)){
     # using b, g
     if(identical(g, 1) | identical(b, 0))
-      x
+      return(x)
     if(identical(b, 1) & g > 1)
-      log(1+(g-1)*x)/log(g)
+      return(
+        log(1+(g-1)*x)/log(g)
+      )
     if(identical(b*g, 1) & g>1)
-      (1-b^x)/(1-b)
+      return((1-b^x)/(1-b))
     else
-      log(((g-1)*b + (1-g*b)*b^x)/(1-b))/log(g*b)  
+      return(
+        log(((g-1)*b + (1-g*b)*b^x)/(1-b))/log(g*b)  
+      )
   }else{
     # using a nd b 
-    (log(a+b^x)-log(a+1))/(log(a+b)-log(a+1))
+    if(identical(a, 0) | identical(b, 1))
+      return(x)
+    if(a*(1-b)>0)
+      return( 
+        (log(a+b^x)-log(a+1))/(log(a+b)-log(a+1))
+      )
+    else
+      return((1-b^x) / (1-b))
   }
 }
 
@@ -49,10 +60,14 @@ dG<-function(x,a,b,g)
 
 mbbefdExposure<-function(x, a, b, g)
 {
-  if(x>1||x<0) stop("Error! x should be between 0 and 1")  #check parameters coherence
-  if(b<0) stop("b should be greater or equal 0")
-  if(missing(a)) 
+  if(x>1||x<0) 
+    stop("Error! x should be between 0 and 1")  #check parameters coherence
+  if(b<0) 
+    stop("b should be greater or equal 0")
+  if(missing(a)){
+    if(g <= 0) stop("g has to be greater than 0")
     .G(x, g=g,b=b)
+  }
   else
     .G(x=x, a=a, b=b)
 }

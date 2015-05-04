@@ -5,7 +5,9 @@ date: '`r format(Sys.time(), "%d %B %Y")`'
 output: pdf_document
 bibliography: mbbefd.bib
 vignette: |
-  %\VignetteIndexEntry{Introduction to Exposure Rating} %\VignetteEngine{knitr::rmarkdown} \usepackage[utf8]{inputenc}
+  %\VignetteIndexEntry{Introduction to Exposure Rating} 
+  %\VignetteEngine{knitr::rmarkdown} 
+  \usepackage[utf8]{inputenc}
 ---
 
 ```{r setup, echo=FALSE, message=FALSE, warning=FALSE}
@@ -31,9 +33,10 @@ mu <- log(Mean) - sigma^2 / 2
 Exposure rating is a tool for insurance pricing that allocates premium to bands
 of damage ratios or severity of losses. First ideas were published in `r citep(bib['salzmann1963'])`. It is often used to price excess of loss reinsurance. 
 
-Exposure rating uses the loss experience of a similar portfolio of policies to estimate the expected losses of the portfolio to be covered. The method is often used as a benchmark when there is no sufficient credible claims history from the client.
+Exposure rating uses the loss experience of a similar portfolio of policies to estimate the expected losses of the portfolio to be covered. The method is frequently used as a benchmark when there is no sufficient credible claims history from the client.
 
 # Loss Distribution
+
 First lets assume we have perfect information, i.e. we know the loss distribution for a certain risk.
 
 To keep it simple I assume the loss distribution is log-normal with
@@ -94,7 +97,7 @@ $$
 
 ## Limited Expected Loss
 
-If I further assume that losses are limited by $\alpha$ in my contract. Then
+Let's further assume that losses are limited by $\alpha$ in my contract. Then
 the limited expected value (LEV), written as $E[X \wedge \alpha]$, is given as
 
 $$
@@ -217,7 +220,8 @@ the risk.
 
 Instead, we will have to infer information from others risks that
 share similar loss characteristics as a function of the overall exposure, 
-assuming that the relative loss size distribution is independent of individual characteristic of the risk.  
+assuming that the relative loss size distribution is independent of the 
+individual risk characteristic.  
 
 Hence, we will require a view on the expected full value loss cost for the overall
 exposure. 
@@ -299,7 +303,7 @@ is unknown. Some say it is based on fire losses during World War II.
 
 Stefan Bernegger showed that those exposure curves can be approximated
 with the Mawell-Boltzmann, Bose-Einstein and Fermi-Diarc (MBBEFD)
-distributions, `r citep(bib['bernegger97'])`. 
+distributions `r citep(bib['bernegger97'])`. 
 
 These distributions are of the form
 
@@ -314,7 +318,7 @@ one parameter $c$, as shown by Bernegger. See also the functions `swissRe` and
 `mbbefdExposure` as part of this package.
 
 
-```{r mbbefdPlot, fig.height=2.5, fig.width=5.5, echo=FALSE}
+```{r mbbefdPlot, fig.height=2.5, fig.width=5.5, echo=FALSE, warning=FALSE}
 mbbefdCurve <- function(d, C){
   mbbefdExposure(d, b=swissRe(C)['b'], g=swissRe(C)['g'])
 }
@@ -345,7 +349,7 @@ xyplot(G ~ Deductible | Curve, data=dat,
 ```
 
 Typical uses cases of those curves with parameter $c$ are summarised 
-in the table below, taken from the Swiss Re paper *Exposure rating*,
+in the table below, taken from the Swiss Re paper *Exposure rating*
 `r citep(bib['ExposureRating2004'])`.:
 
 **Gasser** | **Parameter** $c$| **Scope of application**  | **Basis**
@@ -374,7 +378,7 @@ $$
 \mbox{CHF } 3,500,000 \mbox{ xs CHF } 1,500,000
 $$
 
-The total gross net premium income (GNPI) is CHF $95\,975,000$ in 2004, 
+The total gross net premium income (GNPI) is CHF $95,975,000$ in 2004, 
 with an expected loss ratio of 55%. Therefore we have a view on the 
 mean expected loss cost.
 
@@ -419,7 +423,9 @@ retainedLoss <- mbbefdExposure(retainedDed, b=swissRe(4)['b'], g=swissRe(4)['g']
 prem <- 1194 * (1 - retainedLoss)
 ```
 
-In order to use the exposure curves we need the expected loss and the deductible as % of the MPL. We have to consider three scenarios:
+In order to use the exposure curves we need the expected loss and the deductible as % of the MPL. 
+
+We have to consider three scenarios:
 
 ### Losses below deductible
 
@@ -431,7 +437,7 @@ no reinsurance premium needs to be calculated.
 As an example I use the band that has a maximum MPL of CHF 4m, 
 with a mean MPL gross loss of CH 3.5m and gross premium of CH 1.194m.
 
-The client would retain 1\,246/3\,500=`r round(retainedDed*100,1)`% of the 
+The client would retain 1,246/3,500=`r round(retainedDed*100,1)`% of the 
 maximum MPL. Using our exposure curve we can read of that this would reduce our 
 expected claims burden by `r round(retainedLoss*100,1)`%.
 

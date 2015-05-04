@@ -6,7 +6,7 @@ Version: 0.7
 Date: 2015-05-04
 Authors@R: c(person("Giorgio", "Spedicato", role = c("aut", "cre"),
     email = "spedicato_giorgio@yahoo.it"),
-    person("Christophe", "Christophe", role = "aut"),
+    person("Christophe", "Dutang", role = "aut"),
     person("Markus", "Gesmann", role = "ctb",
     email = "markus.gesmann@gmail.com"))
 Description: Distribtuions that are typically used for exposure rating in

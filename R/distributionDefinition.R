@@ -74,7 +74,7 @@ mbbefdExposure<-function(x, a, b, g)
 
 ####################################
 #classical functions
-#distirbution function
+#distribution function
 pmbbefd<-function(q,a,b,g)
 {
   if(missing(a)) a<-g2a(g=g,b=b)

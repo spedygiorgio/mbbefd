@@ -10,7 +10,7 @@ Authors@R: c(person("Giorgio", "Spedicato", role = c("aut", "cre"),
     person("Markus", "Gesmann", role = "ctb",
     email = "markus.gesmann@gmail.com"))
 Description: Distribtuions that are typically used for exposure rating in
-             general  insurance, in particular to price reinsurance contracts.
+             general insurance, in particular to price reinsurance contracts.
              The vignette shows code snippets to fit the distribution to
              empirical data.
 License: GPL-2

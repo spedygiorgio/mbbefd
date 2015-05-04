@@ -11,3 +11,15 @@ test_that("some values", {
   expect_equal(round(1-pmbbefd(q= .6, a=.2, b=.04),4),.5043)  
 })
 
+
+test_that("mbbefdExposure", {
+  expect_equal(mbbefdExposure(0.5, a=1, b=1), 0.5)  
+  expect_equal(mbbefdExposure(0.5, a=0, b=1), 0.5) 
+  expect_equal(mbbefdExposure(0.5, a=0, b=0), 0.5)  
+  expect_equal(mbbefdExposure(0.5, a=1, b=0), 1)  
+  
+  expect_equal(mbbefdExposure(0.5, g=1, b=1), 0.5)  
+  expect_equal(mbbefdExposure(0.5, g=1, b=0), 0.5)
+  
+})
+

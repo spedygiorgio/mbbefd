@@ -2,10 +2,12 @@
 title: "Introduction to Exposure Rating"
 author: "Markus Gesmann"
 date: '`r format(Sys.time(), "%d %B %Y")`'
-output: word_document
+output: pdf_document
 bibliography: mbbefd.bib
-vignette: "%\\VignetteIndexEntry{Introduction to Exposure Rating} \n%\\VignetteEngine{knitr::rmarkdown}
-  \n\\usepackage[utf8]{inputenc}\n"
+vignette: |
+  %\VignetteIndexEntry{Introduction to Exposure Rating} 
+  %\VignetteEngine{knitr::rmarkdown} 
+  \usepackage[utf8]{inputenc}
 ---
 
 ```{r setup, echo=FALSE, message=FALSE, warning=FALSE}
@@ -51,7 +53,7 @@ $$
 The following chart shows the corresponding probability density curve 
 $f(x)$, cumulative distribution function $F(x)$ and survival function $S(x)=1-F(x)$. 
 
-```{r, fig.height=2.5, fig.width=5.5, echo=FALSE, warning=FALSE}
+```{r, fig.height=2.5, fig.width=6, echo=FALSE, warning=FALSE}
 library(lattice)
 n <- 100
 Loss <- seq(1, 150, length=n)
@@ -267,7 +269,7 @@ $$
 
 For our example, using a log-normal distribution and a MPL of 200 we get:
 
-```{r ExposureCurve, dev.args=list(pointsize=8), fig.height=2.75, fig.width=3}
+```{r ExposureCurve, dev.args=list(pointsize=8), fig.height=3, fig.width=3}
 MPL <- 200
 ExpectedLoss <- 65
 Deductible <- seq(0, MPL, 1)
@@ -316,7 +318,7 @@ one parameter $c$, as shown by Bernegger. See also the functions `swissRe` and
 `mbbefdExposure` as part of this package.
 
 
-```{r mbbefdPlot, fig.height=2.5, fig.width=6, echo=FALSE, warning=FALSE}
+```{r mbbefdPlot, fig.height=2.5, fig.width=6.5, echo=FALSE, warning=FALSE}
 mbbefdCurve <- function(d, C){
   mbbefdExposure(d, b=swissRe(C)['b'], g=swissRe(C)['g'])
 }

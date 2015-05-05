@@ -2,12 +2,10 @@
 title: "Introduction to Exposure Rating"
 author: "Markus Gesmann"
 date: '`r format(Sys.time(), "%d %B %Y")`'
-output: pdf_document
+output: word_document
 bibliography: mbbefd.bib
-vignette: |
-  %\VignetteIndexEntry{Introduction to Exposure Rating} 
-  %\VignetteEngine{knitr::rmarkdown} 
-  \usepackage[utf8]{inputenc}
+vignette: "%\\VignetteIndexEntry{Introduction to Exposure Rating} \n%\\VignetteEngine{knitr::rmarkdown}
+  \n\\usepackage[utf8]{inputenc}\n"
 ---
 
 ```{r setup, echo=FALSE, message=FALSE, warning=FALSE}
@@ -269,7 +267,7 @@ $$
 
 For our example, using a log-normal distribution and a MPL of 200 we get:
 
-```{r ExposureCurve, dev.args=list(pointsize=8), fig.height=2.75, fig.width=3.5}
+```{r ExposureCurve, dev.args=list(pointsize=8), fig.height=2.75, fig.width=3}
 MPL <- 200
 ExpectedLoss <- 65
 Deductible <- seq(0, MPL, 1)
@@ -318,7 +316,7 @@ one parameter $c$, as shown by Bernegger. See also the functions `swissRe` and
 `mbbefdExposure` as part of this package.
 
 
-```{r mbbefdPlot, fig.height=2.5, fig.width=5.5, echo=FALSE, warning=FALSE}
+```{r mbbefdPlot, fig.height=2.5, fig.width=6, echo=FALSE, warning=FALSE}
 mbbefdCurve <- function(d, C){
   mbbefdExposure(d, b=swissRe(C)['b'], g=swissRe(C)['g'])
 }
@@ -396,7 +394,7 @@ exposure curves, in this case the parameter $c$ of the MBBEFD curve.
 The policies have been grouped into different exposure bands. The mean MPL is 
 simply the average of the lower and upper band.
 
-```{r SwissReExample, message=FALSE, echo=FALSE}
+```{r SwissReExample, message=FALSE, echo=FALSE, warning=FALSE}
 Client <- scan(textConnection(
 '150 75 250 200 400 325 600 500 800 700 1000 900 1250 1125 1500 1375 1750 1625 2000 1875 2500 2250 3000 2750 4000 3500 5500 4750 9000 7250 12500 10750 18000 15250 24000 21000 36000 30000 48000 42000 72000 60000 90000 81000'))
 MaxMPL <- Client[seq(from=1, to=length(Client),by = 2)]
@@ -441,7 +439,7 @@ The client would retain 1,246/3,500=`r round(retainedDed*100,1)`% of the
 maximum MPL. Using our exposure curve we can read of that this would reduce our 
 expected claims burden by `r round(retainedLoss*100,1)`%.
 
-Therefore the reinsurance premium for this band is 1,194k $\cdot$ `r round((1-retainedLoss*100),1)`% =`r round(prem,1)`k. 
+Therefore the reinsurance premium for this band is 1,194k $\cdot$ `r round((100-retainedLoss*100),1)`% =`r round(prem,1)`k. 
 
 ### Losses above limit
 

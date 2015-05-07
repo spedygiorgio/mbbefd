@@ -1,5 +1,7 @@
 
 
+
+
 ### R version of d,p,q,r functions MBBEFD(g,b)
 
 dMBBEFDR <- function(x, g, b, log=FALSE)
@@ -161,4 +163,21 @@ tlMBBEFDR <- function(g, b)
     return(NaN)
   1/g
 }
+
+
+
+
+### d,p,q,ec,m,tl functions MBBEFD(g,b)
+
+dMBBEFD <- dMBBEFDR
+
+pMBBEFD <- pMBBEFDR
+
+qMBBEFD <- qMBBEFDR
+
+ecMBBEFD <- ecMBBEFDR
+
+mMBBEFD <- mMBBEFDR
+
+tlMBBEFD <- tlMBBEFDR
 

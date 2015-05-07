@@ -66,7 +66,7 @@ mbbefdExposure<-function(x, a, b, g)
 ####################################
 #classical functions
 #distribution function
-pmbbefd<-function(q,a,b,g)
+pmbbefd2<-function(q,a,b,g)
 {
   if(missing(a)) a<-g2a(g=g,b=b)
   if(q>1||q<0) stop("Error! q should lie between 0 and 1")
@@ -82,7 +82,7 @@ pmbbefd<-function(q,a,b,g)
 
 #density functio
 
-dmbbefd<-function(x,a,b,g)
+dmbbefd2<-function(x,a,b,g)
 {
   if(missing(a)) a<-g2a(g=g,b=b)
   if(x>1||x<0) stop("Error! x should lie between 0 and 1")

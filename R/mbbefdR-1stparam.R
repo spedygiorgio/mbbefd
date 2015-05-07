@@ -2,10 +2,12 @@
 
 ### R version of d,p,q,r functions MBBEFD(a,b)
 
-dmbbefdR <- function(x, a, b, log=FALSE)
+dmbbefdR <- function(x, a, b, log=FALSE, g)
 {
   if(!(a +1 >0 && b > 0 && a*(1-b) >= 0))
     return(rep(NaN, length(x)))
+  if(!missing(g)) #to be removed
+    stop("please dMBBEFD for the second parametrization")
   
   if(a == 0 || b == 1) #Dirac
   {
@@ -27,10 +29,13 @@ dmbbefdR <- function(x, a, b, log=FALSE)
   res  
 }  
 	
-pmbbefdR <- function(q, a, b, lower.tail = TRUE, log.p = FALSE)
+pmbbefdR <- function(q, a, b, lower.tail = TRUE, log.p = FALSE, g)
 {
   if(!(a +1 >0 && b > 0 && a*(1-b) >= 0))
     return(rep(NaN, length(q)))
+  if(!missing(g)) #to be removed
+    stop("please pMBBEFD for the second parametrization")
+  
   
   if(a == 0 || b == 1) #Dirac
   {
@@ -54,10 +59,13 @@ pmbbefdR <- function(q, a, b, lower.tail = TRUE, log.p = FALSE)
 }  
   
 	 
-qmbbefdR <- function(p, a, b, lower.tail = TRUE, log.p = FALSE)
+qmbbefdR <- function(p, a, b, lower.tail = TRUE, log.p = FALSE, g)
 {
   if(!(a +1 >0 && b > 0 && a*(1-b) >= 0))
     return(rep(NaN, length(p)))
+  if(!missing(g)) #to be removed
+    stop("please qMBBEFD for the second parametrization")
+  
   
   if(!lower.tail)
     p <- 1-p
@@ -140,4 +148,20 @@ tlmbbefdR <- function(a, b)
     res <- (a+1)*b/(a+b)
   res
 }
+
+
+
+### d,p,q,ec,m,tl functions MBBEFD(a,b)
+
+dmbbefd <- dmbbefdR
+
+pmbbefd <- pmbbefdR
+
+qmbbefd <- qmbbefdR
+
+ecmbbefd <- ecmbbefdR
+
+mmbbefd <- mmbbefdR
+
+tlmbbefd <- tlmbbefdR
 

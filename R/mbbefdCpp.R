@@ -29,6 +29,10 @@ rmbbefdC <- function(n, a, b, g)
   out<-sapply(u,.f4Sampler,a=a,b=b) #using the Rcpp function
   return(out)
 }
+rmbbefdCpp <- function(n, a, b)
+{
+  .rmbbefdC2(n,  a,  b) 
+}
 
 rMBBEFDC <- function(n, g, b)
 {

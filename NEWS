@@ -1,6 +1,11 @@
+Version 0.7-1
+08-05-2015
+Remove depreciated functions. Update C++ rng for MBBEFD.
+
 Version 0.7
 03-05-2015
-Markus Gessman added as contributor. New vignette on exposure rating added.
+Markus Gessman added as contributor. New vignette on exposure rating added. 
+Start organizing a common interface between R and C++ functions.
 
 Version 0.6.2
 20-03-2015

@@ -16,6 +16,21 @@
 #' f4Sampler(x=.2, a=.2, b=.05)
 NULL
 
+#' random number generation - 1st param
+#' 
+#' \code{rmbbefdC2} generates random variates distribution parameters a and b
+#' 
+#' @param n: the number of random variates
+#' @param a: first shape parameter
+#' @param b: second shape parameter
+#' 
+#' @return a vector of real values
+#' 
+#' @example
+#' 
+#' rmbbefdC2(n=10, a=.2, b=.05)
+NULL
+
 #' Get a parameter known g and b
 #' 
 #' \code{g2a} returns the a parameter known g and b
@@ -40,5 +55,9 @@ g2a <- function(g, b) {
 
 .f4Sampler <- function(x, a, b) {
     .Call('mbbefd_f4Sampler', PACKAGE = 'mbbefd', x, a, b)
+}
+
+.rmbbefdC2 <- function(n, a, b) {
+    .Call('mbbefd_rmbbefdC2', PACKAGE = 'mbbefd', n, a, b)
 }
 

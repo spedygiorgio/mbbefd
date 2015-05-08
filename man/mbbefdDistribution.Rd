@@ -16,21 +16,7 @@
 \alias{mMBBEFD}
 \alias{tlMBBEFD}
 
-\alias{dmbbefdR}
-\alias{pmbbefdR}
-\alias{qmbbefdR}
-\alias{rmbbefdR}
-\alias{ecmbbefdR}
-\alias{mmbbefdR}
-\alias{tlmbbefdR}
 
-\alias{dMBBEFDR}
-\alias{pMBBEFDR}
-\alias{qMBBEFDR}
-\alias{rMBBEFDR}
-\alias{ecMBBEFDR}
-\alias{mMBBEFDR}
-\alias{tlMBBEFDR}
 
 \title{
 The MBBEFD distribution (two parametrizations)
@@ -61,21 +47,6 @@ mMBBEFD(order, g, b)
 tlMBBEFD(g, b)
 
 
-dmbbefdR(x, a, b, log=FALSE, g)
-pmbbefdR(q, a, b, lower.tail = TRUE, log.p = FALSE, g)
-qmbbefdR(p, a, b, lower.tail = TRUE, log.p = FALSE, g)
-rmbbefdR(n, a, b)
-ecmbbefdR(x, a, b)
-mmbbefdR(order, a, b)
-tlmbbefdR(a, b)
-
-dMBBEFDR(x, g, b, log=FALSE)
-pMBBEFDR(q, g, b, lower.tail = TRUE, log.p = FALSE)
-qMBBEFDR(p, g, b, lower.tail = TRUE, log.p = FALSE)
-rMBBEFDR(n, g, b)
-ecMBBEFDR(x, g, b)
-mMBBEFDR(order, g, b)
-tlMBBEFDR(g, b)
 }
 
 \arguments{
@@ -117,7 +88,7 @@ Giorgio Spedicato,
 Dutang Christophe
 }
 \seealso{
-\code{\link{swissRe}}, \code{\link{mbbefdExposure}}
+\code{\link{swissRe}}, \code{\link{exposureCurve}}.
 }
 \examples{
 #1st parametrization

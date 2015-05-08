@@ -4,14 +4,14 @@
 export(dmbbefd, pmbbefd, qmbbefd, rmbbefd, ecmbbefd, mmbbefd, tlmbbefd)
 export(dMBBEFD, pMBBEFD, qMBBEFD, rMBBEFD, ecMBBEFD, mMBBEFD, tlMBBEFD)
 
-
-#C++ version of the MBBEFD distribution
-#export(mbbefdExposure, rmbbefdC, qmbbefdC, dmbbefd2, pmbbefd2, dG) #deprecated functions
 export(g2a) #backward compatibility
 
+#C++ version of the MBBEFD distribution (not exported)
+#export(mbbefdExposure, rmbbefdC, qmbbefdC, dmbbefd2, pmbbefd2, dG) #deprecated functions
+
 #R version of the MBBEFD distribution (no longer exported)
-export(dmbbefdR, pmbbefdR, qmbbefdR, rmbbefdR, ecmbbefdR, mmbbefdR, tlmbbefdR)
-export(dMBBEFDR, pMBBEFDR, qMBBEFDR, rMBBEFDR, ecMBBEFDR, mMBBEFDR, tlMBBEFDR)
+#export(dmbbefdR, pmbbefdR, qmbbefdR, rmbbefdR, ecmbbefdR, mmbbefdR, tlmbbefdR)
+#export(dMBBEFDR, pMBBEFDR, qMBBEFDR, rMBBEFDR, ecMBBEFDR, mMBBEFDR, tlMBBEFDR)
 
 #Swiss Re curves
 export(swissRe)
@@ -21,7 +21,7 @@ export(swissRe)
 importFrom(actuar, munif, levunif) #d,p,q,r in base R
 export(ecunif)
 importFrom(actuar, mbeta, levbeta) #d,p,q,r in base R
-importFrom(gsl, dilog) #dilogarith function used somewere
+importFrom(gsl, dilog) #dilogarith function used variance
 export(ecbeta)
 export(dstpareto, pstpareto, qstpareto, rstpareto, ecstpareto, mstpareto)
 
@@ -42,8 +42,5 @@ S3method(print, summary.eecf)
 S3method(plot, eecf)
 
 
-
 importFrom(Rcpp,sourceCpp)
 useDynLib(mbbefd)
-
-

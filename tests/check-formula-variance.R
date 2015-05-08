@@ -39,22 +39,22 @@ sapply(1:3, function(b)
 
 vartheo <- function(a, b)
 {
-  EX <- mmbbefdR(1, a, b)
+  EX <- mmbbefd(1, a, b)
   
-  mmbbefdR(2, a, b) - EX^2
+  mmbbefd(2, a, b) - EX^2
 }
 
 require(mbbefd)
 n <- 1e4
-x <- rmbbefdR(n, 2, 1/2)
+x <- rmbbefd(n, 2, 1/2)
 c(var(x), vartheo(2, 1/2))
 
-x <- rmbbefdR(n, -1/2, 3)
+x <- rmbbefd(n, -1/2, 3)
 c(var(x), vartheo(-1/2, 3))
 
-x <- rmbbefdR(n, -1/2, 2)
+x <- rmbbefd(n, -1/2, 2)
 c(var(x), vartheo(-1/2, 2))
 
-x <- rmbbefdR(n, 2, 1/5)
+x <- rmbbefd(n, 2, 1/5)
 c(var(x), vartheo(2, 1/5))
 

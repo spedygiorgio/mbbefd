@@ -36,7 +36,7 @@ TODO
 Dutang Christophe
 }
 \seealso{
-\code{\link{mbbefdExposure}}.
+\code{\link{exposureCurve}}.
 }
 \examples{
 #TODO

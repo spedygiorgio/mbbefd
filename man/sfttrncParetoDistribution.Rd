@@ -64,7 +64,7 @@ TODO
 Dutang Christophe
 }
 \seealso{
-\code{\link{mbbefd-distr}}, \code{\link{mbbefdExposure}}
+\code{\link{mbbefd-distr}}, \code{\link{exposureCurve}}
 }
 \examples{
 

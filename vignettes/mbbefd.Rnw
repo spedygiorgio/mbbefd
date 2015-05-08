@@ -95,6 +95,7 @@ MBBEFD distributions}
   \fi}
   
 \begin{document}
+\SweaveOpts{concordance=TRUE}
 %\SweaveOpts{concordance=TRUE}
 
 
@@ -459,14 +460,14 @@ $$
 The curve can be use to price property coverage and associate reinsurance treaties. Suppose a property expected loss to be 40K, MPL to be 2MLN. An XL coverage is available with a retention of 1Mln. The exposure curve that characterize the property is the usual one. Therefore the percentage of loss net and ceded is determined as it follows
 
 <<example1, keep.source=TRUE>>=
-net<-mbbefdExposure(x=1/2, a=0.2,b=0.04)*40000
+net<-ecmbbefd(x=1/2, a=0.2,b=0.04)*40000
 ceded<-40000-net
 @
 
 and the expected loss as a percentage of total insured value is
 
 <<example1b, keep.source=TRUE>>=
-expectedLoss<-1/dG(x=0,a=0.2,b=0.04)*40000
+expectedLoss<-mmbbefd(order=1,a=0.2,b=0.04)*40000
 expectedLoss
 @
 
@@ -477,7 +478,7 @@ Similarly, it is possible to draw the underluying suvival curve $S\left( x \righ
 \begin{center}
 <<label=survivalPlot,fig=TRUE,echo=FALSE>>=
 x<-seq(from=0,to=1,by=.1)
-smbbefd<-function(x,a,b) 1-pmbbefd(q=x,a=a,b=b)
+smbbefd<-function(...) pmbbefd(lower.tail=FALSE, ...)
 y<-sapply(x, smbbefd,a=.2,b=.04)
 
 plot(x, y, type="l",lwd=2,col="steelblue",xlab="normalized loss",
@@ -492,7 +493,7 @@ plot(x, y, type="l",lwd=2,col="steelblue",xlab="normalized loss",
 The probability of a maximum loss for such exposure curve is obtained evaluating the survival function at 1
 
 <<example1c, keep.source=TRUE>>=
-pTotalLoss<-1-pmbbefd(q=1,a=0.2,b=0.04)
+pTotalLoss<-tlmbbefd(a=0.2,b=0.04)
 pTotalLoss
 @
 
@@ -508,7 +509,7 @@ qmbbefd(p=0.6,a=0.2,b=0.04)
 whilst a loss worse than 80\% of IV could happen in 
 
 <<example1e, keep.source=TRUE>>=
-100*(1-pmbbefd(q=0.8,a=0.2,b=0.04))
+100*tlmbbefd(a=0.2,b=0.04)
 @
 
 cases out of 100.

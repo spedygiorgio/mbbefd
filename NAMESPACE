@@ -6,10 +6,10 @@ export(dMBBEFD, pMBBEFD, qMBBEFD, rMBBEFD, ecMBBEFD, mMBBEFD, tlMBBEFD)
 
 
 #C++ version of the MBBEFD distribution
-#export(rmbbefdC, qmbbefdC, dmbbefd2, pmbbefd2)
-export(mbbefdExposure, g2a, dG) #backward compatibility
+#export(mbbefdExposure, rmbbefdC, qmbbefdC, dmbbefd2, pmbbefd2, dG) #deprecated functions
+export(g2a) #backward compatibility
 
-#R version of the MBBEFD distribution
+#R version of the MBBEFD distribution (no longer exported)
 export(dmbbefdR, pmbbefdR, qmbbefdR, rmbbefdR, ecmbbefdR, mmbbefdR, tlmbbefdR)
 export(dMBBEFDR, pMBBEFDR, qMBBEFDR, rMBBEFDR, ecMBBEFDR, mMBBEFDR, tlMBBEFDR)
 

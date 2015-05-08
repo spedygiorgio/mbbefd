@@ -315,12 +315,12 @@ $$
 
 The Swiss Re and Lloyd's curves can be approximate as a function of only 
 one parameter $c$, as shown by Bernegger. See also the functions `swissRe` and
-`mbbefdExposure` as part of this package.
+`ecmbbefd` as part of this package.
 
 
 ```{r mbbefdPlot, fig.height=2.5, fig.width=6.5, echo=FALSE, warning=FALSE}
 mbbefdCurve <- function(d, C){
-  mbbefdExposure(d, b=swissRe(C)['b'], g=swissRe(C)['g'])
+  ecMBBEFD(d, b=swissRe(C)['b'], g=swissRe(C)['g'])
 }
 n <- 100
 ded <-seq(0, 1, length=n)
@@ -419,7 +419,7 @@ D <- 1.5e3*457/550
 L <- 5e3*457/550
 MPLoss <- 3.5e6
 retainedDed <- D/MPLoss*1000
-retainedLoss <- mbbefdExposure(retainedDed, b=swissRe(4)['b'], g=swissRe(4)['g'])
+retainedLoss <- ecMBBEFD(retainedDed, b=swissRe(4)['b'], g=swissRe(4)['g'])
 prem <- 1194 * (1 - retainedLoss)
 ```
 
@@ -448,14 +448,14 @@ Therefore the reinsurance premium for this band is 1,194k $\cdot$ `r round((100-
 Here I select the band with a maximum MPL of CHF 90m and a mean gross
 MPL of  CHF 81m. Because of the limit of CHF `r round(L, 1)` only that amount matters. From the exposure curve we can read
 of again the average proportion of loss paid by the cedant
-`r round(mbbefdExposure(D/L, b=swissRe(4)['b'], g=swissRe(4)['g']),1)`%. 
+`r round(ecMBBEFD(D/L, b=swissRe(4)['b'], g=swissRe(4)['g']),1)`%. 
 
 To calculate the premium we first have to derive the proportion of
 premium that is attached to the risk below the limit: 4,155k/8,100k $\cdot$ 
 1,918k=`r round(4155/81000*1918,1)`k.
 
 Multiplying the premium with the reinsurer's share of the loss gives
-us a premium of CHF `r round(4155/81000*1918*(1-mbbefdExposure(D/L, b=swissRe(4)['b'], g=swissRe(4)['g'])),1)`k.
+us a premium of CHF `r round(4155/81000*1918*(1-ecMBBEFD(D/L, b=swissRe(4)['b'], g=swissRe(4)['g'])),1)`k.
 
 ### Rate on Line
 
@@ -469,7 +469,7 @@ XL_ROL <- function(Deductible, Limit, MaxMPL,
                                    ifelse(MaxMPL<Limit, MaxMPL, Limit))
   LossShare <- 1 - apply(cbind(DedPerMPL, C), 1, 
                          function(x){ 
-                           mbbefdExposure(x[1], 
+                           ecMBBEFD(x[1], 
                                           b=swissRe(x[2])['b'], 
                                           g=swissRe(x[2])['g'])
                            })

@@ -115,3 +115,70 @@ NumericVector rmbbefdC2(int n, double a, double b) {
   
   return out;
 }
+
+
+
+//' random number generation - 2nd param
+//' 
+//' \code{rMBBEFDC2} generates random variates distribution parameters g and b
+//' 
+//' @param n: the number of random variates
+//' @param g: first shape parameter
+//' @param b: second shape parameter
+//' 
+//' @return a vector of real values
+//' 
+//' @example
+//' 
+//' rMBBEFDC2(n=10, g=2, b=.05)
+
+// [[Rcpp::export(.rMBBEFDC2)]]
+NumericVector rMBBEFDC2(int n, double g, double b) {
+  
+  NumericVector out(n);
+  double u;
+  
+  if(g == 1 || b == 0) //Dirac
+  {
+    for(int i=0; i<n; ++i)
+    {
+      u = unif_rand();
+      if(u > 0)
+        out[i] = 1.0;
+      else
+        out[i] = 0.0;
+    }
+  }else if(g == 1/b && b < 1) //bg=1
+  {
+    for(int i=0; i<n; ++i)
+    {
+      u = unif_rand();
+      if(u > 1-b)
+        out[i] = 1.0;
+      else
+        out[i] = log(1-u)/log(b);
+    }
+  }else if(g > 1 && b == 1) //b=1
+  {
+    for(int i=0; i<n; ++i)
+    {
+      u = unif_rand();
+      if(u > 1-1/g)
+        out[i] = 1.0;
+      else
+        out[i] = u/((1-u)*(g-1));
+    }
+  }else
+  {
+    for(int i=0; i<n; ++i)
+    {
+      u = unif_rand();
+      if(u > 1-1/g)
+        out[i] = 1.0;
+      else
+        out[i] = 1-log((g*b-1)/(g-1) + (1-b)/((1-u)*(g-1)))/log(b);
+    }
+  }
+  
+  return out;
+}

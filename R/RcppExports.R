@@ -31,6 +31,21 @@ NULL
 #' rmbbefdC2(n=10, a=.2, b=.05)
 NULL
 
+#' random number generation - 2nd param
+#' 
+#' \code{rMBBEFDC2} generates random variates distribution parameters g and b
+#' 
+#' @param n: the number of random variates
+#' @param g: first shape parameter
+#' @param b: second shape parameter
+#' 
+#' @return a vector of real values
+#' 
+#' @example
+#' 
+#' rMBBEFDC2(n=10, g=2, b=.05)
+NULL
+
 #' Get a parameter known g and b
 #' 
 #' \code{g2a} returns the a parameter known g and b
@@ -59,5 +74,9 @@ g2a <- function(g, b) {
 
 .rmbbefdC2 <- function(n, a, b) {
     .Call('mbbefd_rmbbefdC2', PACKAGE = 'mbbefd', n, a, b)
+}
+
+.rMBBEFDC2 <- function(n, g, b) {
+    .Call('mbbefd_rMBBEFDC2', PACKAGE = 'mbbefd', n, g, b)
 }
 

@@ -43,7 +43,11 @@ rMBBEFDC <- function(n, g, b)
   return(out)
 }
 
-
+rMBBEFDCpp <- function(n, g, b)
+{
+  .rMBBEFDC2(n, g, b) 
+}
+  
 
 ### r function MBBEFD(a,b)
 rmbbefd <- rmbbefdC

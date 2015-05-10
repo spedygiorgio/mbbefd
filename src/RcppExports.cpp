@@ -56,3 +56,16 @@ BEGIN_RCPP
     return __result;
 END_RCPP
 }
+// rMBBEFDC2
+NumericVector rMBBEFDC2(int n, double g, double b);
+RcppExport SEXP mbbefd_rMBBEFDC2(SEXP nSEXP, SEXP gSEXP, SEXP bSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< int >::type n(nSEXP);
+    Rcpp::traits::input_parameter< double >::type g(gSEXP);
+    Rcpp::traits::input_parameter< double >::type b(bSEXP);
+    __result = Rcpp::wrap(rMBBEFDC2(n, g, b));
+    return __result;
+END_RCPP
+}

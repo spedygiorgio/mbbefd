@@ -80,9 +80,15 @@ NumericVector rmbbefdC2(int n, double a, double b) {
   NumericVector out(n);
   double u, pab;
   
-  if(a == 0 || b == 1) //Dirac
+  if(!(a +1 >0 && b > 0 && a*(1-b) >= 0))
   {
-    for(int i=0; i<n; ++i)
+    for(int i=0; i<n; i++)
+    {
+        out[i] = R_NaN;
+    }
+  }else if(a == 0 || b == 1) //Dirac
+  {
+    for(int i=0; i<n; i++)
     {
       u = unif_rand();
       if(u > 0)
@@ -90,9 +96,9 @@ NumericVector rmbbefdC2(int n, double a, double b) {
       else
         out[i] = 0.0;
     }
-  }else if(!isfinite(a))
+  }else if(!R_FINITE(a))
   {
-    for(int i=0; i<n; ++i)
+    for(int i=0; i<n; i++)
     {
       u = unif_rand();
       if(u > 1-b)
@@ -103,7 +109,7 @@ NumericVector rmbbefdC2(int n, double a, double b) {
   }else
   {
     pab = (a+1)*b/(a+b);
-    for(int i=0; i<n; ++i)
+    for(int i=0; i<n; i++)
     {
       u = unif_rand();
       if(u > 1-pab)
@@ -138,9 +144,15 @@ NumericVector rMBBEFDC2(int n, double g, double b) {
   NumericVector out(n);
   double u;
   
-  if(g == 1 || b == 0) //Dirac
+  if(!(g >= 1 && b >= 0))
   {
-    for(int i=0; i<n; ++i)
+    for(int i=0; i<n; i++)
+    {
+        out[i] = R_NaN;
+    }
+  }else if(g == 1 || b == 0) //Dirac
+  {
+    for(int i=0; i<n; i++)
     {
       u = unif_rand();
       if(u > 0)
@@ -150,7 +162,7 @@ NumericVector rMBBEFDC2(int n, double g, double b) {
     }
   }else if(g == 1/b && b < 1) //bg=1
   {
-    for(int i=0; i<n; ++i)
+    for(int i=0; i<n; i++)
     {
       u = unif_rand();
       if(u > 1-b)
@@ -160,7 +172,7 @@ NumericVector rMBBEFDC2(int n, double g, double b) {
     }
   }else if(g > 1 && b == 1) //b=1
   {
-    for(int i=0; i<n; ++i)
+    for(int i=0; i<n; i++)
     {
       u = unif_rand();
       if(u > 1-1/g)
@@ -170,7 +182,7 @@ NumericVector rMBBEFDC2(int n, double g, double b) {
     }
   }else
   {
-    for(int i=0; i<n; ++i)
+    for(int i=0; i<n; i++)
     {
       u = unif_rand();
       if(u > 1-1/g)

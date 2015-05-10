@@ -5,6 +5,20 @@ testfunc <- function(x)
 extensive <- TRUE
 extensive <- FALSE
 
+
+# test invalid param
+n <- 5
+a <- 0 
+b <- -1/2
+mbbefd:::rmbbefdCpp(n, a, b)
+mbbefd:::rmbbefdR(n, a, b)
+g <- 1/2 
+b <- 3
+
+mbbefd:::rMBBEFDCpp(n, g, b)
+mbbefd:::rMBBEFDR(n, g, b)
+
+
 #test of MBBEFD(a,b) distribution
 
 n <- 10

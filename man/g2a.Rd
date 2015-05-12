@@ -17,6 +17,10 @@ a real value
 \description{
 \code{g2a} returns the a parameter known g and b
 }
+\seealso{
+\code{\link{mbbefd-distr}}.
+}
+
 \examples{
 g2a(10,2)
 }

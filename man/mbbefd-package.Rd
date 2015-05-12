@@ -26,7 +26,9 @@ Maintainer:  Giorgio Spedicato <spedicato_giorgio@yahoo.it>
 BERNEGGER, STEFAN. THE SWISS RE EXPOSURE CURVES AND THE MBBEFD DISTRIBUTION CLASS. Astin Bulletin (1997): 99.
 }
 \keyword{package}
-\examples{
-#sample variates
-losses<-rmbbefd(n=10,a=0.2,b=0.04)
+\seealso{
+See \code{\link{mbbefd-distr}} for the MBBEFD distribution;
+see \code{\link{swissRe}}, \code{\link{exposureCurve}} for exposure curves;
+see \code{\link{oidistribution}}, \code{\link{oibeta}}, \code{\link{oiunif}}, \code{\link{oistpareto}} for one-inflated distributions.
 }
+

@@ -8,6 +8,7 @@ export(g2a) #backward compatibility
 
 #C++ version of the MBBEFD distribution (not exported)
 #export(mbbefdExposure, rmbbefdC, qmbbefdC, dmbbefd2, pmbbefd2, dG) #deprecated functions
+#export(rmbbefdCpp, rMBBEFDCpp)
 
 #R version of the MBBEFD distribution (no longer exported)
 #export(dmbbefdR, pmbbefdR, qmbbefdR, rmbbefdR, ecmbbefdR, mmbbefdR, tlmbbefdR)

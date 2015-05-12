@@ -28,10 +28,10 @@ Giorgio Spedicato
 }
 
 \seealso{
-\code{\link{dmbbefd}}
+\code{\link{mbbefd-distr}}.
 }
 \examples{
-pars<-swissRe(4)
-losses<-rmbbefd(n=1000,b=pars[1],g=pars[2])
+pars <- swissRe(4)
+losses <- rMBBEFD(n=1000,b=pars[1],g=pars[2])
 mean(losses)
 }

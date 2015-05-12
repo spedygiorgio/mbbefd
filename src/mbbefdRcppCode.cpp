@@ -24,45 +24,10 @@ double g2a(double g, double b) {
   return out;
 }
 
-// [[Rcpp::export(.dmbbefdC)]]
-double dmbbefdC(double x, double a, double b) {
-  double out;
-  if (x<1)
-    out= -( (a+1)*a*log(b)*pow(b,x) )/( pow( (a+pow(b, x) ),2) );
-  else 
-    out=((a+1)*b/(a+b));
-  return out;
-}
-
-//' inverse CDF function
-//' 
-//' \code{f4Sampler} returns the x known the probability level x and distribution parameters a and b
-//' 
-//' @param x: the probability
-//' @param a: parameter of the mbbefd density function
-//' @param b: parameter of the mbbefd density function
-//' 
-//' @return a real value
-//' 
-//' @example
-//' 
-//' f4Sampler(x=.2, a=.2, b=.05)
-
-
-// [[Rcpp::export(.f4Sampler)]]
-double f4Sampler(double x, double a, double b) {
-  double out;
-  if (x >= 1-(a+1)*b/(a+b))
-    out=1;
-  else
-    out=log( (a*(1-x)) / (a+x) ) /log(b);
-  return out;
-}
-
 
 //' random number generation - 1st param
 //' 
-//' \code{rmbbefdC2} generates random variates distribution parameters a and b
+//' \code{rmbbefdC} generates random variates distribution parameters a and b
 //' 
 //' @param n: the number of random variates
 //' @param a: first shape parameter
@@ -74,8 +39,8 @@ double f4Sampler(double x, double a, double b) {
 //' 
 //' rmbbefdC2(n=10, a=.2, b=.05)
 
-// [[Rcpp::export(.rmbbefdC2)]]
-NumericVector rmbbefdC2(int n, double a, double b) {
+// [[Rcpp::export(.rmbbefdC)]]
+NumericVector rmbbefdC(int n, double a, double b) {
   
   NumericVector out(n);
   double u, pab;
@@ -126,7 +91,7 @@ NumericVector rmbbefdC2(int n, double a, double b) {
 
 //' random number generation - 2nd param
 //' 
-//' \code{rMBBEFDC2} generates random variates distribution parameters g and b
+//' \code{rMBBEFDC} generates random variates distribution parameters g and b
 //' 
 //' @param n: the number of random variates
 //' @param g: first shape parameter
@@ -138,8 +103,8 @@ NumericVector rmbbefdC2(int n, double a, double b) {
 //' 
 //' rMBBEFDC2(n=10, g=2, b=.05)
 
-// [[Rcpp::export(.rMBBEFDC2)]]
-NumericVector rMBBEFDC2(int n, double g, double b) {
+// [[Rcpp::export(.rMBBEFDC)]]
+NumericVector rMBBEFDC(int n, double g, double b) {
   
   NumericVector out(n);
   double u;

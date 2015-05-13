@@ -25,12 +25,14 @@ importFrom(actuar, mbeta, levbeta) #d,p,q,r in base R
 importFrom(gsl, dilog) #dilogarith function used variance
 export(ecbeta)
 export(dstpareto, pstpareto, qstpareto, rstpareto, ecstpareto, mstpareto)
+export(dgbeta, pgbeta, qgbeta, rgbeta, ecgbeta, mgbeta)
 
 #one-inflated distributions (on the unit interval)
 export(doifun, poifun, qoifun, roifun, ecoifun, moifun)
 export(doiunif, poiunif, qoiunif, roiunif, ecoiunif, moiunif)
 export(doibeta, poibeta, qoibeta, roibeta, ecoibeta, moibeta)
 export(doistpareto, poistpareto, qoistpareto, roistpareto, ecoistpareto, moistpareto)
+export(doigbeta, poigbeta, qoigbeta, roigbeta, ecoigbeta, moigbeta)
 
 #empirical total loss
 export(etl)

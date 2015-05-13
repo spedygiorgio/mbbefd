@@ -8,12 +8,12 @@ doibeta <- function(x, shape1, shape2, p1, ncp=0, log=FALSE)
 
 poibeta <- function(q, shape1, shape2, p1, ncp=0, lower.tail = TRUE, log.p = FALSE)
 {
-  poifun(q=q, pfun=pbeta, p1=p1, lower.tail = TRUE, log.p = FALSE, shape1=shape1, shape2=shape2, ncp=ncp)
+  poifun(q=q, pfun=pbeta, p1=p1, lower.tail = lower.tail, log.p = log.p, shape1=shape1, shape2=shape2, ncp=ncp)
 }
 
 qoibeta <- function(p, shape1, shape2, p1, ncp=0, lower.tail = TRUE, log.p = FALSE)
 {
-  qoifun(p=p, qfun=qbeta, p1=p1, lower.tail = TRUE, log.p = FALSE, shape1=shape1, shape2=shape2, ncp=ncp)
+  qoifun(p=p, qfun=qbeta, p1=p1, lower.tail = lower.tail, log.p = log.p, shape1=shape1, shape2=shape2, ncp=ncp)
 }  
 
 roibeta <- function(n, shape1, shape2, p1, ncp=0)

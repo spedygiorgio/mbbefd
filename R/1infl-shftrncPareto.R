@@ -7,13 +7,13 @@ doistpareto <- function(x, a, p1, log=FALSE)
 
 poistpareto <- function(q, a, p1, lower.tail = TRUE, log.p = FALSE)
 {
-  poifun(q=q, pfun=pstpareto, p1=p1, lower.tail = TRUE, log.p = FALSE, a=a)
+  poifun(q=q, pfun=pstpareto, p1=p1, lower.tail = lower.tail, log.p = log.p, a=a)
 }
 
 
 qoistpareto <- function(p, a, p1, lower.tail = TRUE, log.p = FALSE)
 {
-  qoifun(p=p, qfun=qstpareto, p1=p1, lower.tail = TRUE, log.p = FALSE, a=a)
+  qoifun(p=p, qfun=qstpareto, p1=p1, lower.tail = lower.tail, log.p = log.p, a=a)
 }  
 
 roistpareto <- function(n, a, p1)

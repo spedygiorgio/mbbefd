@@ -1,28 +1,28 @@
-\name{oibeta}
-\alias{oibeta}
-\alias{doibeta}
-\alias{poibeta}
-\alias{qoibeta}
-\alias{roibeta}
-\alias{ecoibeta}
-\alias{moibeta}
+\name{oigbeta}
+\alias{oigbeta}
+\alias{doigbeta}
+\alias{poigbeta}
+\alias{qoigbeta}
+\alias{roigbeta}
+\alias{ecoigbeta}
+\alias{moigbeta}
 
 \title{
-One-inflated beta distribution
+One-inflated generalized beta of the first kind (GB1)) distribution
 }
 \description{
 These functions perform probabilistic analysis as well as random sampling 
-on one-inflated beta distribution.
+on one-inflated GB1 distribution.
 
 }
 \usage{
 
-doibeta(x, shape1, shape2, p1, ncp=0, log=FALSE)
-poibeta(q, shape1, shape2, p1, ncp=0, lower.tail = TRUE, log.p = FALSE)
-qoibeta(p, shape1, shape2, p1, ncp=0, lower.tail = TRUE, log.p = FALSE)
-roibeta(n, shape1, shape2, p1, ncp=0)
-ecoibeta(x, shape1, shape2, p1, ncp=0)
-moibeta(order, shape1, shape2, p1, ncp=0)
+doigbeta(x, shape0, shape1, shape2, p1, log=FALSE)
+poigbeta(q, shape0, shape1, shape2, p1, lower.tail = TRUE, log.p = FALSE)
+qoigbeta(p, shape0, shape1, shape2, p1, lower.tail = TRUE, log.p = FALSE)
+roigbeta(n, shape0, shape1, shape2, p1)
+ecoigbeta(x, shape0, shape1, shape2, p1)
+moigbeta(order, shape0, shape1, shape2, p1)
 
 }
 
@@ -36,8 +36,8 @@ vector of probabilities.
 \item{n}{
 number of observations. If \code{length(n) > 1}, the length is take to be the number required.
 }
-\item{p1, shape1, shape2, ncp}{
-parameters.
+\item{p1, shape0, shape1, shape2}{
+shape parameters.
 }
 \item{order}{
 order of the raw moment.
@@ -51,10 +51,10 @@ logical; if \code{TRUE} (default), probabilities are \eqn{P[X <= x]}, otherwise,
 
 }
 \details{
-\code{d,p,q,ec,m}-\code{oibeta} functions computes the density function,
+\code{d,p,q,ec,m}-\code{oigbeta} functions computes the density function,
 the distribution function, the quantile function, the exposure curve function and raw moments
-of the one-inflated beta distribution.
-\code{roibeta} generates random variates of this distribution.
+of the one-inflated GB1 distribution.
+\code{roigbeta} generates random variates of this distribution.
 
 }
 \value{

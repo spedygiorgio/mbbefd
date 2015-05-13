@@ -74,11 +74,6 @@ moifun <- function(order, mfun, p1, ...)
   if(!(p1 >= 0 && p1 <= 1))
     return(rep(NaN, length(order)))
   
-  if(order == 1)
-  {
-    E0 <- mfun(order=1, ...) #expectation
-    return(p1 + (1-p1)*E0)
-  }else
-    stop("not yet implemented")
-  
+  E0 <- mfun(order=order, ...) #expectation
+  p1 + (1-p1)*E0
 }

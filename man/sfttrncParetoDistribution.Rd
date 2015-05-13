@@ -73,4 +73,4 @@ dstpareto(0:4/4, 2)
 pstpareto(0:4/4, 1/2)
 
 }
-
+\keyword{distribution}

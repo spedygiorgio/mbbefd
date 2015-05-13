@@ -80,4 +80,4 @@ Dutang Christophe
 \examples{
 #TODO
 }
-
+\keyword{distribution}

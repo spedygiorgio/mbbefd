@@ -32,7 +32,7 @@ the 2nd parametrization MBBEFD(g,b) is implemented in <d,p,q,r>MBBEFD.
 dmbbefd(x, a, b, log=FALSE, g)
 pmbbefd(q, a, b, lower.tail = TRUE, log.p = FALSE, g)
 qmbbefd(p, a, b, lower.tail = TRUE, log.p = FALSE, g)
-rmbbefd(n, a, b, g)
+rmbbefd(n, a, b)
 ecmbbefd(x, a, b)
 mmbbefd(order, a, b)
 tlmbbefd(a, b)

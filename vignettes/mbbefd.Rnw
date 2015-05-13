@@ -456,7 +456,7 @@ $$
 
 
 %______________________________________________________
-\section{Examples of MBBEFD curves}\label{sec:examples}
+\section{Examples of MBBEFD curves}\label{sec:examples}\label{sec:package}
 The curve can be use to price property coverage and associate reinsurance treaties. Suppose a property expected loss to be 40K, MPL to be 2MLN. An XL coverage is available with a retention of 1Mln. The exposure curve that characterize the property is the usual one. Therefore the percentage of loss net and ceded is determined as it follows
 
 <<example1, keep.source=TRUE>>=

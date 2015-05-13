@@ -36,6 +36,19 @@ for(i in 2:4)
   print(c(mean(y^i), mgbeta(i, shape0=pi, shape1=3, shape2=3/2)))
 }
 
+#test limited expected value
+d <- 1/2
+s0 <- 2
+s1 <- 3
+s2 <- 3/2
+
+mean(pmin(x, d))
+
+f <- function(x, d, shape0) dgbeta(x, shape0=shape0, shape1=3, shape2=3/2)*pmin(x,d)
+integrate(f, 0, 1, d=d, shape0=s0)
+
+
+
 
 #test EC
 f <- function(x, d, shape0) dgbeta(x, shape0=shape0, shape1=3, shape2=3/2)*pmin(x, d)/mgbeta(1, shape0=shape0, shape1=3, shape2=3/2)

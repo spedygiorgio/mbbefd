@@ -54,7 +54,8 @@ ecgbeta <- function(x, shape0, shape1, shape2)
   
   b12 <- beta(shape1, shape2)
   EX <- mgbeta(1, shape0, shape1, shape2)
-  betainc(x, shape1+shape0, shape2)/(b12*EX) + x*(b12 - betainc(x, shape1, shape2))/(b12*EX)
+  
+  betainc(x^(1/shape0), shape1+shape0, shape2)/(b12*EX) + x*(b12 - betainc(x^(1/shape0), shape1, shape2))/(b12*EX)
 }
 
 mgbeta <- function(order, shape0, shape1, shape2)

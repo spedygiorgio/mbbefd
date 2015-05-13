@@ -1,4 +1,5 @@
-\name{rstpareto}
+\name{stpareto}
+\alias{stpareto}
 \alias{dstpareto}
 \alias{pstpareto}
 \alias{qstpareto}

@@ -3,29 +3,14 @@
 # Author: Giorgio
 ###############################################################################
 
-
-# display version number and date when the package is loaded
-# .onAttach <- function(libname, pkgname) {
-# 	desc  <- packageDescription(pkgname, libname)
-# 	packageStartupMessage(
-# 			'Version:  ', desc$Version, '\n', 
-# 			'Date:     ', desc$Date, '\n',
-# 			'Author:   ', 'Giorgio Alfredo Spedicato Ph.D, C.Stat ACAS'
-# 	)
-# }
-
 #adding a startup message
 
 .onLoad <- function(libname, pkgname) {
-  
-  desc  <- packageDescription(pkgname, libname)
-  
-  packageStartupMessage('This is package: ',desc$Package, '\n',
-    'Version:  ', desc$Version, '\n', 
-    'Date:     ', desc$Date, '\n'
+  #desc  <- utils::packageDescription(pkgname, libname)
+  packageStartupMessage('This is mbbefd package: ','\n',
+                        "Please note <d,q,p,r>mbbefd functions have been split into  <d,q,p,r>mbbefd and  <d,q,p,r>MBBEFD",'\n',
+                        "depending respectively whether (a,b) or (g,b) are used. Update your code whether necessary"
   )
-  message("Please note <d,q,p,r>mbbefd functions have been split into  <d,q,p,r>mbbefd and  <d,q,p,r>MBBEFD")
-  message("depending the group of parameters being used. Update your code whether necessary")
 }
 
 

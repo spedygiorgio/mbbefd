@@ -19,7 +19,7 @@ ByteCompile: yes
 Suggests: testthat, copula, fitdistrplus, pander, knitcitations,
         rmarkdown, knitr, lattice
 LinkingTo: Rcpp
-Imports: Rcpp
+Imports: Rcpp, utils
 URL: http://github.com/spedygiorgio/mbbefd
 BugReports: http://github.com/spedygiorgio/mbbefd/issues
 VignetteBuilder: knitr

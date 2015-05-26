@@ -23,7 +23,7 @@ export(swissRe)
 importFrom(actuar, munif, levunif) #d,p,q,r in base R
 export(ecunif)
 importFrom(actuar, mbeta, levbeta) #d,p,q,r in base R
-importFrom(gsl, dilog) #dilogarith function used variance
+importFrom(gsl, dilog) #dilogarithm function used variance
 export(ecbeta)
 export(dstpareto, pstpareto, qstpareto, rstpareto, ecstpareto, mstpareto)
 export(dgbeta, pgbeta, qgbeta, rgbeta, ecgbeta, mgbeta)

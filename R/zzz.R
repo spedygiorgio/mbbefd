@@ -4,8 +4,9 @@
 ###############################################################################
 
 #adding a startup message
+#for future version, should test : if(verbose <- getOption("verbose")) 
 
-onAttach <- function(libname, pkgname) {
+.onAttach <- function(libname, pkgname) {
   desc  <- packageDescription(pkgname, libname)
   packageStartupMessage('Package:  ', desc$Package, '\n',
                         'Version:  ', desc$Version, '\n', 

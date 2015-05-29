@@ -2,12 +2,16 @@ library(mbbefd)
 
 #test of GB1 distribution
 
+
+
+
 #integral of the density
 integrate(dgbeta, 0, 1, shape0=1, shape1=3, shape2=3/2)
 integrate(dgbeta, 0, 1, shape0=1/2, shape1=3, shape2=3/2)
 integrate(dgbeta, 0, 1, shape0=2, shape1=3, shape2=3/2)
 
 z <- 0:10/10
+cbind(1/pi*z^(3/pi-1)*(1-z^(1/pi))^(3/2-1)/beta(3, 3/2), dgbeta(z, pi, 3, 3/2))
 cbind(dbeta(z^(1/pi), 3, 3/2)*1/pi*z^(1/pi-1), dgbeta(z, pi, 3, 3/2))
 cbind(pbeta(z^(1/pi), 3, 3/2), pgbeta(z, pi, 3, 3/2))
 cbind(qbeta(z, 3, 3/2)^pi, qgbeta(z, pi, 3, 3/2))
@@ -17,16 +21,24 @@ n <- 1e4
 x <- rgbeta(n, shape0=2, shape1=3, shape2=3/2)
 y <- rgbeta(n, shape0=pi, shape1=3, shape2=3/2)
 
-#test CDF
+#test density
 z <- 0:10/10
+
+plot(density(x)); lines(z, dgbeta(z, shape0=2, shape1=3, shape2=3/2), col="red")
+plot(density(y)); lines(z, dgbeta(z, shape0=pi, shape1=3, shape2=3/2), col="red")
+
+
+#test CDF
 cbind(ecdf(x)(z), pgbeta(z, shape0=2, shape1=3, shape2=3/2))
 
 cbind(ecdf(y)(z), pgbeta(z, shape0=pi, shape1=3, shape2=3/2))
 
+#plot(ecdf(x)); lines(z, pgbeta(z, shape0=2, shape1=3, shape2=3/2), col="red")
+#plot(ecdf(y)); lines(z, pgbeta(z, shape0=pi, shape1=3, shape2=3/2), col="red")
 
 #mean
-c(mean(x), mgbeta(1, shape0=2, shape1=3, shape2=3/2), ecgbeta(1, shape0=2, shape1=3, shape2=3/2))
-c(mean(y), mgbeta(1, shape0=pi, shape1=3, shape2=3/2), ecgbeta(1, shape0=pi, shape1=3, shape2=3/2))
+c(mean(x), mgbeta(1, shape0=2, shape1=3, shape2=3/2))
+c(mean(y), mgbeta(1, shape0=pi, shape1=3, shape2=3/2))
 
 #raw moment
 for(i in 2:4)
@@ -46,7 +58,6 @@ mean(pmin(x, d))
 
 f <- function(x, d, shape0) dgbeta(x, shape0=shape0, shape1=3, shape2=3/2)*pmin(x,d)
 integrate(f, 0, 1, d=d, shape0=s0)
-
 
 
 

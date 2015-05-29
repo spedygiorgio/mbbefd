@@ -43,7 +43,7 @@ rgbeta <- function(n, shape0, shape1, shape2)
   rbeta(n, shape1, shape2)^(shape0)
 }
 
-#internal function
+#internal function : incomplete beta function
 betainc <- function(x, a,b) pbeta(x, a, b)*beta(a,b)
 
 ecgbeta <- function(x, shape0, shape1, shape2)
@@ -53,10 +53,9 @@ ecgbeta <- function(x, shape0, shape1, shape2)
   if(shape0 < 0 || shape1 < 0 || shape2 < 0)
     return(rep(NaN, length(x)))
   
-  b12 <- beta(shape1, shape2)
-  EX <- mgbeta(1, shape0, shape1, shape2)
+  cst2 <- beta(shape1, shape0)/beta(shape1 + shape2, shape0)
   
-  betainc(x^(1/shape0), shape1+shape0, shape2)/(b12*EX) + x*(b12 - betainc(x^(1/shape0), shape1, shape2))/(b12*EX)
+  pbeta(x^(1/shape0), shape1+shape0, shape2) + x*(1 - pbeta(x^(1/shape0), shape1, shape2))*cst2
 }
 
 mgbeta <- function(order, shape0, shape1, shape2)

@@ -51,6 +51,7 @@ qstpareto <- function(p, a, lower.tail = TRUE, log.p = FALSE)
 
 rstpareto <- function(n, a)
 {
+  n <- ifelse(length(n)>1, length(n), n)
   if(!(a > 0))
     return(rep(NaN, n))
   qstpareto(runif(n, 0, 1), a)

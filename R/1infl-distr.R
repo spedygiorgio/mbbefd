@@ -48,6 +48,7 @@ qoifun <- function(p, qfun, p1, lower.tail = TRUE, log.p = FALSE, ...)
 
 roifun <- function(n, rfun, p1, ...)
 {
+  n <- ifelse(length(n)>1, length(n), n)
   if(!(p1 >= 0 && p1 <= 1))
     return(rep(NaN, n))
   res <- rfun(n, ...)

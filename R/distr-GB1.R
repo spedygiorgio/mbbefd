@@ -37,8 +37,9 @@ rgbeta <- function(n, shape0, shape1, shape2)
 {
   if(!is.numeric(shape0) || !is.numeric(shape1) || !is.numeric(shape0))
     stop("non numeric argument.")
+  n <- ifelse(length(n)>1, length(n), n)
   if(shape0 < 0 || shape1 < 0 || shape2 < 0)
-    return(rep(NaN, ifelse(length(n)>1, length(n), n)))
+    return(rep(NaN, n))
   rbeta(n, shape1, shape2)^(shape0)
 }
 

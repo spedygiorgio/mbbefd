@@ -30,3 +30,10 @@ moigbeta <- function(order, shape0, shape1, shape2, p1)
 {
   moifun(order=order, mfun=mgbeta, p1=p1, shape1=shape1, shape2=shape2, shape0=shape0)
 }
+
+tloigbeta <- function(shape0, shape1, shape2, p1)
+{
+  tloifun(p1=p1, shape1=shape1, shape2=shape2, shape0=shape0)
+}
+
+

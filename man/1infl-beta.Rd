@@ -6,6 +6,7 @@
 \alias{roibeta}
 \alias{ecoibeta}
 \alias{moibeta}
+\alias{tloibeta}
 
 \title{
 One-inflated beta distribution
@@ -23,6 +24,7 @@ qoibeta(p, shape1, shape2, p1, ncp=0, lower.tail = TRUE, log.p = FALSE)
 roibeta(n, shape1, shape2, p1, ncp=0)
 ecoibeta(x, shape1, shape2, p1, ncp=0)
 moibeta(order, shape1, shape2, p1, ncp=0)
+tloibeta(shape1, shape2, p1, ncp=0)
 
 }
 
@@ -51,9 +53,9 @@ logical; if \code{TRUE} (default), probabilities are \eqn{P[X <= x]}, otherwise,
 
 }
 \details{
-\code{d,p,q,ec,m}-\code{oibeta} functions computes the density function,
-the distribution function, the quantile function, the exposure curve function and raw moments
-of the one-inflated beta distribution.
+\code{d,p,q,ec,m,tl}-\code{oibeta} functions computes the density function,
+the distribution function, the quantile function, the exposure curve function, 
+raw moments and total loss of the one-inflated beta distribution.
 \code{roibeta} generates random variates of this distribution.
 
 }

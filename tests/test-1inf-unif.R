@@ -13,8 +13,8 @@ cbind(ecdf(x)(z), poiunif(z, 1/2))
 cbind(ecdf(y)(z), poiunif(z, 1/3))
 
 #total loss
-etl(x)
-etl(y)
+c(etl(x), tloiunif(1/2))
+c(etl(y), tloiunif(1/3))
 
 #mean
 c(mean(x), moiunif(1, 1/2))

@@ -6,6 +6,7 @@
 \alias{roiunif}
 \alias{ecoiunif}
 \alias{moiunif}
+\alias{tloiunif}
 
 \title{
 One-inflated uniform distribution
@@ -23,6 +24,7 @@ qoiunif(p, p1, lower.tail = TRUE, log.p = FALSE)
 roiunif(n, p1)
 ecoiunif(x, p1)
 moiunif(order, p1)
+tloiunif(p1)
 
 }
 
@@ -51,11 +53,10 @@ logical; if \code{TRUE} (default), probabilities are \eqn{P[X <= x]}, otherwise,
 
 }
 \details{
-\code{d,p,q,ec,m}-\code{oiunif} functions computes the density function,
-the distribution function, the quantile function, the exposure curve function and raw moments
-of the one-inflated uniform distribution.
+\code{d,p,q,ec,m,tl}-\code{oiunif} functions computes the density function,
+the distribution function, the quantile function, the exposure curve function, 
+raw moments and total loss of the one-inflated uniform distribution.
 \code{roiunif} generates random variates of this distribution.
-
 }
 \value{
 A numeric value or a vector.

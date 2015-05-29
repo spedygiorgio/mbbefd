@@ -78,3 +78,9 @@ moifun <- function(order, mfun, p1, ...)
   E0 <- mfun(order=order, ...) #expectation
   p1 + (1-p1)*E0
 }
+
+#total loss function
+tloifun <- function(p1, ...)
+{
+  p1
+}

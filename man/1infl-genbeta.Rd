@@ -6,6 +6,7 @@
 \alias{roigbeta}
 \alias{ecoigbeta}
 \alias{moigbeta}
+\alias{tloigbeta}
 
 \title{
 One-inflated generalized beta of the first kind (GB1)) distribution
@@ -23,6 +24,7 @@ qoigbeta(p, shape0, shape1, shape2, p1, lower.tail = TRUE, log.p = FALSE)
 roigbeta(n, shape0, shape1, shape2, p1)
 ecoigbeta(x, shape0, shape1, shape2, p1)
 moigbeta(order, shape0, shape1, shape2, p1)
+tloigbeta(shape0, shape1, shape2, p1)
 
 }
 
@@ -51,9 +53,9 @@ logical; if \code{TRUE} (default), probabilities are \eqn{P[X <= x]}, otherwise,
 
 }
 \details{
-\code{d,p,q,ec,m}-\code{oigbeta} functions computes the density function,
-the distribution function, the quantile function, the exposure curve function and raw moments
-of the one-inflated GB1 distribution.
+\code{d,p,q,ec,m,tl}-\code{oigbeta} functions computes the density function,
+the distribution function, the quantile function, the exposure curve function, 
+raw moments and total loss of the one-inflated GB1 distribution.
 \code{roigbeta} generates random variates of this distribution.
 
 }

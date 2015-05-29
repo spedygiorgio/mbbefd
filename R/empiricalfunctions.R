@@ -86,5 +86,5 @@ plot.eecf <- function(x, ..., ylab="Gn(x)", verticals = FALSE, do.points=TRUE,
 
 #total loss
 etl <- function(x)
-  sum(x == 1)/length(x)
+  mean(x == 1)
 

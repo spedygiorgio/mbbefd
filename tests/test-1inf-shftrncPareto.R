@@ -13,8 +13,8 @@ cbind(ecdf(x)(z), poistpareto(z, 2, 1/2))
 cbind(ecdf(y)(z), poistpareto(z, 1/2, 1/3))
 
 #total loss
-etl(x)
-etl(y)
+c(etl(x), tloistpareto(2, 1/2))
+c(etl(y), tloistpareto(1/2, 1/3))
 
 #mean
 c(mean(x), moistpareto(1, 2, 1/2))

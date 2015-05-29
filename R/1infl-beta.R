@@ -34,3 +34,9 @@ moibeta <- function(order, shape1, shape2, p1, ncp=0)
     stop("not yet implemented.")
   moifun(order=order, mfun=mbeta, p1=p1, shape1=shape1, shape2=shape2)
 }
+
+
+tloibeta <- function(shape1, shape2, p1, ncp=0)
+{
+  tloifun(p1=p1, shape1=shape1, shape2=shape2, ncp=ncp)
+}

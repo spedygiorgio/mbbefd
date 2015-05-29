@@ -6,6 +6,7 @@
 \alias{roistpareto}
 \alias{ecoistpareto}
 \alias{moistpareto}
+\alias{tloistpareto}
 
 \title{
 One-inflated shifted truncated pareto distribution
@@ -23,6 +24,7 @@ qoistpareto(p, a, p1, lower.tail = TRUE, log.p = FALSE)
 roistpareto(n, a, p1)
 ecoistpareto(x, a, p1)
 moistpareto(order, a, p1)
+tloistpareto(a, p1)
 
 }
 
@@ -51,9 +53,9 @@ logical; if \code{TRUE} (default), probabilities are \eqn{P[X <= x]}, otherwise,
 
 }
 \details{
-\code{d,p,q,ec,m}-\code{oistpareto} functions computes the density function,
-the distribution function, the quantile function, the exposure curve function and raw moments
-of the one-inflated shifted truncated pareto distribution.
+\code{d,p,q,ec,m,tl}-\code{oistpareto} functions computes the density function,
+the distribution function, the quantile function, the exposure curve function, 
+raw moments and total loss of the one-inflated shifted truncated pareto distribution.
 \code{roistpareto} generates random variates of this distribution.
 
 }

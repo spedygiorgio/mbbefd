@@ -6,6 +6,7 @@
 \alias{roifun}
 \alias{ecoifun}
 \alias{moifun}
+\alias{tloifun}
 
 \title{
 One-inflated distributions
@@ -23,6 +24,7 @@ qoifun(p, qfun, p1, lower.tail = TRUE, log.p = FALSE, ...)
 roifun(n, rfun, p1, ...)
 ecoifun(x, ecfun, mfun, p1, ...)
 moifun(order, mfun, p1, ...)
+tloifun(p1, ...)
 
 }
 
@@ -61,9 +63,10 @@ further arguments to pass to \code{dfun, pfun, qfun, rfun, ecfun, mfun}.
 
 }
 \details{
-\code{d,p,q,ec,m} functions of \code{oifun} computes the density function,
-the distribution function, the quantile function, the exposure curve function and raw moments
-of an one-inflated distribution of an original distribution specified by \code{d,p,q,ec,m}-\code{fun}.
+\code{d,p,q,ec,m,tl} functions of \code{oifun} computes the density function,
+the distribution function, the quantile function, the exposure curve function, 
+raw moments and total loss of an one-inflated distribution of an original distribution 
+specified by \code{d,p,q,ec,m}-\code{fun}.
 \code{roifun} generates random variates of the resulting distribution.
 
 }
@@ -77,7 +80,5 @@ Dutang Christophe
 \seealso{
 \code{\link{oibeta}}, \code{\link{oiunif}}, \code{\link{oistpareto}} and \code{\link{oidistribution}}.
 }
-\examples{
-#TODO
-}
+
 \keyword{distribution}

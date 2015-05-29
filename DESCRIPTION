@@ -14,7 +14,7 @@ Description: Distributions that are typically used for exposure rating in
              The vignettes show code snippets to fit the distribution to
              empirical data.
 License: GPL-2
-Depends: R (>= 2.14), actuar, gsl
+Depends: R (>= 2.14), actuar, gsl, MASS
 ByteCompile: yes
 Suggests: testthat, copula, fitdistrplus, pander, knitcitations,
         rmarkdown, knitr, lattice

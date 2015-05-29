@@ -13,8 +13,8 @@ cbind(ecdf(x)(z), poibeta(z, 2, 2, 1/2))
 cbind(ecdf(y)(z), poibeta(z, 4/3, 2/3, 1/3))
 
 #total loss
-etl(x)
-etl(y)
+c(etl(x), tloibeta(2, 2, 1/2))
+c(etl(y), tloibeta(4/3, 2/3, 1/3))
 
 #mean
 c(mean(x), moibeta(1, 2, 2, 1/2))

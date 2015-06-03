@@ -9,9 +9,13 @@ gendilog <- function(a, b, checkparam=TRUE)
     return(log(b)/2)
   else if(b == 1)
     return(log(a+1))
-  #require(gsl)
-  
-  res <- dilog(-1/abs(a)) - dilog(-b/abs(a))
-  res <- log(abs(a)) + res/log(b)
+  else if(a > 0)
+  {
+    res <- (dilog(-1/a) - dilog(-b/a))/log(b)+log(a)
+  }else
+  {
+    res <- (dilog(1+b/a) - dilog(1+1/a))/log(b)
+    res <- res + log(a+b) - log(-a)*log((a+b)/(a+1))/log(b)
+  }
   res
 }

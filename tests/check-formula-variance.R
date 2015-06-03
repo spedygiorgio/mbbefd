@@ -10,9 +10,8 @@ f <- function(x, a, b)
 }
 
 
-
 a <- -1/2
-sapply(1:3, function(b)
+sapply(1:3+1/2, function(b)
   c(a=a, b=b, check=integrate(f, 0, 1, a=a, b=b)$value, th=mbbefd:::gendilog(a, b))
 )
 

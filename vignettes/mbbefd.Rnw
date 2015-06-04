@@ -556,7 +556,7 @@ distribution function, starting from known values of $p=\frac{1}{g}$ The algorit
   \item Compare $E\left[ x^2 \right]$ to the empirical moment. Repeat the process modifying $p$ until the theoretical second moment is close to the empirical one enough (the second moment is an increasing function of p).
 \end{enumerate}
 
-Fitting a MBBEFD distribution is not easy. The result is sensible to initial values and appears to be instable.  We have applied the first three steps of this process in order to obtain initial estimates of $a$ and $b$ to feed the Maximum Likelihood estimation process using \pkg{fitdistrplus} package, \cite{fitdistrplusR}. We show two example one using both artificial data or real one (from package \pkg{copula}, \cite{copulaR}).
+Fitting a MBBEFD distribution is not easy. The result is sensible to initial values and appears to be instable.  We have applied the first three steps of this process in order to obtain initial estimates of $a$ and $b$ to feed the Maximum Likelihood estimation process using \pkg{fitdistrplus} package, \cite{fitdistrplusR}. We show two example one using both artificial data or real one (from package \pkg{copula}, \cite{copulaR}). The code below shows initializers that are also copied in the \code{initializers.R} file in demo folder.
 
 
 <<fitting, keep.source=TRUE>>=

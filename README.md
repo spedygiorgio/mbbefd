@@ -11,3 +11,6 @@ install.packages('mbbefd')
 ```r
 devtools::install_github('spedygiorgio/mbbefd')
 ```
+
+##Travis status
+![alt tag](https://travis-ci.org/spedygiorgio/mbbefd.svg?branch=master)

@@ -245,7 +245,7 @@ believed that the distance between the building will ensure that fires can be
 contained in a local area. Hence the MPL might be only the highest value of any 
 of those buildings. 
 
-Shifting from the metric from loss amounts to damage ratio (loss 
+Shifting the metric from loss amounts to damage ratio (loss 
 as a % of the exposure metric) allows us to compare and benchmarks risks.
 
 ## Analysing deductibles
@@ -293,7 +293,7 @@ the proportion of large loss.
 If all losses were total losses then the exposure curve would be 
 identical with the diagonal.
 
-Different perils and exposure will have different exposure curves. 
+Different perils and exposures will have different exposure curves. 
 Well known exposure curves are those used by Swiss Re and Lloyd's.
 
 The Swiss Re curves were developed based on data from the 
@@ -363,7 +363,7 @@ Y3     | 3.0          |Commercial lines (medium-scale)  | Sum Insured
 Y4     | 4.0          |Industrial and large commercial  | MPL
 Lloyd's  | 5.0          |Lloyd's: Industry  | Top location
 
-It is believed that smaller risks have a higher proportion of server losses
+It is believed that smaller risks have a higher proportion of severe losses
 than larger risks, relative to the sum insured.
 
 # Example

@@ -14,12 +14,12 @@ Description: Distributions that are typically used for exposure rating in
              The vignettes show code snippets to fit the distribution to
              empirical data.
 License: GPL-2
-Depends: R (>= 2.14), actuar, gsl, MASS
+Depends: R (>= 2.14) 
 ByteCompile: yes
 Suggests: testthat, copula, fitdistrplus, pander, knitcitations,
         rmarkdown, knitr, lattice, alabama
 LinkingTo: Rcpp
-Imports: Rcpp, utils
+Imports: Rcpp, utils, actuar, gsl, MASS
 URL: http://github.com/spedygiorgio/mbbefd
 BugReports: http://github.com/spedygiorgio/mbbefd/issues
 VignetteBuilder: knitr

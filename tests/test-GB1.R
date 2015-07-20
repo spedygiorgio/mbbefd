@@ -27,6 +27,16 @@ z <- 0:10/10
 plot(density(x)); lines(z, dgbeta(z, shape0=2, shape1=3, shape2=3/2), col="red")
 plot(density(y)); lines(z, dgbeta(z, shape0=pi, shape1=3, shape2=3/2), col="red")
 
+#mode
+modeGB1 <- function(shape0, shape1, shape2)
+{
+  if(shape1+shape2-shape0>1)
+    ((shape1-shape0)/(shape1+shape2-shape0-1))^shape0
+  else
+    NaN
+}
+c(modeGB1(2, 3, 3/2), density(x)$x[which.max(density(x)$y)])
+c(modeGB1(pi, 3, 3/2), density(y)$x[which.max(density(y)$y)])
 
 #test CDF
 cbind(ecdf(x)(z), pgbeta(z, shape0=2, shape1=3, shape2=3/2))

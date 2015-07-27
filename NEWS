@@ -1,3 +1,6 @@
+Version 0.8
+Added data sets (aon and loss)
+
 Version 0.7-1
 12-05-2015
 Remove depreciated functions. Update C++ rng for MBBEFD.

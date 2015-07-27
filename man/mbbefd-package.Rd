@@ -22,8 +22,8 @@ The vignette shows code snippets to fit the distribution to empirical data.
 \tabular{ll}{
 Package: \tab mbbefd\cr
 Type: \tab Package\cr
-Version: \tab 0.7-1\cr
-Date: \tab 2015-05-13\cr
+Version: \tab 0.8\cr
+Date: \tab 2015-08-30\cr
 License: \tab GPL 2\cr
 }
 }

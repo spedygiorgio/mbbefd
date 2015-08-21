@@ -2,22 +2,24 @@ library(mbbefd)
 library(fitdistrplus)
 
 
-#oiunif
+#oistpareto
 n <- 1e3
 nboot <- 1000
 nboot <- 10
 set.seed(12345)
 x <- roistpareto(n, 2, 1/6)
-f1 <- fitdist(x, "oistpareto", method="mle", start=list(a=1/mean(x), p1=etl(x)))
-b1 <- bootdist(f1, niter=nboot)
 
+f1 <- fitDR(x, "oistpareto", method="mle")
+summary(f1)
+summary(fitdist(x, "oistpareto", method="mle", start=list(a=1/mean(x), p1=etl(x))))#check
+
+b1 <- bootDR(f1, niter=nboot)
 summary(b1)
 
-plot(b1)
-abline(v=2, h=1/6, col="red")
+plot(b1, enhance=TRUE, trueval=c(1/6, 2))
 
 hist(b1$estim[,1])
 hist(b1$estim[,2])
 
 
-mbbefd:::pairs2(b1$estim, c(2, 1/6), main="one-inflated ST Pareto")
+

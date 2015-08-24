@@ -19,13 +19,22 @@ args(constrOptim.nl)
 
 constrab <- function(x, fix.arg, obs, ddistnam)
 {
-	x[1]*(1-x[2]) #a*(1-b)
+	x[1]*(1-x[2]) #a*(1-b) >= 0
 }
+
+f1 <- fitDR(lossrate, "mbbefd")
+
+summary(f1)
+cdfcomp(f1, do.points=FALSE)
+qqcomp(f1)
 
 alabama1 <- fitdist(lossrate, distr=distlist, start=initparmbbefd[[1]], 
         custom.optim= constrOptim.nl, hin=constrab, method="mle",
         control.outer=list(trace= FALSE))
 
+mbbefd:::grLLfunc(obs=lossrate, theta=c(0.5548252, 0.1069368), dist="mbbefd")
+mbbefd:::heLLfunc(obs=lossrate, theta=c(0.5548252, 0.1069368), dist="mbbefd")
+  
 alabama2 <- fitdist(lossrate, distr=distlist, start=initparmbbefd[[2]], 
         custom.optim= constrOptim.nl, hin=constrab, method="mle",
         control.outer=list(trace=FALSE))

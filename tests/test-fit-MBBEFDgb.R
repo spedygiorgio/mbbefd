@@ -4,10 +4,10 @@ n <- 1e3
 nboot <- 100
 nboot <- 10
 set.seed(123456)
-lossrate <- rmbbefd(n, 1/2, 1/10)
+x <- rMBBEFD(n, 2, 1/10)
 
 
-f1 <- fitDR(lossrate, "mbbefd")
+f1 <- fitDR(x, "MBBEFD")
 
 summary(f1)
 cdfcomp(f1, do.points=FALSE)

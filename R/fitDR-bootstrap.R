@@ -5,7 +5,6 @@ bootDR <- function(f, bootmethod="param", niter=1001, silent=TRUE)
   if (niter<10) 
     stop("niter must be an integer above 10")
   bootmethod <- match.arg(bootmethod, c("param", "nonparam"))
-  print(f$distname)
   
   #simulate bootstrap data
   if (bootmethod == "param") { # parametric bootstrap
@@ -24,8 +23,9 @@ bootDR <- function(f, bootmethod="param", niter=1001, silent=TRUE)
   start <- as.list(f$estimate) #a named vector is no longer is accepted as starting values.
   #if (is.null(f$dots))
   func <- function(iter) {
-    res <- try(do.call(fitDR, list(x=rdata[, iter], dist=f$distname, start=start)))
-    if(class(res) == "try-error")
+    res <- try(do.call(fitDR, list(x=rdata[, iter], dist=f$distname, start=start)), silent=silent)
+    
+    if(class(res)[1] == "try-error")
       return(c(rep(NA, length(start)), 100))
     else
       return(c(res$estimate, res$convergence))

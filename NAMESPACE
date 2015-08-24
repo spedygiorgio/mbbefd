@@ -53,6 +53,7 @@ S3method(plot, eecf)
 
 #fitting methods
 importFrom(fitdistrplus, fitdist)
+importFrom(alabama, constrOptim.nl) #only for MBBEFD
 export(fitDR) #fitDR class inheriting from fitdist class
 export(bootDR) #bootDR class inheriting from bootdist class
 

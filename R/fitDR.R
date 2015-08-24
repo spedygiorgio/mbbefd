@@ -9,10 +9,10 @@ fitDR <- function(x, dist, method="mle", form.arg=NULL, start=NULL, ...)
   if(dist == "mbbefd")
   {
     initparmbbefd <- list(list(a=-1/2, b=2), list(a=2, b=1/2))
-    require(alabama)
     
     if(method == "mle")
     {
+      
       #wrap gradient -LL to match the call by fitdist
       grLL <- function(x, fix.arg, obs, ddistnam) -grLLfunc(obs=obs, theta=x, dist="mbbefd")
       
@@ -24,47 +24,75 @@ fitDR <- function(x, dist, method="mle", form.arg=NULL, start=NULL, ...)
       alabama2 <- fitdist(x, distr="mbbefd", start=initparmbbefd[[2]], 
                         custom.optim= constrOptim.nl, hin=constrmbbefd, method="mle",
                         control.outer=list(trace= FALSE), gr=grLL)
-      
-      if(alabama1$loglik > alabama2$loglik)
+      if(alabama1$convergence == 100 && alabama2$convergence == 100)
         f1 <- alabama1
+      else if(alabama1$convergence == 100 && alabama2$convergence != 100) 
+        f1 <- alabama2
+      else if(alabama1$convergence != 100 && alabama2$convergence == 100) 
+        f1 <- alabama2
       else
-        f1 <- alabama2  
-      #computes Hessian of -LL at estimate values
-      f1hess <- -heLLfunc(obs=x, theta=f1$estimate, dist="mbbefd")
-      
-      if(all(!is.na(f1hess)) && qr(f1hess)$rank == NCOL(f1hess)){
-        f1$vcov <- solve(f1hess)
-        f1$sd <- sqrt(diag(f1$vcov))
-        f1$cor <- cov2cor(f1$vcov)
-      }#otherwise it is already at NA from fitdist
+      {
+        if(alabama1$loglik > alabama2$loglik)
+          f1 <- alabama1
+        else
+          f1 <- alabama2  
+        #computes Hessian of -LL at estimate values
+        f1hess <- -heLLfunc(obs=x, theta=f1$estimate, dist="mbbefd")
+        
+        if(all(!is.na(f1hess)) && qr(f1hess)$rank == NCOL(f1hess)){
+          f1$vcov <- solve(f1hess)
+          f1$sd <- sqrt(diag(f1$vcov))
+          f1$cor <- cov2cor(f1$vcov)
+        }#otherwise it is already at NA from fitdist
+      }
       
       class(f1) <- c("DR", class(f1))
     }else
       stop("not yet implemented")
   }else if(dist == "MBBEFD")
   {
-    stop("not yet implemented")
+    
+    g <- 1/etl(x)
+    phalf <- mean(x <= 1/2)
+    b <- Re(polyroot(c(phalf, (1-g)*(1-phalf), - 1 +g*(1-phalf))))
+    if(any(b > 0 | b < 1))
+      b <- max(b[b > 0 & b < 1])
+    else
+      b <- 1/2
+    initMBBEFD <- list(g=g, b=b)
+    
+    if(method == "mle")
+    {
+      #domain : (g,b) in (1, +Inf) x (0, +Inf)
+      f1 <- fitdist(x, distr="MBBEFD", start=initMBBEFD, 
+                          custom.optim= constrOptim.nl, hin=constrMBBEFD, method="mle",
+                          control.outer=list(trace= TRUE))
+      class(f1) <- c("DR", class(f1))
+    }else
+      stop("not yet implemented")  
+      
   }else if(dist == "oiunif")
   {
     if(is.null(start))
-      start=list(p1=etl(x))
+      start <- list(p1=etl(x))
     
     #print(LLfunc(x, start$p1, dist))
     f1 <- fitdist(x, distr=dist, method=method, start=start,
                   lower=0, upper=1, ..., optim.method="Brent") #, control=list(trace=6, REPORT=1)
     
     #gof stat
-    f1$loglik <- LLfunc(obs=x, theta=f1$estimate, dist=dist)
-    npar <- length(f1$estimate)
-    f1$aic <- -2*f1$loglik+2*npar
-    f1$bic <- -2*f1$loglik+log(f1$n)*npar
-    
-    f1$vcov <- rbind(cbind(as.matrix(f1$vcov), rep(0, npar-1)), 
-                     c(rep(0, npar-1), p1*(1-p1)))
-    dimnames(f1$vcov) <- list(names(f1$estimate), names(f1$estimate))
-    
-    f1$sd <- sqrt(diag(f1$vcov))
-    f1$cor <- cov2cor(f1$vcov)
+#     f1$loglik <- LLfunc(obs=x, theta=f1$estimate, dist=dist)
+#     p1 <- f1$estimate["p1"]
+#     npar <- length(f1$estimate)
+#     f1$aic <- -2*f1$loglik+2*npar
+#     f1$bic <- -2*f1$loglik+log(f1$n)*npar
+#     
+#     f1$vcov <- rbind(cbind(as.matrix(f1$vcov), rep(0, npar-1)), 
+#                      c(rep(0, npar-1), p1*(1-p1)))
+#     dimnames(f1$vcov) <- list(names(f1$estimate), names(f1$estimate))
+#     
+#     f1$sd <- sqrt(diag(f1$vcov))
+#     f1$cor <- cov2cor(f1$vcov)
     class(f1) <- c("DR", class(f1))
     
   }else if(dist %in% c("oistpareto", "oibeta", "oigbeta")) #one-inflated distr
@@ -211,6 +239,8 @@ heLLfunc <- function(obs, theta, dist)
     stop("not yet implemented.")
   }
 }
+
+#to meet the standard 'fn' argument and specific name arguments, 
 
 #constraint function for MBBEFD(a,b)
 constrmbbefd <- function(x, fix.arg, obs, ddistnam)

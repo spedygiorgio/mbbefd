@@ -1,5 +1,5 @@
 
-fitDR <- function(x, dist, method="mle", form.arg=NULL, start=NULL, ...)
+fitDR <- function(x, dist, method="mle", start=NULL, ...)
 {
   if(any(x < 0 | x > 1))
     stop("Values outside [0,1] are not supported in fitDR.")
@@ -51,22 +51,37 @@ fitDR <- function(x, dist, method="mle", form.arg=NULL, start=NULL, ...)
       stop("not yet implemented")
   }else if(dist == "MBBEFD")
   {
-    
+    xneq1 <- x[x != 1]
     g <- 1/etl(x)
+    
     phalf <- mean(x <= 1/2)
     b <- Re(polyroot(c(phalf, (1-g)*(1-phalf), - 1 +g*(1-phalf))))
     if(any(b > 0 | b < 1))
       b <- max(b[b > 0 & b < 1])
     else
       b <- 1/2
-    initMBBEFD <- list(g=g, b=b)
-    
+    #cat("g", g, "b", b, "\n")
     if(method == "mle")
     {
       #domain : (g,b) in (1, +Inf) x (0, +Inf)
-      f1 <- fitdist(x, distr="MBBEFD", start=initMBBEFD, 
-                          custom.optim= constrOptim.nl, hin=constrMBBEFD, method="mle",
-                          control.outer=list(trace= TRUE))
+      f1 <- fitdist(x, distr="MBBEFD", start=list(b=b), fix.arg=list(g=g),
+                          custom.optim= constrOptim.nl, hin=constrMBBEFDb, method="mle",
+                          control.outer=list(trace= FALSE))
+      if(f1$convergence == 0)
+      {
+        f1$estimate <- c(g=g, f1$estimate) 
+        f1$fix.arg <- NULL
+        
+        #gof stat
+        f1$loglik <- LLfunc(obs=x, theta=f1$estimate, dist=dist)
+        npar <- length(f1$estimate)
+        f1$aic <- -2*f1$loglik+2*npar
+        f1$bic <- -2*f1$loglik+log(f1$n)*npar
+        
+        #f1$vcov 
+        #f1$sd <- sqrt(diag(f1$vcov))
+        #f1$cor <- cov2cor(f1$vcov)
+      }
       class(f1) <- c("DR", class(f1))
     }else
       stop("not yet implemented")  
@@ -80,19 +95,6 @@ fitDR <- function(x, dist, method="mle", form.arg=NULL, start=NULL, ...)
     f1 <- fitdist(x, distr=dist, method=method, start=start,
                   lower=0, upper=1, ..., optim.method="Brent") #, control=list(trace=6, REPORT=1)
     
-    #gof stat
-#     f1$loglik <- LLfunc(obs=x, theta=f1$estimate, dist=dist)
-#     p1 <- f1$estimate["p1"]
-#     npar <- length(f1$estimate)
-#     f1$aic <- -2*f1$loglik+2*npar
-#     f1$bic <- -2*f1$loglik+log(f1$n)*npar
-#     
-#     f1$vcov <- rbind(cbind(as.matrix(f1$vcov), rep(0, npar-1)), 
-#                      c(rep(0, npar-1), p1*(1-p1)))
-#     dimnames(f1$vcov) <- list(names(f1$estimate), names(f1$estimate))
-#     
-#     f1$sd <- sqrt(diag(f1$vcov))
-#     f1$cor <- cov2cor(f1$vcov)
     class(f1) <- c("DR", class(f1))
     
   }else if(dist %in% c("oistpareto", "oibeta", "oigbeta")) #one-inflated distr
@@ -252,4 +254,8 @@ constrmbbefd <- function(x, fix.arg, obs, ddistnam)
 constrMBBEFD <- function(x, fix.arg, obs, ddistnam)
 {
   c(x[1]-1, x[2]) #g >= 1, b > 0
+}
+constrMBBEFDb <- function(x, fix.arg, obs, ddistnam)
+{
+  x[1] #b > 0
 }

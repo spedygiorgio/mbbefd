@@ -8,6 +8,7 @@
 \alias{mmbbefd}
 \alias{tlmbbefd}
 
+\alias{MBBEFD}
 \alias{dMBBEFD}
 \alias{pMBBEFD}
 \alias{qMBBEFD}

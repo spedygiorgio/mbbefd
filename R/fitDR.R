@@ -3,7 +3,7 @@ fitDR <- function(x, dist, method="mle", start=NULL, ...)
 {
   if(any(x < 0 | x > 1))
     stop("Values outside [0,1] are not supported in fitDR.")
-  method <- match.arg(method, c("mle", "mme", "qme", "mge"))
+  method <- match.arg(method, c("mle", "tlmme"))
   dist <- match.arg(dist, c("oiunif", "oistpareto", "oibeta", "oigbeta", "mbbefd", "MBBEFD"))
   
   if(dist == "mbbefd")
@@ -18,18 +18,18 @@ fitDR <- function(x, dist, method="mle", start=NULL, ...)
       
       #domain : (a,b) in (-1, 0) x (1, +Inf)
       alabama1 <- fitdist(x, distr="mbbefd", start=initparmbbefd[[1]], 
-                        custom.optim= constrOptim.nl, hin=constrmbbefd, method="mle",
+                        custom.optim= constrOptim.nl, hin=constrmbbefd1, method="mle",
                         control.outer=list(trace= FALSE), gr=grLL)
       #domain : (a,b) in (0, +Inf) x (0, 1)
       alabama2 <- fitdist(x, distr="mbbefd", start=initparmbbefd[[2]], 
-                        custom.optim= constrOptim.nl, hin=constrmbbefd, method="mle",
+                        custom.optim= constrOptim.nl, hin=constrmbbefd2, method="mle",
                         control.outer=list(trace= FALSE), gr=grLL)
       if(alabama1$convergence == 100 && alabama2$convergence == 100)
         f1 <- alabama1
       else if(alabama1$convergence == 100 && alabama2$convergence != 100) 
         f1 <- alabama2
       else if(alabama1$convergence != 100 && alabama2$convergence == 100) 
-        f1 <- alabama2
+        f1 <- alabama1
       else
       {
         if(alabama1$loglik > alabama2$loglik)
@@ -47,6 +47,38 @@ fitDR <- function(x, dist, method="mle", start=NULL, ...)
       }
       
       class(f1) <- c("DR", class(f1))
+    }else if(method == "tlmme")
+    {
+      DIFF2 <- function(par, obs) 
+      {
+        (mmbbefd(1, par[1], par[2]) - mean(obs))^2 + (tlmbbefd(par[1], par[2]) - etl(obs))^2
+      }
+      alabama1 <- constrOptim.nl(unlist(initparmbbefd[[1]]), fn=DIFF2, hin=constrmbbefd1, obs=x, control.outer=list(trace=FALSE))
+      alabama2 <- constrOptim.nl(unlist(initparmbbefd[[2]]), fn=DIFF2, hin=constrmbbefd2, obs=x, control.outer=list(trace=FALSE))
+      
+      if(alabama1$convergence > 0 && alabama2$convergence > 0)
+        f1 <- list(estimate=NA, convergence=100)
+      else if(alabama1$convergence > 0 && alabama2$convergence == 0) 
+        f1 <- list(estimate=alabama2$par, convergence=0)
+      else if(alabama1$convergence == 0 && alabama2$convergence > 0) 
+        f1 <- list(estimate=alabama1$par, convergence=0)
+      else
+      {
+        if(alabama1$value < alabama2$value)
+          f1 <- list(estimate=alabama1$par, convergence=0)
+        else
+          f1 <- list(estimate=alabama2$par, convergence=0)
+      }
+      f1$method <- "tlmme"
+      f1$data <- x
+      f1$n <- length(x)
+      f1$distname <- "mbbefd"
+      f1$fix.arg <- f1$fix.arg.fun <- f1$dots <- f1$weights <- NULL
+      f1$discrete <- FALSE
+      f1$aic <- f1$bic <- f1$loglik <- NA
+      f1$sd <- f1$vcov <- f1$cor <- NA
+      class(f1) <- c("DR", "fitdist")
+      
     }else
       stop("not yet implemented")
   }else if(dist == "MBBEFD")
@@ -60,28 +92,43 @@ fitDR <- function(x, dist, method="mle", start=NULL, ...)
       b <- max(b[b > 0 & b < 1])
     else
       b <- 1/2
+    
+    initparMBBEFD <- list(list(g=1/etl(x), b=2), list(g=1/etl(x), b=etl(x)/2))
+    
     #cat("g", g, "b", b, "\n")
     if(method == "mle")
     {
-      #domain : (g,b) in (1, +Inf) x (0, +Inf)
-      f1 <- fitdist(x, distr="MBBEFD", start=list(b=b), fix.arg=list(g=g),
-                          custom.optim= constrOptim.nl, hin=constrMBBEFDb, method="mle",
-                          control.outer=list(trace= FALSE))
-      if(f1$convergence == 0)
+      
+      #domain : (g,b) in (1, +Inf) x (1, +Inf) with gb > 1
+      alabama1 <- fitdist(x, distr="MBBEFD", start=initparMBBEFD[[1]], 
+                          custom.optim= constrOptim.nl, hin=constrMBBEFD1, method="mle",
+                          control.outer=list(trace= FALSE), hin.jac=constrMBBEFD1jac, silent=FALSE)
+      #domain : (g,b) in (1, +Inf) x (0, 1) with gb < 1
+      alabama2 <- fitdist(x, distr="MBBEFD", start=initparMBBEFD[[2]], 
+                          custom.optim= constrOptim.nl, hin=constrMBBEFD2, method="mle",
+                          control.outer=list(trace= FALSE), hin.jac=constrMBBEFD2jac, silent=FALSE)
+      
+      print(summary(alabama1))
+      print(summary(alabama2))
+      if(alabama1$convergence == 100 && alabama2$convergence == 100)
+        f1 <- alabama1
+      else if(alabama1$convergence == 100 && alabama2$convergence != 100) 
+        f1 <- alabama2
+      else if(alabama1$convergence != 100 && alabama2$convergence == 100) 
+        f1 <- alabama1
+      else
       {
-        f1$estimate <- c(g=g, f1$estimate) 
-        f1$fix.arg <- NULL
-        
+        if(alabama1$loglik > alabama2$loglik)
+          f1 <- alabama1
+        else
+          f1 <- alabama2 
         #gof stat
         f1$loglik <- LLfunc(obs=x, theta=f1$estimate, dist=dist)
         npar <- length(f1$estimate)
         f1$aic <- -2*f1$loglik+2*npar
         f1$bic <- -2*f1$loglik+log(f1$n)*npar
-        
-        #f1$vcov 
-        #f1$sd <- sqrt(diag(f1$vcov))
-        #f1$cor <- cov2cor(f1$vcov)
       }
+      
       class(f1) <- c("DR", class(f1))
     }else
       stop("not yet implemented")  
@@ -249,11 +296,45 @@ constrmbbefd <- function(x, fix.arg, obs, ddistnam)
 {
   x[1]*(1-x[2]) #a*(1-b) >= 0
 }
+constrmbbefd1 <- function(x, fix.arg, obs, ddistnam)
+{
+  c(x[1]+1, -x[1], x[2]-1, x[1]*(1-x[2])) #-1 < a < 0, b > 1, a*(1-b) >= 0
+}
+constrmbbefd2 <- function(x, fix.arg, obs, ddistnam)
+{
+  c(x[1], x[1], 1-x[2], x[1]*(1-x[2])) #0 < a , 0 < b < 1, a*(1-b) >= 0
+}
 
 #constraint function for MBBEFD(g,b)
 constrMBBEFD <- function(x, fix.arg, obs, ddistnam)
 {
   c(x[1]-1, x[2]) #g >= 1, b > 0
+}
+constrMBBEFD1 <- function(x, fix.arg, obs, ddistnam)
+{
+  c(x[1]-1, x[2]-1, x[1]*x[2]-1) #g > 1, b > 1, gb > 1
+}
+constrMBBEFD1jac <- function(x, fix.arg, obs, ddistnam)
+{
+  j <- matrix(0, 3, 2)
+  j[1,] <- c(1, 0)
+  j[2,] <- c(0, 1)
+  j[3,] <- c(x[2], x[1])
+  j
+}
+
+constrMBBEFD2 <- function(x, fix.arg, obs, ddistnam)
+{
+  c(x[1]-1, 1-x[2], x[2], 1-x[1]*x[2]) #g > 1, 1 > b > 0, gb < 1
+}
+constrMBBEFD2jac <- function(x, fix.arg, obs, ddistnam)
+{
+  j <- matrix(0, 4, 2)
+  j[1,] <- c(1, 0)
+  j[2,] <- c(0, -1)
+  j[3,] <- c(0, 1)
+  j[4,] <- c(-x[2], -x[1])
+  j
 }
 constrMBBEFDb <- function(x, fix.arg, obs, ddistnam)
 {

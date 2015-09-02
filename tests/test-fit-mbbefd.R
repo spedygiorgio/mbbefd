@@ -18,3 +18,8 @@ b1 <- bootDR(f1, niter=nboot, silent=TRUE)
 
 plot(b1, enhance=TRUE, trueval=c(1/2, 1/10))
 
+
+
+
+f2 <- fitDR(lossrate, "mbbefd", method="tlmme")
+

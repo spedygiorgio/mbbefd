@@ -1,6 +1,8 @@
 
 fitDR <- function(x, dist, method="mle", start=NULL, ...)
 {
+  if(any(is.na(x)))
+    x <- x[!is.na(x)]
   if(any(x < 0 | x > 1))
     stop("Values outside [0,1] are not supported in fitDR.")
   method <- match.arg(method, c("mle", "tlmme"))

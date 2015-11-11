@@ -1,10 +1,12 @@
 Version 0.8
 Added data sets (aon and loss).
+Start an unified approach for paramater estimation
+based on the fitdist function from fitdistrplus.
 
 Version 0.7-1
 12-05-2015
 Remove depreciated functions. Update C++ rng for MBBEFD.
-Added startup message and warning
+Added startup message and warning.
 
 Version 0.7
 03-05-2015

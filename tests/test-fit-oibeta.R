@@ -15,8 +15,16 @@ summary(f1)
 b1 <- bootDR(f1, niter=nboot)
 summary(b1)
 
-plot(b1, enhance=TRUE, trueval=c(1/6, 3, 2))
+plot(b1, enhance=TRUE, trueval=c(3, 2, 1/6))
 
 hist(b1$estim[,1])
 hist(b1$estim[,2])
 hist(b1$estim[,3])
+
+
+f2 <- fitDR(x, "oigbeta", method="tlmme")
+summary(f2)
+
+gofstat(list(f1, f2))
+cdfcomp(list(f1, f2), do.points=FALSE)
+ppcomp(list(f1, f2))

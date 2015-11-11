@@ -16,10 +16,14 @@ summary(fitdist(x, "oistpareto", method="mle", start=list(a=1/mean(x), p1=etl(x)
 b1 <- bootDR(f1, niter=nboot)
 summary(b1)
 
-plot(b1, enhance=TRUE, trueval=c(1/6, 2))
+plot(b1, enhance=TRUE, trueval=c(2, 1/6))
 
 hist(b1$estim[,1])
 hist(b1$estim[,2])
 
+f2 <- fitDR(x, "oistpareto", method="tlmme")
+summary(f2)
 
-
+gofstat(list(f1, f2))
+cdfcomp(list(f1, f2), do.points=FALSE)
+ppcomp(list(f1, f2))

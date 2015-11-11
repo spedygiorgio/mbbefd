@@ -22,15 +22,17 @@ fitDR(x, dist, method="mle", start=NULL, \dots)
   \code{"oiunif"}, \code{"oistpareto"}, \code{"oibeta"}, \code{"oigbeta"}, 
   \code{"mbbefd"}, \code{"MBBEFD"}.}
 \item{method}{A character string coding for the fitting method: 
-    \code{"mle"} for 'maximum likelihood estimation', \code{"mme"} for 'moment matching estimation', 
-    \code{"qme"} for 'quantile matching estimation' and \code{"mge"} for 'maximum goodness-of-fit estimation'.}
-\item{start}{A named list giving the initial values of parameters of the named distribution
+    \code{"mle"} for 'maximum likelihood estimation', 
+    \code{"tlmme"} for 'total-loss-moment matching estimation'.}
+\item{start}{A named list giving the initial values of parameters 
+    of the named distribution
     or a function of data computing initial values and returning a named list.
     This argument may be omitted (default) for some distributions for which reasonable 
     starting values are computed (see the 'details' section of  
     \code{\link[fitdistrplus:fitdist]{mledist}}).}
 
-\item{\dots}{Further arguments to be passed to \code{"fitdist"}.
+\item{\dots}{Further arguments to be passed to \code{"fitdist"}
+    when \code{method != "tlmme"}.
     See \code{\link[fitdistrplus:fitdist]{fitdist}} for details on parameter estimation.}
 }
 
@@ -40,30 +42,22 @@ fitDR(x, dist, method="mle", start=NULL, \dots)
     man page: \code{\link{oiunif}}, \code{\link{oistpareto}}, \code{\link{oibeta}}, \code{\link{oigbeta}}, 
     \code{\link{mbbefd}}, \code{\link{MBBEFD}}.
 
-    The four possible fitting methods are described below:
+    The two possible fitting methods are described below:
 \describe{
     \item{When \code{method="mle"}}{
     Maximum likelihood estimation consists in maximizing the log-likelihood.
     A numerical optimization is carried out in \code{\link{mledist}} via \code{optim}
     to find the best values (see \code{\link{mledist}} for details).
     }
-    \item{When \code{method="mme"}}{
-    Moment matching estimation consists in equalizing theoretical and empirical moments.
+    \item{When \code{method="tlmme"}}{
+    Moment matching estimation consists in equalizing theoretical and empirical 
+    total loss as well as theoretical and empirical moments.
     The theoretical and the empirical moments are matched numerically, 
-    by minimization of the sum of squared differences between observed and theoretical moments
+    by minimization of the sum of squared differences between observed and theoretical 
+    quantities
     (see \code{\link{mmedist}} for details).
     }
-    \item{When \code{method = "qme"}}{
-    Quantile matching estimation consists in equalizing theoretical and empirical quantile.
-    A numerical optimization is carried out in \code{\link{qmedist}} via \code{optim}
-    to minimize of the sum of squared differences between observed and theoretical quantiles
-    (see \code{\link{qmedist}} for details).
-    }
-    \item{When \code{method = "mge"}}{
-    Maximum goodness-of-fit estimation consists in maximizing a goodness-of-fit statistics.
-    A numerical optimization is carried out in \code{\link{mgedist}} via \code{optim}
-    to minimize the goodness-of-fit distance (see \code{\link{mgedist}} for more details). 
-    }
+    
 }
         
     By default, direct optimization of the log-likelihood (or other criteria depending
@@ -180,8 +174,14 @@ Christophe Dutang.
 
 \examples{
 
-# (1) fit of a gamma distribution by maximum likelihood estimation
+# (1) fit of a one-inflated beta distribution by maximum likelihood estimation
 #
+n <- 1e3
+set.seed(12345)
+x <- roibeta(n, 3, 2, 1/6)
+
+f1 <- fitDR(x, "oibeta", method="mle")
+summary(f1)
 
 
 }

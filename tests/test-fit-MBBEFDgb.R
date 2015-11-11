@@ -14,7 +14,6 @@ cdfcomp(f1, do.points=FALSE)
 qqcomp(f1)
 
 
-b1 <- bootDR(f1, niter=nboot, silent=TRUE)
-
-plot(b1, enhance=TRUE, trueval=c(2, 1/10))
+#b1 <- bootDR(f1, niter=nboot, silent=TRUE)
+#plot(b1, enhance=TRUE, trueval=c(2, 1/10))
 

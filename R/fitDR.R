@@ -132,6 +132,43 @@ fitDR <- function(x, dist, method="mle", start=NULL, ...)
       }
       
       class(f1) <- c("DR", class(f1))
+    }else if(method == "tlmme")
+    {
+      DIFF2 <- function(par, obs) 
+      {
+        (mMBBEFD(1, par[1], par[2]) - mean(obs))^2 + (tlMBBEFD(par[1], par[2]) - etl(obs))^2
+      }
+      alabama1 <- constrOptim.nl(unlist(initparMBBEFD[[1]]), fn=DIFF2, hin=constrMBBEFD1, obs=x, control.outer=list(trace=FALSE))
+      alabama2 <- constrOptim.nl(unlist(initparMBBEFD[[2]]), fn=DIFF2, hin=constrMBBEFD2, obs=x, control.outer=list(trace=FALSE))
+      
+      if(alabama1$convergence > 0 && alabama2$convergence > 0)
+        f1 <- list(estimate=NA, convergence=100)
+      else if(alabama1$convergence > 0 && alabama2$convergence == 0) 
+        f1 <- list(estimate=alabama2$par, convergence=0)
+      else if(alabama1$convergence == 0 && alabama2$convergence > 0) 
+        f1 <- list(estimate=alabama1$par, convergence=0)
+      else
+      {
+        if(alabama1$value < alabama2$value)
+          f1 <- list(estimate=alabama1$par, convergence=0)
+        else
+          f1 <- list(estimate=alabama2$par, convergence=0)
+      }
+      f1$method <- "tlmme"
+      f1$data <- x
+      f1$n <- length(x)
+      f1$distname <- "MBBEFD"
+      f1$fix.arg <- f1$fix.arg.fun <- f1$dots <- f1$weights <- NULL
+      f1$discrete <- FALSE
+      #gof stat
+      f1$loglik <- LLfunc(obs=x, theta=f1$estimate, dist=dist)
+      npar <- length(f1$estimate)
+      f1$aic <- -2*f1$loglik+2*npar
+      f1$bic <- -2*f1$loglik+log(f1$n)*npar
+      
+      f1$sd <- f1$vcov <- f1$cor <- NA
+      class(f1) <- c("DR", "fitdist")
+      
     }else
       stop("not yet implemented")  
       
@@ -141,10 +178,17 @@ fitDR <- function(x, dist, method="mle", start=NULL, ...)
       start <- list(p1=etl(x))
     
     #print(LLfunc(x, start$p1, dist))
-    f1 <- fitdist(x, distr=dist, method=method, start=start,
+    
+    if(method %in% c("mle", "tlmme"))
+    {
+      if(method == "tlmme")
+        method <- "mle"
+      f1 <- fitdist(x, distr=dist, method=method, start=start,
                   lower=0, upper=1, ..., optim.method="Brent") #, control=list(trace=6, REPORT=1)
     
-    class(f1) <- c("DR", class(f1))
+      class(f1) <- c("DR", class(f1))
+    }else
+      stop("not yet implemented")  
     
   }else if(dist %in% c("oistpareto", "oibeta", "oigbeta")) #one-inflated distr
   {
@@ -218,6 +262,55 @@ fitDR <- function(x, dist, method="mle", start=NULL, ...)
         f1$cor <- cov2cor(f1$vcov)
         class(f1) <- c("DR", class(f1))
       } 
+      
+    }else if(method == "tlmme")
+    {
+      start <- c(start, list(p1=p1))
+      npar <- length(start)
+      
+      DIFF2 <- function(par, obs) 
+      {
+        PX1 <- do.call(paste0("tl", dist), as.list(par))
+        EX <- do.call(paste0("m", dist), as.list(c(order=1, par)))
+        if(npar <= 2)
+          return( (EX - mean(obs))^2 + (PX1 - etl(obs))^2 )
+        
+        if(npar >= 3)
+          EX2 <- do.call(paste0("m", dist), as.list(c(order=2, par)))
+        if(npar >= 4)
+          EX3 <- do.call(paste0("m", dist), as.list(c(order=3, par)))
+        
+        if(npar == 3)
+          return( (EX - mean(obs))^2 + (EX2 - mean(obs^2))^2 + (PX1 - etl(obs))^2 )
+        else if(npar == 4)
+          return( (EX - mean(obs))^2 + (EX2 - mean(obs^2))^2 + (EX3 - mean(obs^3))^2 + (PX1 - etl(obs))^2 )
+        else
+          stop("not implemented")
+      }
+          
+      
+      res <- optim(par=unlist(start), fn=DIFF2, obs=x, method="L-BFGS-B", lower=uplolist$lower, upper=uplolist$upper)
+      
+      if(res$convergence > 0)
+        f1 <- list(estimate=NA, convergence=100)
+      else
+      {
+        f1 <- list(estimate=res$par, convergence=0)
+      }
+      f1$method <- "tlmme"
+      f1$data <- x
+      f1$n <- length(x)
+      f1$distname <- dist
+      f1$fix.arg <- f1$fix.arg.fun <- f1$dots <- f1$weights <- NULL
+      f1$discrete <- FALSE
+      #gof stat
+      f1$loglik <- LLfunc(obs=x, theta=f1$estimate, dist=dist)
+      
+      f1$aic <- -2*f1$loglik+2*npar
+      f1$bic <- -2*f1$loglik+log(f1$n)*npar
+      
+      f1$sd <- f1$vcov <- f1$cor <- NA
+      class(f1) <- c("DR", "fitdist")
       
     }else
     {

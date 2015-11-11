@@ -19,3 +19,8 @@ abline(v=1/6, col="red")
 
 hist(b1$estim[,1])
 abline(v=1/6, col="red")
+
+
+f2 <- fitDR(x, "oiunif", method="tlmme")
+
+

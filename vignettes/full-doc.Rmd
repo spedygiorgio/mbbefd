@@ -1,0 +1,540 @@
+---
+title: "Exposure rating, destruction rate models and the mbbefd package"
+author: "Giorgio Spedicato, Markus Gesmann, Christophe Dutang"
+date: "`r Sys.Date()`"
+output: 
+  rmarkdown::pdf_document:
+    number_sections: true
+bibliography: mbbefd.bib
+vignette: |
+  %\VignetteIndexEntry{Exposure rating, destruction rate models and the mbbefd package} 
+  %\VignetteEngine{knitr::rmarkdown} 
+  \usepackage[utf8]{inputenc}
+header-includes:
+- \newcommand{\ind}{1\!\!1}
+- \newcommand{\R}{\mathbb R}
+- \newcommand{\N}{\mathbb N}
+- \newcommand{\calD}{\mathcal D}
+- \newcommand{\systL}{\left\{\begin{array}{ll}}
+- \newcommand{\systR}{\end{array}\right.}
+- \newcommand{\matL}{\left(\begin{matrix}}
+- \newcommand{\matR}{\end{matrix}\right)}
+- \newcommand{\detL}{\left|\begin{matrix}}
+- \newcommand{\detR}{\end{matrix}\right|}
+
+---
+
+
+```{r setup, echo=FALSE, message=FALSE, warning=FALSE}
+library("mbbefd")
+library("knitcitations")
+cleanbib()
+options("citation_format" = "pandoc")
+bib <- read.bibtex("mbbefd.bib")
+library(lattice)
+my.settings <- canonical.theme(color=FALSE)
+my.settings[['fontsize']] = list(text = 8, points = 4)
+my.settings[['strip.background']]$col <- "darkgrey"
+my.settings[['strip.border']]$col<- "black"  
+```
+
+
+<!------------------ SECTION 1 ------------------> 
+# Introduction and general notation
+
+Exposure rating is a tool for insurance pricing that allocates premium to bands
+of damage ratios or severity of losses. First ideas were published in `r citep(bib['salzmann1963'])`. It is often used to price excess of loss reinsurance. 
+
+Exposure rating uses the loss experience of a similar portfolio of policies to estimate the expected losses of the portfolio to be covered. The method is frequently used as a benchmark when there is no sufficient credible claims history from the client.
+
+## Loss Distribution
+
+First lets assume we have perfect information, i.e. we know the loss distribution for a certain risk.
+
+To keep it simple I assume the loss distribution is log-normal with
+a mean ($M$) of 65 and a coefficient of variation ($CV$) of 30%. 
+The corresponding log-normal parameters $\mu$ and $\sigma$ can be derived via:
+
+$$
+\begin{aligned}
+\sigma^2&=\log(1+CV^2) \\
+\mu &=\log(M) - \sigma^2/2 
+\end{aligned}
+$$
+
+The following chart shows the corresponding probability density curve 
+$f(x)$, cumulative distribution function $F(x)$ and survival function $S(x)=1-F(x)$. 
+
+```{r, fig.height=2.5, fig.width=6, echo=FALSE, warning=FALSE}
+library(lattice)
+n <- 100
+Loss <- seq(1, 150, length=n)
+mu <- 4.13
+sigma <- 0.29
+CDF <- plnorm(Loss, mu, sigma)
+Density <- dlnorm(Loss, mu, sigma)
+Survival <- 1 - CDF
+dat <- data.frame(Loss=rep(Loss, 3),
+                  Value=c(Density, CDF, Survival),
+                  Type=gl(3, n,
+                         labels=c("PDF: f(x)", 
+                                  "CDF: F(x)", 
+                                  "SF: S(x)=1-F(x)"),
+                         ordered=TRUE))
+xyplot(Value ~ Loss | Type, data=dat, ylab="", 
+       layout=c(3,1), as.table=TRUE, t="l",
+       par.settings = my.settings, 
+       par.strip.text=list(col="white", font=2), 
+       scales=list(relation="free", alternating=1))
+```
+
+
+In the insurance context the survival function is  often called *exceedance 
+probability function*, as it describes the 
+probability of exceeding a certain loss.
+
+## Expected Loss
+
+Let's define $X$ as the random variable that describes the ground up loss.
+The expected loss (in plain English the probability weighted sum of the losses) 
+is then:
+
+$$
+E[X] = \int_{-\infty}^\infty x\, f(x) dx
+$$
+
+Assuming losses are not negative ($P(X<0)=0$) this simplifies to:
+
+$$ 
+E[X] = \int_{0}^\infty x\, f(x) dx
+$$
+
+## Limited Expected Loss
+
+Let's further assume that losses are limited by $\alpha$ in my contract. Then
+the limited expected value (LEV), written as $E[X \wedge \alpha]$, is given as
+
+$$
+E[X \wedge \alpha] = \int_0^\alpha x \, f(x) dx + \int_\alpha^\infty \alpha \, f(x) dx
+$$
+
+To evaluate this sum of integrals I recall that $F(x)=\int f(x) dx$ and $F(\infty)=1$. Hence:
+
+$$
+\int_\alpha^\infty \alpha \, f(x) dx = \alpha \int_\alpha^\infty f(x) dx = \alpha - \alpha F(\alpha)
+$$
+
+The integration by parts theorem $\int u(x) v'(x) \, dx = u(x) v(x) - \int v(x) \, u'(x)  dx$ helps me with the first part of the integral:
+
+$$
+\int_0^\alpha x \, f(x) dx = \alpha F(\alpha) - \int_0^\alpha F(x) dx
+$$
+
+Therefore:
+
+$$
+E[X \wedge \alpha] = \alpha - \int_0^\alpha F(x) dx = \int_0^\alpha 1-F(x) dx
+ = \int_0^\alpha S(x) dx
+$$
+
+The integral describes the area above the CDF up to $\alpha$, 
+or the area under the survival function up to $\alpha$. In the example
+below the limit $\alpha$ was set to 100.
+
+
+```{r LEV, fig.height=2.5, fig.width=5, echo=FALSE}
+alpha <- 100
+xyplot(Value ~ Loss | Type, 
+       data=subset(dat, !Type %in% "PDF: f(x)"), 
+       ylab="", 
+       panel=function(x,y,...){
+         x1 <- c(x[x<=alpha])
+         if(panel.number()<2){
+           panel.polygon(c(x1, rev(x1)),
+                          rev(c(rep(1, length(x[x<=alpha])),
+                           rev(y[x<=alpha]))),
+                         col="skyblue", border=NA)
+         }else{
+           panel.polygon(c(x1, rev(x1)),
+                         c(rep(0, length(x[x<=alpha])),
+                           rev(y[x<=alpha])),
+                        col="skyblue", border=NA)
+         }
+         panel.xyplot(x,y,...)
+         #panel.text(x=20, y=0.4, label=paste("LEV[X]", cex=2)
+       },
+       layout=c(2,1), as.table=TRUE, t="l",
+       par.settings = my.settings, 
+       par.strip.text=list(col="white", font=2), 
+       scales=list(relation="free", alternating=1))
+```
+
+## Loss Cost of a Layer 
+
+Suppose I want to insure the layer of claims between 80 and 100.
+
+
+```{r LEV2, fig.height=2.5, fig.width=5, echo=FALSE}
+alpha1 <- 80
+alpha2 <- 100
+xyplot(Value ~ Loss | Type, 
+       data=subset(dat, !Type %in% "PDF: f(x)"), 
+       ylab="", 
+       panel=function(x,y,...){
+         x1 <- c(x[x >= alpha1 & x<=alpha2])
+         if(panel.number()<2){
+           panel.polygon(
+             c(x1, rev(x1)),
+             rev(c(rep(1, length(x[x >= alpha1 & x<=alpha2])),
+               rev(y[x >= alpha1 & x<=alpha2]))),
+              col="skyblue", border=NA)
+         }else{
+           panel.polygon(
+             c(x1, rev(x1)),
+             c(rep(0, length(x[x >= alpha1 & x<=alpha2])),
+               rev(y[x >= alpha1 & x<=alpha2])),
+             col="skyblue", border=NA)
+         }
+         panel.xyplot(x,y,...)
+       },
+       layout=c(2,1), as.table=TRUE, t="l",
+       par.settings = my.settings, 
+       par.strip.text=list(col="white", font=2), 
+       scales=list(relation="free", alternating=1))
+```
+
+
+The expected loss cost would be the difference between the 
+limited expected values of $E[X \wedge 100] - E[X \wedge 80]$.
+
+```{r}
+S <- function(x){ 1 - plnorm(x, mu, sigma) }
+(lyr <- integrate(S, 0, 100)$value - integrate(S, 0, 80)$value)
+```
+
+## Increased Limit Factor
+
+On the other hand the ratio of the original loss cost with a limit of 100
+to a limit of 80 is called an increased limit factor (ILF):
+
+```{r}
+(ILF <- integrate(S, 0, 100)$value / integrate(S, 0, 80)$value)
+```
+
+Therefore we would expect the LEV to increase by `r round((ILF-1)*100,1)`% as
+the limit increases from 80 to 100.
+
+Note ILFs are often used for pricing casualty business.
+
+## Exposure curves
+
+From the loss distribution we could read of the expected loss for any 
+layer. However, often we will not have that level of information about
+the risk. 
+
+Instead, we will have to infer information from others risks that
+share similar loss characteristics as a function of the overall exposure, 
+assuming that the relative loss size distribution is independent of the 
+individual risk characteristic.  
+
+Hence, we will require a view on the expected full value loss cost for the overall
+exposure. 
+
+### Normalising loss experience using TIV and MPL
+
+To make risks more comparable we look at ratio of losses to the 
+underlying exposure, where the exposure is given as the 
+sum insured (SI), or better the total insured value (TIV), 
+or perhaps as the maximum probable loss (MPL). 
+
+Other definitions and measures are also popular, such as possible maximum 
+loss (PML), estimate maximum loss (EML), or maximum foreseeable loss (MFL).
+
+While the TIV and SI are straightforward to understand, the other metrics can 
+be little more challenging to assess. 
+
+Suppose we insure a big production plant with of several buildings against fire. 
+It is unlikely that a fire will destroy the whole facility, instead it is 
+believed that the distance between the building will ensure that fires can be 
+contained in a local area. Hence the MPL might be only the highest value of any 
+of those buildings. 
+
+Shifting the metric from loss amounts to damage ratio (loss 
+as a % of the exposure metric) allows us to compare and benchmarks risks.
+
+
+
+<!------------------ SECTION 2 ------------------> 
+# Destruction rate models
+
+## Usual distributions
+
+### Uniform distribution
+\label{sec:unif}
+
+The most trivial example of exposure curve is obtained for the uniform distribution on $I$.
+We consider $F_X(x)=x$ leading to
+$$
+G_X(d) 
+= d(2-d).
+$$
+
+
+### Beta distribution
+\label{sec:beta}
+
+A more interesting example is obtained for the Beta distribution on $I$ 
+(e.g.~\cite{kotzjohnsonbalak94v2})
+for which the density is $f_X(x) = x^{a-1}(1-x)^{b-1}/\beta(a,b)$ for $x\in ]0,1[$ and $a,b>0$
+where $\beta(.,.)$ denotes the 
+beta function, see e.g.~\cite{nist10}.
+The distribution function is obtained in terms of the incomplete beta ratio function 
+$F_X(x) = \beta(x;a,b)/\beta(a,b) = I(x;a,b)$.
+We get
+$$
+G_X(d) %= \frac{1 - I(d;a,b) \frac{b}{a+b} - \frac{d^a(1-d)^b}{(a+b)\beta(a,b)} }{a/(a+b)}
+= \frac{a+b}{a} - I(d;a,b) \frac{b}{a} - \frac{d^a(1-d)^b}{a\beta(a,b)},
+$$
+where $\beta(.;.,.)$ denotes the incomplete beta function.
+
+
+
+## One-inflated distributions
+\label{sec:oidistr:generic}
+
+
+### Characterizations
+\label{sec:oidistr:generic:charac}
+Let us consider a continuous distribution function $F_0$ of a random variable $X_0$. 
+The corresponding distribution function of the one-inflated random variable $X_1$ is 
+$$
+F_1(x) = (1-p_1) F_0(x) + p_1 \ind_{[1,+\infty[}(x).
+$$
+There is no density but an improper density $(1-p)F_0'(x)$ and a probability mass $p_1$ at $x=1$.
+
+
+
+### The one-inflated beta distribution
+We consider the one-inflated beta distribution.
+Using Section \ref{sec:beta}, we obtain the following distribution function
+$$
+F_X(x) = 
+\systL
+0 & \text{if } x<0 \\
+I(x;a,b)(1-p_1) & \text{if } 0\leq x <1 \\
+1 & \text{if } x\geq 1
+\systR
+$$
+where $I(x;a,b)$ denotes the incomplete beta ratio function.
+This leads to a non-null probability at $x=1$, $P(X=1)=p_1$.
+The improper density function is 
+$$
+\tilde f_X(x) = (1-p_1) \frac{x^{a-1}(1-x)^{b-1}}{\beta(a,b)}.
+$$
+The expectation is
+$$
+E(X) 
+= p_1 + (1-p_1)\frac{a}{a+b}.
+$$
+The exposure curve is 
+$$
+G_X(d) =  
+\frac{(1-p_1) \left(1 - I(d;a,b) \frac{b}{a+b} - \frac{d^a(1-d)^b}{(a+b)\beta(a,b)}\right) + p_1d
+}{p_1 + (1-p_1)\frac{a}{a+b}}.
+$$
+
+
+## The MBBEFD distribution, first parametrization
+
+We denote this first parametrization by $MBBEFD(a,b)$.
+We define the parameter domain $\calD_{a,b}$ as 
+\begin{equation}
+\calD_{a,b} = \{(a,b)\in\R^2, a+1>0, a(1-b)>0, b>0\}
+\cup \{(a,b), a=+\infty, b<1\}.
+\label{eq:paramdomain:mbbefd:ab}
+\end{equation}
+Let us note that this domain includes two particular sets $\calD_{a,1}=\{(a,1), a+1>0\}$ and $\calD_{0,b}=\{(0,b), b>0\}$.
+
+
+### Characterization by the exposure curve
+The MBBEFD distribution is defined by the following exposure curve for $(a,b)\in\calD_{a,b}$
+\begin{equation}
+\forall x\in I,~
+G_X(x) = 
+\systL
+\frac{\ln(\frac{a+b^x}{a+1})}{\ln(\frac{a+b}{a+1})} & \text{if } a(1-b) >0 \\
+\frac{1-b^x}{1-b} & \text{if } a=+\infty \text{ and } b<1 \\
+x & \text{if } a=0 \text{ or } b=1. \\
+\systR
+\label{expcurve:mbbefd:ab}
+\end{equation}
+The two special cases of $a(1-b)=0$ 
+correspond to $\calD_{a,1}$ and $\calD_{0,b}$.
+Note that the denominator is a normalizing constant to ensure the term belongs to $[0,1]$.
+
+
+
+### Distribution, density and quantile functions
+Differentiating $G_X$, we obtain the following distribution function
+ for $(a,b)\in\calD_{a,b}$
+\begin{equation}
+\forall x\in I,~
+F_X(x) = 
+\systL
+\left(1-\frac{(a+1)b^x}{a+b^x}\right)\ind_{[0,1[}(x) + \ind_{[1,+\infty[}(x) & \text{if } a(1-b) >0 \\
+(1-b^x)\ind_{[0,1[}(x) + \ind_{[1,+\infty[}(x) & \text{if } a=+\infty \text{ and } b<1 \\
+\ind_{[1,+\infty[}(x) & \text{if } a=0 \text{ or } b=1. \\
+\systR
+\label{cdf:mbbefd:ab}
+\end{equation}
+Note that the MBBEFD distribution is a mixed-type distribution with mass probability at $x=1$
+\begin{equation}
+P(X=1)  = \frac{(a+1)b}{a+b} = p_{a,b},
+\label{mass0:mbbefd:ab}
+\end{equation}
+which equals to 1 when $a(1-b)=0$. In other words, for $\calD_{a,1}$ and $\calD_{0,b}$, $X$ has a Dirac distribution at $x=1$.
+When $a=+\infty$, the total loss probability is $P(X=1)=b$.
+
+For $a(1-b)>0$, the improper density function is 
+\begin{equation}
+\tilde f_X(x) 
+\systL
+-\frac{a(a+1)b^x\ln(b)}{(a+b^x)^2}\ind_{[0,1[}(x) & \text{if } a(1-b) >0 \\
+-\ln(b)b^x\ind_{[0,1[}(x)  & \text{if } a=+\infty \text{ and } b<1 \\
+0 & \text{if } a=0 \text{ or } b=1. \\
+\systR
+\label{impd:mbbefd:ab}
+\end{equation}
+The quantile function is 
+\begin{equation}
+\forall p\in [0,1],~
+q_X(p) = 
+\systL
+\frac{\ln\left(\frac{(1-p)a}{a+p}\right)}{\ln(b)} \ind_{[0,1-p_{a,b}[}(p) + \ind_{[1-p_{a,b},1]}(p)  & \text{if } a(1-b) >0 \\
+\frac{\ln(1-p)}{\ln(b)}\ind_{[0,1-b[}(p) + \ind_{[1-b,1]}(p)   & \text{if } a=+\infty \text{ and } b<1 \\
+\ind_{]0,1]}(p) & \text{if } a=0 \text{ or } b=1. \\
+\systR
+\label{q:mbbefd:ab}
+\end{equation}
+
+
+### Moments
+Using the definition of the exposure curve, we have
+$E(X) = 1/G_X'(0).$
+The expectation for $MBBEFD(a,b)$ is
+$$
+E(X)=\frac{\ln(\frac{a+b}{a+1})}{\ln(b)} (a+1).
+$$
+When $a=0$ or $b=1$, the expectation is simply $E(X)=1$.
+
+
+## The MBBEFD distribution, second parametrization
+\label{sec:mbbefd2p}
+
+
+### Parameter domain
+
+For fitting purposes and for verifying parameter constraints, 
+\cite{bernegger97} proposed a second parametrization $MBBEFD(g,b)$.
+Using the following parameter $g=1/p_{a,b}$, it is possible to reformulate the $MBBEFD(a,b)$.
+That is
+$$
+g= \frac{a+b}{(a+1)b}
+\Leftrightarrow
+a=\frac{(g-1)b}{1-gb}.
+$$
+So $g\geq 1$ guarantees that $\frac{a+b}{(a+1)b}\in [0,1]$, in addition to $b>0$.
+The special case $g=1$ leading to a Dirac distribution at $x=1$ corresponds to $a(1-b)=0$ in the previous parametrization.
+The parameter domain is
+$$
+\widetilde{\calD}_{g,b}= \left\{
+(g,b)\in\R^2, b>0, g\geq 1
+\right\}.
+$$
+
+
+### Characterization by the exposure curve
+
+The exposure curve is defined for $x\in[0,1]$ as
+\begin{equation}
+G_X(x)=
+\systL
+\frac{\ln(\frac{(g-1)b}{1-b}+\frac{1-gb}{1-b}b^x)}{\ln(gb)} & \text{ if } g>1, b\neq 1, b\neq 1/g \\
+\frac{\ln(1+(g-1)x)}{\ln( g)} & \text{ if } g>1, b= 1 \\
+\frac{1-b^x}{1-b} & \text{ if } g>1, bg= 1 \\
+x & \text{ if } g=1 \text{ or } b= 0
+\systR
+\label{expcurve:mbbefd:gb}
+\end{equation}
+Note that the case $g>1, bg=1$ implies $g=1/b, b<1$.
+
+
+### Distribution, density and quantile functions
+
+The resulting distribution function is
+\begin{equation}
+F_X(x)=
+\systL
+\left(1- \frac{1-b}{(g-1)b^{1-x}+1-gb}\right)\ind_{[0,1[}(x) + \ind_{[1,+\infty[}(x) & \text{ if } g>1, b\neq 1, b\neq 1/g \\
+\left(1- \frac{1}{1+(g-1)x}\right)\ind_{[0,1[}(x) + \ind_{[1,+\infty[}(x) & \text{ if } g>1, b= 1 \\
+(1-b^x)\ind_{[0,1[}(x) + \ind_{[1,+\infty[}(x) & \text{ if } g>1, bg= 1 \\
+\ind_{[1,+\infty[}(x) & \text{ if } g=1 \text{ or } b= 0
+\systR
+\label{cdf:mbbefd:gb}
+\end{equation}
+As in the previous parametrization, there is a non-null probability at $x=1$, 
+\begin{equation}
+P(X=1)  = 1/g.
+\label{mass0:mbbefd:gb}
+\end{equation}
+The improper density function is for $x\in ]0,1[$
+\begin{equation}
+\tilde f_X(x) = 
+\systL
+- \frac{(1-b)\ln(b)b^{1-x}}{((g-1)b^{1-x}+1-gb)^2}  & \text{ if } g>1, b\neq 1, b\neq 1/g \\
+\frac{g-1}{(1+(g-1)x)^2} & \text{ if } g>1, b= 1 \\
+-\ln(b) b^x  & \text{ if } g>1, bg= 1 \\
+0 & \text{ if } g=1 \text{ or } b= 0
+\systR
+\label{impd:mbbefd:gb}
+\end{equation}
+The quantile function is 
+\begin{equation}
+\forall p\in [0,1],~
+q_X(p) = 
+\systL
+\left(1-\frac{\ln\left(\frac{gb-1}{g-1} +\frac{1-b}{(1-p)(g-1)}\right)}{\ln(b)}  \right)
+\ind_{[0,1-1/g[}(p) + \ind_{[1-1/g,1]}(p) & \text{ if } g>1, b\neq 1, b\neq 1/g \\
+\frac{p}{(1-p)(g-1)}\ind_{[0,1-1/g[}(p) + \ind_{[1-1/g,1]}(p)  & \text{ if } g>1, b= 1 \\
+\frac{\ln(1-p)}{\ln(b)}\ind_{[0,1-1/g[}(p) + \ind_{[1-1/g,1]}(p) & \text{ if }  g>1, bg= 1 \\
+\ind_{]0,1]}(p) & \text{ if } g=1 \text{ or } b= 0
+\systR
+\label{q:mbbefd:gb}
+\end{equation}
+
+
+### Moments
+Let us compute the first two moments.
+$$
+E(X) = 1/G_X'(0) = 
+\systL
+\frac{\ln(gb)(1-b)}{\ln(b)(1-gb)} & \text{ if } g>1, b\neq 1, b\neq 1/g \\
+\frac{\ln(g)}{g-1}  & \text{ if } g>1, b= 1 \\
+\frac{b-1}{\ln(b)} & \text{ if }  g>1, bg= 1 \\
+1 & \text{ if } g=1 \text{ or } b= 0
+\systR
+$$
+
+
+
+<!------------------ SECTION 3 ------------------> 
+# Fitting methods and pricing examples
+
+## Fitting methods: MLE and TLMME
+
+## Examples
+
+## Computation of rate on line
+
+
+

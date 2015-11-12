@@ -51,6 +51,9 @@ S3method(print, eecf)
 S3method(print, summary.eecf)
 S3method(plot, eecf)
 
+#new generic function for DR class similar to cdfcomp
+export(eccomp)
+
 #fitting methods
 importFrom(fitdistrplus, fitdist)
 importFrom(alabama, constrOptim.nl) #only for MBBEFD

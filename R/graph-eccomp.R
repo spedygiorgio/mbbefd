@@ -1,4 +1,4 @@
-eccomp <- function(ft, xlim, ylim, main, xlab, ylab, 
+eccomp <- function(ft, xlim, ylim, main, xlab, ylab, do.points=TRUE,
                     datapch, datacol, fitlty, fitcol, addlegend = TRUE, 
                    legendtext, xlegend = "bottomright", 
                     ylegend = NULL, ...)
@@ -69,7 +69,7 @@ eccomp <- function(ft, xlim, ylim, main, xlab, ylab,
   
   #main plotting
   resec <- plot(eecf(x = mydata), main=main, xlab=xlab, ylab=ylab, xlim=xlim, 
-                ylim=ylim, col=datacol)
+                ylim=ylim, col=datacol, do.points=do.points)
   #plot fitted densities
   for(i in 1:nft)
     lines(sfin, fittedec[,i], lty=fitlty[i], col=fitcol[i], ...)

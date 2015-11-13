@@ -695,7 +695,129 @@ eccomp(list(f1, f2, f3), leg=c("mbbefd", "oibeta", "oiunif"), do.points=FALSE)
 
 
 
-## Computation of rate on line
+## Computation of rate on line (example)
 
 
+The following example data is taken from the earlier Swiss Re
+technical paper above. 
+It is the aim to find the risk premium for a per risk WXL cover 
+(fire only) with the limits
+$$
+\mbox{CHF } 3,500,000 \mbox{ xs CHF } 1,500,000
+$$
 
+The total gross net premium income (GNPI) is CHF $95,975,000$ in 2004, 
+with an expected loss ratio of 55%. Therefore we have a view on the 
+mean expected loss cost.
+
+The risk profile given by the cedent is from the year 2002.
+However, instead of re-indexing the historical data to 2004, we back-index
+the data to 2002 with a factor of $457/550=`r round(457/550,2)`$:
+$$
+\mbox{CHF } `r format(3500000*457/550, big.mark=",")` 
+\mbox{ xs CHF } `r format(1500000*457/550, big.mark=",")`
+$$
+ 
+The data presented below is from the client, with pre-selected
+exposure curves, in this case the parameter $c$ of the MBBEFD curve.
+
+The policies have been grouped into different exposure bands. The mean MPL is 
+simply the average of the lower and upper band.
+
+```{r SwissReExample, message=FALSE, echo=FALSE, warning=FALSE}
+Client <- scan(textConnection(
+'150 75 250 200 400 325 600 500 800 700 1000 900 1250 1125 1500 1375 1750 1625 2000 1875 2500 2250 3000 2750 4000 3500 5500 4750 9000 7250 12500 10750 18000 15250 24000 21000 36000 30000 48000 42000 72000 60000 90000 81000'))
+MaxMPL <- Client[seq(from=1, to=length(Client),by = 2)]
+MeanMPLGrossLoss <- Client[seq(from=2, to=length(Client),by = 2)]
+GrossPremium <- scan(textConnection(
+  '33434 14568 6324 4584 3341 1405 1169 683 613 554 700 552 1194 1490 4177 3527 3249 2712 2588 1988 657 1918'
+))
+ExposureCurve <- c(rep(1.5,3), rep(2.0,3), rep(3.0, 4), rep(4.0, 12))
+ClientData <- data.frame(MaxMPL, MeanMPLGrossLoss, 
+                         GrossPremium, ExposureCurve)
+ClientData2 <- ClientData
+names(ClientData2) <- c("Max MPL '000", "Mean MPL Gross Loss '000",
+                        "Gross Premium '000", "Exposure Curve Parameter c")
+library(pander)
+panderOptions('big.mark', ',')
+panderOptions('table.split.cells', 8)
+pander(ClientData2, justify = rep('right', ncol(ClientData2)))
+## Example layer
+D <- 1.5e3*457/550
+L <- 5e3*457/550
+MPLoss <- 3.5e6
+retainedDed <- D/MPLoss*1000
+retainedLoss <- ecMBBEFD(retainedDed, b=swissRe(4)['b'], g=swissRe(4)['g'])
+prem <- 1194 * (1 - retainedLoss)
+```
+
+In order to use the exposure curves we need the expected loss and the deductible as % of the MPL. 
+
+We have to consider three scenarios:
+
+### Losses below deductible
+
+Losses with a maximum MPL below the deductible are not relevant and hence 
+no reinsurance premium needs to be calculated.
+
+### Losses above deductible, but below limit
+
+As an example I use the band that has a maximum MPL of CHF 4m, 
+with a mean MPL gross loss of CH 3.5m and gross premium of CH 1.194m.
+
+The client would retain 1,246/3,500=`r round(retainedDed*100,1)`% of the 
+maximum MPL. Using our exposure curve we can read of that this would reduce our 
+expected claims burden by `r round(retainedLoss*100,1)`%.
+
+Therefore the reinsurance premium for this band is 1,194k $\cdot$ `r round((100-retainedLoss*100),1)`% =`r round(prem,1)`k. 
+
+### Losses above limit
+
+Here I select the band with a maximum MPL of CHF 90m and a mean gross
+MPL of  CHF 81m. Because of the limit of CHF `r round(L, 1)` only that amount matters. From the exposure curve we can read
+of again the average proportion of loss paid by the cedant
+`r round(ecMBBEFD(D/L, b=swissRe(4)['b'], g=swissRe(4)['g']),1)`%. 
+
+To calculate the premium we first have to derive the proportion of
+premium that is attached to the risk below the limit: 4,155k/8,100k $\cdot$ 
+1,918k=`r round(4155/81000*1918,1)`k.
+
+Multiplying the premium with the reinsurer's share of the loss gives
+us a premium of CHF `r round(4155/81000*1918*(1-ecMBBEFD(D/L, b=swissRe(4)['b'], g=swissRe(4)['g'])),1)`k.
+
+### Rate on Line
+
+For the overall portfolio we can calculate the rate on line, which is the loss cost
+of the layer compared to the total loss cost, using the expected loss ratio of 55%:
+
+```{r SwissRe2}
+XL_ROL <- function(Deductible, Limit, MaxMPL, 
+                   MeanMPL, GrossPremium, C, ULR){
+  DedPerMPL <- Deductible / ifelse(MaxMPL < Deductible, Deductible, 
+                                   ifelse(MaxMPL<Limit, MaxMPL, Limit))
+  LossShare <- 1 - apply(cbind(DedPerMPL, C), 1, 
+                         function(x){ 
+                           ecMBBEFD(x[1], 
+                                          b=swissRe(x[2])['b'], 
+                                          g=swissRe(x[2])['g'])
+                           })
+  NetPremium <- GrossPremium * ifelse(MaxMPL < Limit, 1, 
+                                      Limit/MaxMPL)
+  XL_Premium <- NetPremium * LossShare
+  # Rate on Line
+  sum(XL_Premium)/sum(NetPremium)*ULR
+}
+
+rol <- XL_ROL(Deductible = D,
+              Limit = L,
+              MaxMPL = ClientData$MaxMPL,
+              MeanMPL = ClientData$MeanMPLGrossLoss,
+              GrossPremium = ClientData$GrossPremium,
+              C=ClientData$ExposureCurve, ULR=0.55)
+```
+
+Applying the function to our data we get a rate on line of `r round(rol*100,2)`%.
+Differences to the Swiss Re paper are a result of rounding errors.
+
+
+# References

@@ -15,12 +15,14 @@ header-includes:
 - \newcommand{\R}{\mathbb R}
 - \newcommand{\N}{\mathbb N}
 - \newcommand{\calD}{\mathcal D}
+- \newcommand{\calL}{\mathcal L}
 - \newcommand{\systL}{\left\{\begin{array}{ll}}
 - \newcommand{\systR}{\end{array}\right.}
 - \newcommand{\matL}{\left(\begin{matrix}}
 - \newcommand{\matR}{\end{matrix}\right)}
 - \newcommand{\detL}{\left|\begin{matrix}}
 - \newcommand{\detR}{\end{matrix}\right|}
+- \newcommand{\pkg}{\textsf}
 
 ---
 
@@ -43,9 +45,17 @@ my.settings[['strip.border']]$col<- "black"
 # Introduction and general notation
 
 Exposure rating is a tool for insurance pricing that allocates premium to bands
-of damage ratios or severity of losses. First ideas were published in `r citep(bib['salzmann1963'])`. It is often used to price excess of loss reinsurance. 
+of damage ratios or severity of losses. First ideas were published in `r citep(bib['salzmann1963'])`. It is often used to price non-proportional
+reinsurance contracts, such as excess of loss (XL) reinsurance. 
 
 Exposure rating uses the loss experience of a similar portfolio of policies to estimate the expected losses of the portfolio to be covered. The method is frequently used as a benchmark when there is no sufficient credible claims history from the client.
+
+In this vignette, we first present the general notation and concepts of loss modelling.
+Secondly, we focus on destruction models implemented in the \pkg{mbbefd} package. 
+One popular model uses the MBBEFD distribution introduced by `r citep(bib['bernegger97'])`.
+Finally, we provide an example of pricing of XL contract.
+
+
 
 ## Loss Distribution
 
@@ -259,15 +269,78 @@ believed that the distance between the building will ensure that fires can be
 contained in a local area. Hence the MPL might be only the highest value of any 
 of those buildings. 
 
-Shifting the metric from loss amounts to damage ratio (loss 
+Shifting the metric from loss amounts to damage ratio or destruction rates (loss 
 as a % of the exposure metric) allows us to compare and benchmarks risks.
 
 
 
+### Analysing deductibles
+
+Most insurance policies are written with a deductible, so that the
+insured will cover the first $X of the losses.
+
+Thus, the reinsurer needs to understand, by how much the claims burden is reduced 
+for a given deductible. 
+
+From the previous section we have learned how to calculate the limited expected 
+value, which is the loss cost to the insured.
+
+The exposure curve (or also called *first loss curve* or *original loss cure* ) 
+is defined as the proportion of the LEV for a given deductible $d$ compared to 
+the overall expected claims cost $E[X]$:
+
+$$
+G(d) = \frac{E[X \wedge d]}{E[X]}
+$$
+
+For our example, using a log-normal distribution and a MPL of 200 we get:
+
+```{r ExposureCurve, dev.args=list(pointsize=8), fig.height=3, fig.width=3}
+MPL <- 200
+ExpectedLoss <- 65
+Deductible <- seq(0, MPL, 1)
+G <- sapply(Deductible, function(x){
+  LEVx <- integrate(S, 0, x)$value
+  LEVx/ExpectedLoss
+})
+plot(Deductible/MPL, G, 
+     t="l", bty="n", lwd=1.5,
+     main="Exposure Curve",
+     xlab="Deductible as % of MPL",
+     ylab="% of expected loss paid by insured",
+     xlim=c(0,1), ylim=c(0,1))
+abline(a=0, b=1, lty=2)
+```
+
+The steepness of the curve is related to the severity of the loss 
+distribution. The closer the curve is to the diagonal the greater
+the proportion of large loss.
+
+If all losses were total losses then the exposure curve would be 
+identical with the diagonal.
+
+Different perils and exposures will have different exposure curves. 
+Well known exposure curves are those used by Swiss Re and Lloyd's.
+
 <!------------------ SECTION 2 ------------------> 
 # Destruction rate models
 
-## Usual distributions
+## Classic distributions
+
+As already mentionned, the exposure curve function of $X$ is defined as the ratio of the limited expected value and the expectation.
+Since the loss $X$ is a positive random variable, the exposure curve is 
+$$
+G_X(d) = \frac{\int_0^d (1-F_X(x))dx }{\int_0^1 (1-F_X(x))dx }.
+$$
+Note that the exposure curve is a concave function for $d\in]0,1[$. 
+
+There is a direct link between the distribution function and the exposure curve.
+Since 
+$$
+F_X(x) = \left(1- \frac{G_X'(x)}{G_X'(0)}\right)\ind_{[0,1[}(x) + \ind_{[1,+\infty[}(x),
+$$
+defining the exposure curve or the distribution function is equivalent.
+The exposure curve is also a concave increasing function, see e.g.~`r citep(bib['antal03'])`.
 
 ### Uniform distribution
 \label{sec:unif}
@@ -284,10 +357,10 @@ $$
 \label{sec:beta}
 
 A more interesting example is obtained for the Beta distribution on $I$ 
-(e.g.~\cite{kotzjohnsonbalak94v2})
+(e.g.~`r citep(bib['kotzjohnsonbalak94v2'])`)
 for which the density is $f_X(x) = x^{a-1}(1-x)^{b-1}/\beta(a,b)$ for $x\in ]0,1[$ and $a,b>0$
 where $\beta(.,.)$ denotes the 
-beta function, see e.g.~\cite{nist10}.
+beta function, see e.g.~`r citep(bib['nist10'])`.
 The distribution function is obtained in terms of the incomplete beta ratio function 
 $F_X(x) = \beta(x;a,b)/\beta(a,b) = I(x;a,b)$.
 We get
@@ -435,7 +508,7 @@ When $a=0$ or $b=1$, the expectation is simply $E(X)=1$.
 ### Parameter domain
 
 For fitting purposes and for verifying parameter constraints, 
-\cite{bernegger97} proposed a second parametrization $MBBEFD(g,b)$.
+`r citep(bib['bernegger97'])` proposed a second parametrization $MBBEFD(g,b)$.
 Using the following parameter $g=1/p_{a,b}$, it is possible to reformulate the $MBBEFD(a,b)$.
 That is
 $$
@@ -532,7 +605,95 @@ $$
 
 ## Fitting methods: MLE and TLMME
 
+We consider two fitting methods, namely the maximum likelihood estimation (MLE)
+and the total-loss-moment matching estimation. Both methods are 
+implemented in the \pkg{fitDR} function of the \pkg{mbbefd} package.
+
+
+As its name suggest, the maximum likelihood function consists in maximizing 
+the likelihood function defined as
+$$
+\calL(\theta, x_1,\dots,x_n)= \prod_{i=1}^n f_X(x_i)
+$$
+where $f_X$ denotes the density of the loss random variable $X$ and
+$\theta$ is the parameter vector.
+When $X$ is a continuous non-inflated distribution, $f_X$ is the usual
+density function (obtained by differentiating the distribution function)
+when $X$ is a mixed-type distribution with a non-null probability $P(X=1)$,
+$f_X$ is the product of $P(X=x)\ind_{x=1}$ and $F_X'(x)\ind_{x\neq 1}$.
+
+For example when considering the beta distribution, the likelihood function is
+$$
+\calL((a,b), x_1,\dots,x_n)= \prod_{i=1}^n \frac{x_i^{a-1}(1-x_i)^{b-1}}{\beta(a,b)}.
+$$
+
+The total-loss-moment matching estimation consists in matching the
+total loss and the first moments of a distribution.
+That is we solve the system
+$$
+\systL
+P(X = 1;\theta) = tl_n \\
+E(X; \theta) = \bar x_n\\
+\vdots \\
+E(X^k; \theta) = m_{n,k}\\
+\systR
+\text{ where }
+\systL
+tl_n = \frac{1}{n}\sum_{i=1}^n \ind_{x_i =1},\\
+\bar x_n = \frac{1}{n}\sum_{i=1}^n x_i,\\
+m_{n,k} = \frac{1}{n}\sum_{i=1}^n (x_i)^k.
+\systR
+$$
+The number of equation $k+1$ equals the number of parameters.
+This methods is relevant only for one-inflated distributions as for classic
+continuous distributions such as the beta distribution we know that $P(X=1)=0$.
+
+
+The \pkg{fitDR} function of the \pkg{mbbefd} package returns an object of class
+\pkg{"DR"} inheriting from the \pkg{"fitdist"} class for which generic functions
+are available \pkg{print, plot, summary, gofstat}.
+There is also a bootstrap procedure implemented in the \pkg{bootDR} function.
+
 ## Examples
+
+Let us fit some distributions with a simulated dataset based on a mixture
+of two distributions (regular beta and mbbefd).
+```{r simufit, echo=TRUE, fig.height=5, fig.width=5, warning=FALSE}
+library(mbbefd)
+set.seed(123456)
+x <- c(rbeta(50, 3, 1/2), rmbbefd(50, 1/2, 1/10))
+f1 <- fitDR(x, "mbbefd", method="mle")
+summary(f1)
+b1 <- bootDR(f1, niter=20)
+summary(b1)
+par(mfrow=c(1, 2))
+denscomp(f1, demp=TRUE)
+plot(b1, enhance=TRUE)
+```
+The graph correspond respectively to the histogram (and empirical density)
+against the fitted density and a two-dimensional level curve and scatter plot
+for bootstrap parameters.
+
+As in the \pkg{fitdistrplus} package, we can compare multiple fits on the 
+same graph or with the same statistics. We just have to pass a list of
+\pkg{"DR"} objects.
+
+```{r simufit2, echo=TRUE, fig.height=5, fig.width=10, warning=FALSE}
+f2 <- fitDR(x, "oibeta", method="mle")
+f3 <- fitDR(x, "oiunif", method="mle")
+gofstat(list(f1, f2, f3))
+par(mfrow=c(1, 2))
+cdfcomp(list(f1, f2, f3), leg=c("mbbefd", "oibeta", "oiunif"))
+denscomp(list(f1, f2, f3), leg=c("mbbefd", "oibeta", "oiunif"), ylim=c(0,4), xleg="topleft")
+```
+
+Of course, we can also compare the different fitted exposure curves
+using the function \pkg{eccomp}. That is
+```{r simufit3, echo=TRUE, fig.height=5, fig.width=5, warning=FALSE}
+eccomp(list(f1, f2, f3), leg=c("mbbefd", "oibeta", "oiunif"), do.points=FALSE)
+```
+
+
 
 ## Computation of rate on line
 

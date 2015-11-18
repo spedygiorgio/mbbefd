@@ -1,6 +1,6 @@
 ---
 title: "Exposure rating, destruction rate models and the mbbefd package"
-author: "Giorgio Spedicato, Markus Gesmann, Christophe Dutang"
+author: "Christophe Dutang, Markus Gesmann, Giorgio Spedicato"
 date: "`r Sys.Date()`"
 output: 
   rmarkdown::pdf_document:

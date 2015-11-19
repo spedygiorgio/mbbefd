@@ -1,4 +1,4 @@
-language: r
+Blanguage: r
 warnings_are_errors: true
 sudo: required
 
@@ -13,7 +13,7 @@ before_install:
 
 install:
   - ./travis-tool.sh install_deps
-  - ./travis-tool.sh install_aptget libgsl0-dev r-cran-rcppgsl
+  - ./travis-tool.sh install_aptget libgsl0-dev gsl-bin
 script: ./travis-tool.sh run_tests
 
 after_script:

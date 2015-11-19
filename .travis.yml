@@ -11,6 +11,7 @@ before_install:
 
 install:
   - ./travis-tool.sh install_deps
+  - ./travis-tool.sh install_aptget libgsl0-dev r-cran-rcppgsl
 script: ./travis-tool.sh run_tests
 
 after_script:

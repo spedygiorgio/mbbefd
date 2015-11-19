@@ -13,5 +13,4 @@ devtools::install_github('spedygiorgio/mbbefd')
 ```
 
 ##Travis status
-![alt tag](https://travis-ci.org/spedygiorgio/mbbefd.svg?branch=master)
-[![Downloads](http://cranlogs.r-pkg.org/badges/mbbefd)](http://cran.rstudio.com/package=mbbefd)
+[![Travis-CI Build Status](https://travis-ci.org/spedygiorgio/mbbefd.svg?branch=master)](https://travis-ci.org/spedygiorgio/mbbefd) [![CRAN\_Status\_Badge](http://www.r-pkg.org/badges/version/mbbefd)](http://cran.r-project.org/package=mbbefd) ![downloads](http://cranlogs.r-pkg.org/badges/grand-total/mbbefd)

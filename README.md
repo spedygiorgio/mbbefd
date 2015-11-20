@@ -1,7 +1,9 @@
 # Maxwell Boltzmann Bose Einstein Fermi Dirac Distribution and Destruction Rate Modelling
 [![Travis-CI Build Status](https://travis-ci.org/spedygiorgio/mbbefd.svg?branch=master)](https://travis-ci.org/spedygiorgio/mbbefd) [![CRAN\_Status\_Badge](http://www.r-pkg.org/badges/version/mbbefd)](http://cran.r-project.org/package=mbbefd) ![downloads](http://cranlogs.r-pkg.org/badges/grand-total/mbbefd)
 
-R package providing new distributions (MBBEFD, shifted truncated Pareto,..) as well as functions to handle destruction rate models (exposure curve, benchmark exposures, fitting procedures,..).
+MBBEFD provides additional distributions to R, such as the MBBEFD and shifted truncated Pareto as well as functions to handle destruction rate models. 
+
+The distributions and models of the mbbefd package are particular popular for understanding and pricing risk in general insurance and reinsurance and are used for exposure rating, benchmarking and curve fitting.
 
 ## Install the current release from CRAN:
 ```r

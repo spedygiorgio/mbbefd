@@ -11,10 +11,10 @@ integrate(dgbeta, 0, 1, shape0=1/2, shape1=3, shape2=3/2)
 integrate(dgbeta, 0, 1, shape0=2, shape1=3, shape2=3/2)
 
 z <- 0:10/10
-cbind(1/pi*z^(3/pi-1)*(1-z^(1/pi))^(3/2-1)/beta(3, 3/2), dgbeta(z, pi, 3, 3/2))
-cbind(dbeta(z^(1/pi), 3, 3/2)*1/pi*z^(1/pi-1), dgbeta(z, pi, 3, 3/2))
-cbind(pbeta(z^(1/pi), 3, 3/2), pgbeta(z, pi, 3, 3/2))
-cbind(qbeta(z, 3, 3/2)^pi, qgbeta(z, pi, 3, 3/2))
+cbind(pi*z^(3*pi-1)*(1-z^pi)^(3/2-1)/beta(3, 3/2), dgbeta(z, pi, 3, 3/2))
+cbind(dbeta(z^pi, 3, 3/2)*pi*z^(pi-1), dgbeta(z, pi, 3, 3/2))
+cbind(pbeta(z^pi, 3, 3/2), pgbeta(z, pi, 3, 3/2))
+cbind(qbeta(z, 3, 3/2)^(1/pi), qgbeta(z, pi, 3, 3/2))
 
 #RNG
 n <- 1e4
@@ -22,7 +22,7 @@ x <- rgbeta(n, shape0=2, shape1=3, shape2=3/2)
 y <- rgbeta(n, shape0=pi, shape1=3, shape2=3/2)
 
 #test density
-z <- 0:10/10
+z <- 0:100/100
 
 plot(density(x)); lines(z, dgbeta(z, shape0=2, shape1=3, shape2=3/2), col="red")
 plot(density(y)); lines(z, dgbeta(z, shape0=pi, shape1=3, shape2=3/2), col="red")
@@ -30,8 +30,8 @@ plot(density(y)); lines(z, dgbeta(z, shape0=pi, shape1=3, shape2=3/2), col="red"
 #mode
 modeGB1 <- function(shape0, shape1, shape2)
 {
-  if(shape1+shape2-shape0>1)
-    ((shape1-shape0)/(shape1+shape2-shape0-1))^shape0
+  if(shape1+shape2-1/shape0>1)
+    ((shape1-1/shape0)/(shape1+shape2-1/shape0-1))^(1/shape0)
   else
     NaN
 }
@@ -39,6 +39,7 @@ c(modeGB1(2, 3, 3/2), density(x)$x[which.max(density(x)$y)])
 c(modeGB1(pi, 3, 3/2), density(y)$x[which.max(density(y)$y)])
 
 #test CDF
+z <- 0:10/10
 cbind(ecdf(x)(z), pgbeta(z, shape0=2, shape1=3, shape2=3/2))
 
 cbind(ecdf(y)(z), pgbeta(z, shape0=pi, shape1=3, shape2=3/2))

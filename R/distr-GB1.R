@@ -9,7 +9,7 @@ dgbeta <- function(x, shape0, shape1, shape2, log=FALSE)
   if(shape0 < 0 || shape1 < 0 || shape2 < 0)
     return(rep(NaN, length(x)))
   
-  res <- 1/shape0*x^(1/shape0-1)*dbeta(x^(1/shape0), shape1, shape2, log=log)
+  res <- shape0*x^(shape0-1)*dbeta(x^(shape0), shape1, shape2, log=log)
   res[x == 0] <- 0
   res
 }
@@ -20,7 +20,7 @@ pgbeta <- function(q, shape0, shape1, shape2, lower.tail = TRUE, log.p = FALSE)
     stop("non numeric argument.")
   if(shape0 < 0 || shape1 < 0 || shape2 < 0)
     return(rep(NaN, length(q)))
-  pbeta(q^(1/shape0), shape1, shape2, lower.tail=lower.tail, log.p=log.p)
+  pbeta(q^shape0, shape1, shape2, lower.tail=lower.tail, log.p=log.p)
 }
 
 
@@ -30,7 +30,7 @@ qgbeta <- function(p, shape0, shape1, shape2, lower.tail = TRUE, log.p = FALSE)
     stop("non numeric argument.")
   if(shape0 < 0 || shape1 < 0 || shape2 < 0)
     return(rep(NaN, length(p)))
-  qbeta(p, shape1, shape2, lower.tail=lower.tail, log.p=log.p)^(shape0)
+  qbeta(p, shape1, shape2, lower.tail=lower.tail, log.p=log.p)^(1/shape0)
 }  
 
 rgbeta <- function(n, shape0, shape1, shape2)
@@ -40,7 +40,7 @@ rgbeta <- function(n, shape0, shape1, shape2)
   n <- ifelse(length(n)>1, length(n), n)
   if(shape0 < 0 || shape1 < 0 || shape2 < 0)
     return(rep(NaN, n))
-  rbeta(n, shape1, shape2)^(shape0)
+  rbeta(n, shape1, shape2)^(1/shape0)
 }
 
 #internal function : incomplete beta function
@@ -53,9 +53,9 @@ ecgbeta <- function(x, shape0, shape1, shape2)
   if(shape0 < 0 || shape1 < 0 || shape2 < 0)
     return(rep(NaN, length(x)))
   
-  cst2 <- beta(shape1, shape0)/beta(shape1 + shape2, shape0)
+  cst2 <- beta(shape1, 1/shape0)/beta(shape1 + shape2, 1/shape0)
   
-  pbeta(x^(1/shape0), shape1+shape0, shape2) + x*(1 - pbeta(x^(1/shape0), shape1, shape2))*cst2
+  pbeta(x^shape0, shape1+1/shape0, shape2) + x*(1 - pbeta(x^shape0, shape1, shape2))*cst2
 }
 
 mgbeta <- function(order, shape0, shape1, shape2)
@@ -65,6 +65,6 @@ mgbeta <- function(order, shape0, shape1, shape2)
   if(shape0 < 0 || shape1 < 0 || shape2 < 0)
     return(rep(NaN, length(order)))
   
-  beta(shape1+shape2, order*shape0) / beta(shape1, order*shape0)
+  beta(shape1+shape2, order/shape0) / beta(shape1, order/shape0)
 }
   

@@ -19,7 +19,6 @@ c(etl(y), tloigbeta(shape0=pi, shape1=3, shape2=3/2, p1=2/3))
 #test CDF
 z <- 0:10/10
 cbind(ecdf(x)(z), poigbeta(z, shape0=2, shape1=3, shape2=3/2, p1=1/3))
-
 cbind(ecdf(y)(z), poigbeta(z, shape0=pi, shape1=3, shape2=3/2, p1=2/3))
 
 

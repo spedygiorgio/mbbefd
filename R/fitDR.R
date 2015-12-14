@@ -8,7 +8,6 @@ fitDR <- function(x, dist, method="mle", start=NULL, ...)
   method <- match.arg(method, c("mle", "tlmme"))
   dist <- match.arg(dist, c("oiunif", "oistpareto", "oibeta", "oigbeta", "mbbefd", "MBBEFD"))
   
-  cat("blii\n")
   if(dist == "mbbefd")
   {
     initparmbbefd <- list(list(a=-1/2, b=2), list(a=2, b=1/2))
@@ -193,15 +192,9 @@ fitDR <- function(x, dist, method="mle", start=NULL, ...)
     
   }else if(dist %in% c("oistpareto", "oibeta", "oigbeta")) #one-inflated distr
   {
-    cat("zog\n")
-    
     p1 <- etl(x, na.rm=TRUE)
     xneq1 <- x[x != 1]
     distneq1 <- substr(dist, 3, nchar(dist))
-    
-    #print(dist)
-    #print(distneq1)
-    cat("tau\n")
     
     uplolist <- list(upper=Inf, lower=0)
     if(is.null(start))
@@ -241,11 +234,8 @@ fitDR <- function(x, dist, method="mle", start=NULL, ...)
       
     if(method == "mle")
     {
-      cat(distneq1, "\n")
-      print(start)
       f1 <- fitdist(xneq1, distr=distneq1, method="mle", start=start, 
                   lower=uplolist$lower, upper=uplolist$upper, ...)
-      cat("blii\n")
       if(f1$convergence != 0)
       {
          stop("error in convergence when fitting data.")
@@ -270,7 +260,6 @@ fitDR <- function(x, dist, method="mle", start=NULL, ...)
         f1$cor <- cov2cor(f1$vcov)
         class(f1) <- c("DR", class(f1))
       } 
-      print(f1)
       
     }else if(method == "tlmme")
     {

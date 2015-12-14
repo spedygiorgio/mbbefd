@@ -1,3 +1,8 @@
+######################################################################
+# Empirical sample-based functions
+######################################################################
+
+
 #empirical exposure curve
 #in the spirit of ecdf()
 eecf <- function(x)
@@ -88,3 +93,10 @@ plot.eecf <- function(x, ..., ylab="Gn(x)", verticals = FALSE, do.points=TRUE,
 etl <- function(x)
   mean(x == 1)
 
+###################
+#internal functions
+
+#Theil index, see package ineq for other income index (e.g. Gini coefficient)
+Theil.emp <- function(x, na.rm = FALSE) 
+  mean(x/mean(x, na.rm = na.rm, trim=0)*log(x/mean(x, na.rm = na.rm, trim=0)), 
+       na.rm = na.rm, trim=0)

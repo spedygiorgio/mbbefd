@@ -58,8 +58,6 @@ rgbeta <- function(n, shape0, shape1, shape2)
   rbeta(n, shape1, shape2)^(1/shape0)
 }
 
-#internal function : incomplete beta function
-betainc <- function(x, a,b) pbeta(x, a, b)*beta(a,b)
 
 ecgbeta <- function(x, shape0, shape1, shape2)
 {
@@ -83,3 +81,30 @@ mgbeta <- function(order, shape0, shape1, shape2)
   beta(shape1+shape2, order/shape0) / beta(shape1, order/shape0)
 }
   
+
+###################
+#internal functions
+
+#incomplete beta function
+betainc <- function(x, a,b) pbeta(x, a, b)*beta(a,b)
+
+
+#Theil index, see package ineq for other income index (e.g. Gini coefficient)
+Theil.theo  <- function(shape0, shape1, shape2)
+{
+  EX <- beta(shape1+shape2, 1/shape0) / beta(shape1, 1/shape0)
+  1/shape0*(digamma(shape1+1/shape0)-digamma(shape1+shape2+ 1/shape0)) - log(EX)
+}
+
+Theil.theo.shape0  <- function(shape0, obs)
+{
+  #compute shape1/shape2 on a rescaled sample and moment estimator
+  obs <- obs^shape0
+  m <- mean(obs)
+  v <- (n - 1)/n*var(obs)
+  aux <- m*(1-m)/v - 1
+  shape1 <- m*aux
+  shape2 <- (1-m)*aux
+  
+  Theil.theo(shape0, shape1, shape2)
+}

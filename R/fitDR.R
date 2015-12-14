@@ -8,6 +8,7 @@ fitDR <- function(x, dist, method="mle", start=NULL, ...)
   method <- match.arg(method, c("mle", "tlmme"))
   dist <- match.arg(dist, c("oiunif", "oistpareto", "oibeta", "oigbeta", "mbbefd", "MBBEFD"))
   
+  cat("blii\n")
   if(dist == "mbbefd")
   {
     initparmbbefd <- list(list(a=-1/2, b=2), list(a=2, b=1/2))
@@ -86,7 +87,7 @@ fitDR <- function(x, dist, method="mle", start=NULL, ...)
   }else if(dist == "MBBEFD")
   {
     xneq1 <- x[x != 1]
-    g <- 1/etl(x)
+    g <- 1/etl(x, na.rm=TRUE)
     
     phalf <- mean(x <= 1/2)
     b <- Re(polyroot(c(phalf, (1-g)*(1-phalf), - 1 +g*(1-phalf))))
@@ -192,12 +193,15 @@ fitDR <- function(x, dist, method="mle", start=NULL, ...)
     
   }else if(dist %in% c("oistpareto", "oibeta", "oigbeta")) #one-inflated distr
   {
-    p1 <- etl(x)
+    cat("zog\n")
+    
+    p1 <- etl(x, na.rm=TRUE)
     xneq1 <- x[x != 1]
     distneq1 <- substr(dist, 3, nchar(dist))
     
     #print(dist)
     #print(distneq1)
+    cat("tau\n")
     
     uplolist <- list(upper=Inf, lower=0)
     if(is.null(start))
@@ -208,14 +212,15 @@ fitDR <- function(x, dist, method="mle", start=NULL, ...)
       }else if(distneq1 == "beta")
       {
         n <- length(xneq1)
-        m <- mean(xneq1)
-        v <- (n - 1)/n*var(xneq1)
+        m <- mean(xneq1, na.rm=TRUE)
+        v <- (n - 1)/n*var(xneq1, na.rm=TRUE)
         aux <- m*(1-m)/v - 1
         start <- list(shape1=m*aux, shape2=(1-m)*aux)
         
       }else if(distneq1 == "gbeta")
       {
-        start <- list(shape0=1, shape1=1, shape2=1)
+        shape00 <- optimize(function(z) (Theil.emp(x, na.rm=TRUE) - Theil.theo.shape0(z, obs=x))^2, lower=0.01, upper=20)$minimum
+        start <- c(list(shape0=shape00), as.list(fitdist(x^shape00, "beta", method="mme")$estimate))
       }else
         stop("wrong non-inflated distribution.")
     }else
@@ -236,8 +241,11 @@ fitDR <- function(x, dist, method="mle", start=NULL, ...)
       
     if(method == "mle")
     {
+      cat(distneq1, "\n")
+      print(start)
       f1 <- fitdist(xneq1, distr=distneq1, method="mle", start=start, 
                   lower=uplolist$lower, upper=uplolist$upper, ...)
+      cat("blii\n")
       if(f1$convergence != 0)
       {
          stop("error in convergence when fitting data.")
@@ -262,6 +270,7 @@ fitDR <- function(x, dist, method="mle", start=NULL, ...)
         f1$cor <- cov2cor(f1$vcov)
         class(f1) <- c("DR", class(f1))
       } 
+      print(f1)
       
     }else if(method == "tlmme")
     {

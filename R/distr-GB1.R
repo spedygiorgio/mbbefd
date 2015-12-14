@@ -100,6 +100,7 @@ Theil.theo.shape0  <- function(shape0, obs)
 {
   #compute shape1/shape2 on a rescaled sample and moment estimator
   obs <- obs^shape0
+  n <- length(obs)
   m <- mean(obs)
   v <- (n - 1)/n*var(obs)
   aux <- m*(1-m)/v - 1

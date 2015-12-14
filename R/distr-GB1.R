@@ -8,9 +8,15 @@ dgbeta <- function(x, shape0, shape1, shape2, log=FALSE)
     stop("non numeric argument.")
   if(shape0 < 0 || shape1 < 0 || shape2 < 0)
     return(rep(NaN, length(x)))
-  
-  res <- shape0*x^(shape0-1)*dbeta(x^(shape0), shape1, shape2, log=log)
-  res[x == 0] <- 0
+  if(log)
+  {
+    res <- log(shape0)+(shape0-1)*log(x)+dbeta(x^(shape0), shape1, shape2, log=log)
+    res[x < 0 | x > 1] <- -Inf
+  }else
+  {
+    res <- shape0*x^(shape0-1)*dbeta(x^(shape0), shape1, shape2, log=FALSE)
+    res[x < 0 | x > 1] <- 0
+  }
   res
 }
 
@@ -20,7 +26,12 @@ pgbeta <- function(q, shape0, shape1, shape2, lower.tail = TRUE, log.p = FALSE)
     stop("non numeric argument.")
   if(shape0 < 0 || shape1 < 0 || shape2 < 0)
     return(rep(NaN, length(q)))
-  pbeta(q^shape0, shape1, shape2, lower.tail=lower.tail, log.p=log.p)
+  res <- pbeta(q^shape0, shape1, shape2, lower.tail=TRUE, log.p=FALSE)
+  if(!lower.tail)
+    res <- 1-res
+  if(log.p)
+    res <- log(res)
+  res
 }
 
 
@@ -30,7 +41,11 @@ qgbeta <- function(p, shape0, shape1, shape2, lower.tail = TRUE, log.p = FALSE)
     stop("non numeric argument.")
   if(shape0 < 0 || shape1 < 0 || shape2 < 0)
     return(rep(NaN, length(p)))
-  qbeta(p, shape1, shape2, lower.tail=lower.tail, log.p=log.p)^(1/shape0)
+  if(!lower.tail)
+    p <- 1-p
+  if(log.p) 
+    p <- exp(p)
+  qbeta(p, shape1, shape2, lower.tail=TRUE, log.p=FALSE)^(1/shape0)
 }  
 
 rgbeta <- function(n, shape0, shape1, shape2)

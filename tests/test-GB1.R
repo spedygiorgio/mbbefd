@@ -16,6 +16,16 @@ cbind(dbeta(z^pi, 3, 3/2)*pi*z^(pi-1), dgbeta(z, pi, 3, 3/2))
 cbind(pbeta(z^pi, 3, 3/2), pgbeta(z, pi, 3, 3/2))
 cbind(qbeta(z, 3, 3/2)^(1/pi), qgbeta(z, pi, 3, 3/2))
 
+
+#log argument
+
+cbind(dbeta(z, 3, 3/2, log=TRUE), dgbeta(z, 1, 3, 3/2, log=TRUE))
+cbind(log(dgbeta(z, pi, 3, 3/2, log=FALSE)), dgbeta(z, pi, 3, 3/2, log=TRUE))
+cbind(log(pgbeta(z, pi, 3, 3/2, log=FALSE)), pgbeta(z, pi, 3, 3/2, log=TRUE))
+cbind(log(pgbeta(z, pi, 3, 3/2, log=FALSE, lower=TRUE)), pgbeta(z, pi, 3, 3/2, log=TRUE, lower=TRUE))
+cbind(qgbeta(z, pi, 3, 3/2, log=FALSE), qgbeta(log(z), pi, 3, 3/2, log=TRUE))
+cbind(qgbeta(z, pi, 3, 3/2, log=FALSE, lower=TRUE), qgbeta(log(z), pi, 3, 3/2, log=TRUE, lower=TRUE))
+
 #RNG
 n <- 1e4
 x <- rgbeta(n, shape0=2, shape1=3, shape2=3/2)

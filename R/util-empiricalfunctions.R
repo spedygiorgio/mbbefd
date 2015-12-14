@@ -90,8 +90,8 @@ plot.eecf <- function(x, ..., ylab="Gn(x)", verticals = FALSE, do.points=TRUE,
 
 
 #total loss
-etl <- function(x)
-  mean(x == 1)
+etl <- function(x, na.rm = FALSE)
+  mean(x == 1, na.rm = na.rm, trim=0)
 
 ###################
 #internal functions

@@ -23,7 +23,7 @@ dMBBEFDR <- function(x, g, b, log=FALSE)
     res[x == 1] <- 1/g
   }else
   {
-    res <- -(1-b)*log(b)*b^(1-x)/((g-1)*b^(1-x) + 1-g*b)^2
+    res <- -(1-b)*(g-1)*log(b)*b^(1-x)/((g-1)*b^(1-x) + 1-g*b)^2
     res[x == 1] <- 1/g
   }
   res[x > 1] <- 0

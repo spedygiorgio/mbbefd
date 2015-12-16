@@ -3,6 +3,7 @@ library(mbbefd)
 #test of MBBEFD(a,b) distribution
 n <- 1e4
 
+set.seed(567)
 x <- rmbbefd(n, 2, 1/2)
 y <- rmbbefd(n, -1/2, 2)
 

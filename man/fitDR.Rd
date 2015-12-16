@@ -39,8 +39,8 @@ fitDR(x, dist, method="mle", start=NULL, \dots)
 \details{
 
     The fitted distribution (\code{dist}) has its d, p, q, r functions defined in the
-    man page: \code{\link{oiunif}}, \code{\link{oistpareto}}, \code{\link{oibeta}}, \code{\link{oigbeta}}, 
-    \code{\link{mbbefd}}, \code{\link{MBBEFD}}.
+    man page: \code{\link{oiunif}}, \code{\link{oistpareto}}, \code{\link{oibeta}}, 
+    \code{\link{oigbeta}}, \code{\link{mbbefd}}, \code{\link{MBBEFD}}.
 
     The two possible fitting methods are described below:
 \describe{
@@ -48,14 +48,15 @@ fitDR(x, dist, method="mle", start=NULL, \dots)
     Maximum likelihood estimation consists in maximizing the log-likelihood.
     A numerical optimization is carried out in \code{\link{mledist}} via \code{optim}
     to find the best values (see \code{\link{mledist}} for details).
+    For one-inflated distributions, the probability parameter is estimated
+    by a closed-form formula and other parameters use a two-optimization procedures.
     }
     \item{When \code{method="tlmme"}}{
-    Moment matching estimation consists in equalizing theoretical and empirical 
+    Total loss and moment matching estimation consists in equalizing theoretical and empirical 
     total loss as well as theoretical and empirical moments.
     The theoretical and the empirical moments are matched numerically, 
     by minimization of the sum of squared differences between observed and theoretical 
-    quantities
-    (see \code{\link{mmedist}} for details).
+    quantities (see \code{\link{mmedist}} for details).
     }
     
 }
@@ -64,8 +65,8 @@ fitDR(x, dist, method="mle", start=NULL, \dots)
     of the chosen method) is performed using \code{\link{optim}}, 
     with the "Nelder-Mead" method for distributions characterized by more than one parameter
     and the "BFGS" method for distributions characterized by only one parameter. 
-    Note that when errors are raised by \code{optim}, it's a good idea to start by adding traces during
-    the optimization process by adding \code{control=list(trace=1, REPORT=1)}.
+    Note that when errors are raised by \code{optim}, it's a good idea to start by adding 
+    traces during the optimization process by adding \code{control=list(trace=1, REPORT=1)}.
     
     The estimation process is carried out via \code{fitdist} from the \code{fitdistrplus} package
     and the output object will inherit from the \code{"fitdist"} class.
@@ -76,8 +77,8 @@ fitDR(x, dist, method="mle", start=NULL, \dots)
 }
 
 \value{ 
-    \code{fitDR} returns an object of class \code{"fitDR"} inheriting from the \code{"fitdist"} class.
-    That is a list with the following components:
+    \code{fitDR} returns an object of class \code{"fitDR"} inheriting 
+    from the \code{"fitdist"} class. That is a list with the following components:
     \item{estimate }{ the parameter estimates.}
     \item{method }{ the character string coding for the fitting method : 
         \code{"mle"} for 'maximum likelihood estimation', \code{"mme"} for 'matching moment estimation',
@@ -129,8 +130,8 @@ fitDR(x, dist, method="mle", start=NULL, \dots)
     }
     \item{\code{logLik}}{ Extracts the estimated log-likelihood from the \code{"fitDR"} object.
     }
-    \item{\code{vcov}}{ Extracts the estimated var-covariance matrix from the \code{"fitDR"} object
-    (only available When \code{method = "mle"}).
+    \item{\code{vcov}}{ Extracts the estimated var-covariance matrix from the 
+      \code{"fitDR"} object (only available when \code{method = "mle"}).
     }
     \item{\code{coef}}{ Extracts the fitted coefficients from the \code{"fitDR"} object.
     }
@@ -162,7 +163,8 @@ Springer, New York, pp. 435-446.
 Vose D (2000), \emph{Risk analysis, a quantitative guide}.
 John Wiley & Sons Ltd, Chischester, England, pp. 99-143.
 
-Delignette-Muller ML and Dutang C (2015), \emph{fitdistrplus: An R Package for Fitting Distributions}.
+Delignette-Muller ML and Dutang C (2015), 
+\emph{fitdistrplus: An R Package for Fitting Distributions}.
 Journal of Statistical Software, 64(4), 1-34.
 
 }
@@ -183,6 +185,7 @@ x <- roibeta(n, 3, 2, 1/6)
 f1 <- fitDR(x, "oibeta", method="mle")
 summary(f1)
 
+plot(bootdist(f1, niter=20), enhance=TRUE, trueval=c(3, 2, 1/6))
 
 }
 \keyword{distribution}

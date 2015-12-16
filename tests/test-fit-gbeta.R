@@ -72,6 +72,8 @@ colSums(cbind(do.call("dgbeta", c(list(x), initpar, NULL, log=TRUE)),
 #____________________________________________________________
 #test with starting values equal theoretical values
 
+f1 <- fitDR(x, "oigbeta", "mle")
+
 f1 <- fitdist(x, "gbeta", method="mle", start=initpar) # , control=list(trace=3, REPORT=1)) 
 summary(f1)
 cdfcomp(f1, do.points=FALSE, ylogscale = TRUE)

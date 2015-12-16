@@ -10,108 +10,41 @@ fitDR <- function(x, dist, method="mle", start=NULL, ...)
   
   if(dist == "mbbefd")
   {
-    initparmbbefd <- list(list(a=-1/2, b=2), list(a=2, b=1/2))
-    
+    initparmbbefd <- list(list(a=Trans.m10(0), b=Trans.1Inf(0)), 
+                          list(a=Trans.0Inf(0), b=Trans.01(0)))
+    #print(initparmbbefd)
+    prefit <- prefitDR.mle(x, "mbbefd")
+    #domain : (a,b) in (-1, 0) x (1, +Inf)
+    if(all(!is.na(prefit[[1]])))
+    {
+      initparmbbefd[[1]] <- prefit[[1]]
+      if(initparmbbefd[[1]]["b"] == 1)
+        initparmbbefd[[1]]["b"] <- 2
+    }
+    #domain : (a,b) in (0, +Inf) x (0, 1)
+    if(all(!is.na(prefit[[2]])))
+    {
+      initparmbbefd[[2]] <- prefit[[2]]
+      if(initparmbbefd[[2]]["b"] == 1)
+        initparmbbefd[[2]]["b"] <- 1/2
+    }
+    #print(initparmbbefd)
     if(method == "mle")
     {
       
       #wrap gradient -LL to match the call by fitdist
-      grLL <- function(x, fix.arg, obs, ddistnam) -grLLfunc(obs=obs, theta=x, dist="mbbefd")
+      grLL <- function(x, fix.arg, obs, ddistnam) 
+        -grLLfunc(obs=obs, theta=x, dist="mbbefd")
       
       #domain : (a,b) in (-1, 0) x (1, +Inf)
-      alabama1 <- fitdist(x, distr="mbbefd", start=initparmbbefd[[1]], 
-                        custom.optim= constrOptim.nl, hin=constrmbbefd1, method="mle",
+      alabama1 <- mledist(x, distr="mbbefd", start=initparmbbefd[[1]], 
+                        custom.optim= constrOptim.nl, hin=constrmbbefd1, 
                         control.outer=list(trace= FALSE), gr=grLL)
       #domain : (a,b) in (0, +Inf) x (0, 1)
-      alabama2 <- fitdist(x, distr="mbbefd", start=initparmbbefd[[2]], 
-                        custom.optim= constrOptim.nl, hin=constrmbbefd2, method="mle",
+      alabama2 <- mledist(x, distr="mbbefd", start=initparmbbefd[[2]], 
+                        custom.optim= constrOptim.nl, hin=constrmbbefd2, 
                         control.outer=list(trace= FALSE), gr=grLL)
-      if(alabama1$convergence == 100 && alabama2$convergence == 100)
-        f1 <- alabama1
-      else if(alabama1$convergence == 100 && alabama2$convergence != 100) 
-        f1 <- alabama2
-      else if(alabama1$convergence != 100 && alabama2$convergence == 100) 
-        f1 <- alabama1
-      else
-      {
-        if(alabama1$loglik > alabama2$loglik)
-          f1 <- alabama1
-        else
-          f1 <- alabama2  
-        #computes Hessian of -LL at estimate values
-        f1hess <- -heLLfunc(obs=x, theta=f1$estimate, dist="mbbefd")
-        
-        if(all(!is.na(f1hess)) && qr(f1hess)$rank == NCOL(f1hess)){
-          f1$vcov <- solve(f1hess)
-          f1$sd <- sqrt(diag(f1$vcov))
-          f1$cor <- cov2cor(f1$vcov)
-        }#otherwise it is already at NA from fitdist
-      }
       
-      class(f1) <- c("DR", class(f1))
-    }else if(method == "tlmme")
-    {
-      DIFF2 <- function(par, obs) 
-      {
-        (mmbbefd(1, par[1], par[2]) - mean(obs))^2 + (tlmbbefd(par[1], par[2]) - etl(obs))^2
-      }
-      alabama1 <- constrOptim.nl(unlist(initparmbbefd[[1]]), fn=DIFF2, hin=constrmbbefd1, obs=x, control.outer=list(trace=FALSE))
-      alabama2 <- constrOptim.nl(unlist(initparmbbefd[[2]]), fn=DIFF2, hin=constrmbbefd2, obs=x, control.outer=list(trace=FALSE))
-      
-      if(alabama1$convergence > 0 && alabama2$convergence > 0)
-        f1 <- list(estimate=NA, convergence=100)
-      else if(alabama1$convergence > 0 && alabama2$convergence == 0) 
-        f1 <- list(estimate=alabama2$par, convergence=0)
-      else if(alabama1$convergence == 0 && alabama2$convergence > 0) 
-        f1 <- list(estimate=alabama1$par, convergence=0)
-      else
-      {
-        if(alabama1$value < alabama2$value)
-          f1 <- list(estimate=alabama1$par, convergence=0)
-        else
-          f1 <- list(estimate=alabama2$par, convergence=0)
-      }
-      f1$method <- "tlmme"
-      f1$data <- x
-      f1$n <- length(x)
-      f1$distname <- "mbbefd"
-      f1$fix.arg <- f1$fix.arg.fun <- f1$dots <- f1$weights <- NULL
-      f1$discrete <- FALSE
-      f1$aic <- f1$bic <- f1$loglik <- NA
-      f1$sd <- f1$vcov <- f1$cor <- NA
-      class(f1) <- c("DR", "fitdist")
-      
-    }else
-      stop("not yet implemented")
-  }else if(dist == "MBBEFD")
-  {
-    xneq1 <- x[x != 1]
-    g <- 1/etl(x, na.rm=TRUE)
-    
-    phalf <- mean(x <= 1/2)
-    b <- Re(polyroot(c(phalf, (1-g)*(1-phalf), - 1 +g*(1-phalf))))
-    if(any(b > 0 | b < 1))
-      b <- max(b[b > 0 & b < 1])
-    else
-      b <- 1/2
-    
-    initparMBBEFD <- list(list(g=1/etl(x), b=2), list(g=1/etl(x), b=etl(x)/2))
-    
-    #cat("g", g, "b", b, "\n")
-    if(method == "mle")
-    {
-      
-      #domain : (g,b) in (1, +Inf) x (1, +Inf) with gb > 1
-      alabama1 <- fitdist(x, distr="MBBEFD", start=initparMBBEFD[[1]], 
-                          custom.optim= constrOptim.nl, hin=constrMBBEFD1, method="mle",
-                          control.outer=list(trace= FALSE), hin.jac=constrMBBEFD1jac, silent=FALSE)
-      #domain : (g,b) in (1, +Inf) x (0, 1) with gb < 1
-      alabama2 <- fitdist(x, distr="MBBEFD", start=initparMBBEFD[[2]], 
-                          custom.optim= constrOptim.nl, hin=constrMBBEFD2, method="mle",
-                          control.outer=list(trace= FALSE), hin.jac=constrMBBEFD2jac, silent=FALSE)
-      
-      print(summary(alabama1))
-      print(summary(alabama2))
       if(alabama1$convergence == 100 && alabama2$convergence == 100)
         f1 <- alabama1
       else if(alabama1$convergence == 100 && alabama2$convergence != 100) 
@@ -124,22 +57,133 @@ fitDR <- function(x, dist, method="mle", start=NULL, ...)
           f1 <- alabama1
         else
           f1 <- alabama2 
-        #gof stat
-        f1$loglik <- LLfunc(obs=x, theta=f1$estimate, dist=dist)
-        npar <- length(f1$estimate)
-        f1$aic <- -2*f1$loglik+2*npar
-        f1$bic <- -2*f1$loglik+log(f1$n)*npar
+        
+        
+#         #computes Hessian of -LL at estimate values
+#         f1hess <- -heLLfunc(obs=x, theta=f1$estimate, dist="mbbefd")
+#         
+#         if(all(!is.na(f1hess)) && qr(f1hess)$rank == NCOL(f1hess)){
+#           f1$vcov <- solve(f1hess)
+#           f1$sd <- sqrt(diag(f1$vcov))
+#           f1$cor <- cov2cor(f1$vcov)
+#         }else{
+#           f1$vcov <- NA
+#           f1$sd <- NA
+#           f1$cor <- NA                            
+#         }
       }
+      f1 <- fitDR.addcomp(x=x, theta=f1$estimate, dist="mbbefd", method="mle", f1$convergence)
       
-      class(f1) <- c("DR", class(f1))
+    }else if(method == "tlmme")
+    {
+      DIFF2 <- function(par, obs) 
+      {
+        (mmbbefd(1, par[1], par[2]) - mean(obs))^2 + (tlmbbefd(par[1], par[2]) - etl(obs))^2
+      }
+      alabama1 <- constrOptim.nl(unlist(initparmbbefd[[1]]), fn=DIFF2, hin=constrmbbefd1, 
+                                 hin.jac=constrmbbefd1jac, obs=x, control.outer=list(trace=FALSE))
+      alabama2 <- constrOptim.nl(unlist(initparmbbefd[[2]]), fn=DIFF2, hin=constrmbbefd2, 
+                                 hin.jac=constrmbbefd2jac, obs=x, control.outer=list(trace=FALSE))
+      if(alabama1$convergence > 0 && alabama2$convergence > 0)
+        f1 <- list(estimate=NA, convergence=100)
+      else if(alabama1$convergence > 0 && alabama2$convergence == 0) 
+        f1 <- list(estimate=alabama2$par, convergence=0)
+      else if(alabama1$convergence == 0 && alabama2$convergence > 0) 
+        f1 <- list(estimate=alabama1$par, convergence=0)
+      else
+      {
+        if(alabama1$value < alabama2$value)
+          f1 <- list(estimate=alabama1$par, convergence=0)
+        else
+          f1 <- list(estimate=alabama2$par, convergence=0)
+      }
+      f1 <- fitDR.addcomp(x=x, theta=f1$estimate, hessian=f1$hessian, dist="mbbefd", method="tlmme", f1$convergence)
+      
+    }else
+      stop("not yet implemented")
+  }else if(dist == "MBBEFD")
+  {
+    #starting values
+    g <- 1/etl(x, na.rm=TRUE)
+    initparMBBEFD <- list(list(g=g, b=Trans.1Inf(0)), list(g=g, b=Trans.01(0)))
+    
+    #try to improve initial value for b
+    phalf <- mean(x <= 1/2)
+    b <- Re(polyroot(c(phalf, (1-g)*(1-phalf), - 1 +g*(1-phalf))))
+    if(any(b > 0 | b < 1))
+      initparMBBEFD[[2]]["b"] <- max(b[b > 0 & b < 1])
+    else if(any(b > 1))
+      initparMBBEFD[[2]]["b"] <- max(b[b > 1])
+      
+      
+    #print(unlist(initparMBBEFD))
+    prefit <- prefitDR.mle(x, "MBBEFD")
+    if(all(!is.na(prefit[[1]])))
+    { 
+      initparMBBEFD[[1]] <- prefit[[1]]
+      if(initparMBBEFD[[1]]["b"] == 1)
+        initparMBBEFD[[1]]["b"] <- 2
+    }
+    if(all(!is.na(prefit[[2]])))
+    {  
+      initparMBBEFD[[2]] <- prefit[[2]]
+      if(initparMBBEFD[[2]]["b"] == 1)
+        initparMBBEFD[[2]]["b"] <- 1/2
+    }
+    #print(unlist(initparMBBEFD))
+    
+    #cat("g", g, "b", b, "\n")
+    if(method == "mle")
+    {
+      
+      #domain : (g,b) in (1, +Inf) x (1, +Inf) with gb > 1
+      alabama1 <- mledist(x, distr="MBBEFD", start=initparMBBEFD[[1]], 
+                          custom.optim= constrOptim.nl, hin=constrMBBEFD1, 
+                          control.outer=list(trace= TRUE), hin.jac=constrMBBEFD1jac, silent=FALSE)
+      #domain : (g,b) in (1, +Inf) x (0, 1) with gb < 1
+      alabama2 <- mledist(x, distr="MBBEFD", start=initparMBBEFD[[2]], 
+                          custom.optim= constrOptim.nl, hin=constrMBBEFD2, 
+                          control.outer=list(trace= FALSE), hin.jac=constrMBBEFD2jac, silent=TRUE)
+      
+      #print(summary(alabama1))
+      #print(summary(alabama2))
+      if(alabama1$convergence == 100 && alabama2$convergence == 100)
+        f1 <- alabama1
+      else if(alabama1$convergence == 100 && alabama2$convergence != 100) 
+        f1 <- alabama2
+      else if(alabama1$convergence != 100 && alabama2$convergence == 100) 
+        f1 <- alabama1
+      else
+      {
+        if(alabama1$loglik > alabama2$loglik)
+          f1 <- alabama1
+        else
+          f1 <- alabama2 
+        
+#         if(all(!is.na(f1$hessian)) && qr(f1$hessian)$rank == NCOL(f1$hessian)){
+#           f1$vcov <- solve(f1$hessian)
+#           f1$sd <- sqrt(diag(varcovar))
+#           f1$cor <- cov2cor(varcovar)
+#         }else{
+#           f1$vcov <- NA
+#           f1$sd <- NA
+#           f1$cor <- NA                            
+#         }
+#         
+      }
+      f1 <- fitDR.addcomp(x=x, theta=f1$estimate, hessian=f1$hessian, dist="MBBEFD", method="mle", f1$convergence)
+      
+      
     }else if(method == "tlmme")
     {
       DIFF2 <- function(par, obs) 
       {
         (mMBBEFD(1, par[1], par[2]) - mean(obs))^2 + (tlMBBEFD(par[1], par[2]) - etl(obs))^2
       }
-      alabama1 <- constrOptim.nl(unlist(initparMBBEFD[[1]]), fn=DIFF2, hin=constrMBBEFD1, obs=x, control.outer=list(trace=FALSE))
-      alabama2 <- constrOptim.nl(unlist(initparMBBEFD[[2]]), fn=DIFF2, hin=constrMBBEFD2, obs=x, control.outer=list(trace=FALSE))
+      alabama1 <- constrOptim.nl(unlist(initparMBBEFD[[1]]), fn=DIFF2, hin=constrMBBEFD1, 
+                                 obs=x, control.outer=list(trace=FALSE))
+      alabama2 <- constrOptim.nl(unlist(initparMBBEFD[[2]]), fn=DIFF2, hin=constrMBBEFD2, 
+                                 obs=x, control.outer=list(trace=FALSE))
       
       if(alabama1$convergence > 0 && alabama2$convergence > 0)
         f1 <- list(estimate=NA, convergence=100)
@@ -154,20 +198,8 @@ fitDR <- function(x, dist, method="mle", start=NULL, ...)
         else
           f1 <- list(estimate=alabama2$par, convergence=0)
       }
-      f1$method <- "tlmme"
-      f1$data <- x
-      f1$n <- length(x)
-      f1$distname <- "MBBEFD"
-      f1$fix.arg <- f1$fix.arg.fun <- f1$dots <- f1$weights <- NULL
-      f1$discrete <- FALSE
-      #gof stat
-      f1$loglik <- LLfunc(obs=x, theta=f1$estimate, dist=dist)
-      npar <- length(f1$estimate)
-      f1$aic <- -2*f1$loglik+2*npar
-      f1$bic <- -2*f1$loglik+log(f1$n)*npar
+      f1 <- fitDR.addcomp(x=x, theta=f1$estimate, hessian=f1$hessian, dist="MBBEFD", method="tlmme", f1$convergence)
       
-      f1$sd <- f1$vcov <- f1$cor <- NA
-      class(f1) <- c("DR", "fitdist")
       
     }else
       stop("not yet implemented")  
@@ -186,7 +218,7 @@ fitDR <- function(x, dist, method="mle", start=NULL, ...)
       f1 <- fitdist(x, distr=dist, method=method, start=start,
                   lower=0, upper=1, ..., optim.method="Brent") #, control=list(trace=6, REPORT=1)
     
-      class(f1) <- c("DR", class(f1))
+      
     }else
       stop("not yet implemented")  
     
@@ -234,6 +266,26 @@ fitDR <- function(x, dist, method="mle", start=NULL, ...)
       
     if(method == "mle")
     {
+      #check the initial value
+      loglik0 <- fitdistrplus:::loglikelihood(unlist(start), NULL, xneq1, paste0("d", distneq1))
+      if(is.infinite(loglik0))
+        stop("initial value of the log-likelihood is infinite.")
+    
+        #improve initial parameters for GB1
+      if(distneq1 == "gbeta")
+      {
+        #exp/log transform of the parameter
+        dgbeta2 <- function(x, shape0, shape1, shape2, log=FALSE)
+          dgbeta(x, exp(shape0), exp(shape1), exp(shape2), log=log)
+        
+        f0 <- mledist(xneq1, dist="gbeta2", optim.method="BFGS", 
+                      control=list(trace=0, REPORT=1, maxit=100), start=lapply(start, log))
+        #print(unlist(start))
+        if(all(!is.na(f0$estimate)))
+          start <- as.list(exp(f0$estimate))
+        #print(unlist(start))
+        
+      }
       f1 <- fitdist(xneq1, distr=distneq1, method="mle", start=start, 
                   lower=uplolist$lower, upper=uplolist$upper, ...)
       if(f1$convergence != 0)
@@ -258,7 +310,7 @@ fitDR <- function(x, dist, method="mle", start=NULL, ...)
         
         f1$sd <- sqrt(diag(f1$vcov))
         f1$cor <- cov2cor(f1$vcov)
-        class(f1) <- c("DR", class(f1))
+        
       } 
       
     }else if(method == "tlmme")
@@ -286,8 +338,8 @@ fitDR <- function(x, dist, method="mle", start=NULL, ...)
           stop("not implemented")
       }
           
-      
-      res <- optim(par=unlist(start), fn=DIFF2, obs=x, method="L-BFGS-B", lower=uplolist$lower, upper=uplolist$upper)
+      res <- optim(par=unlist(start), fn=DIFF2, obs=x, method="L-BFGS-B", 
+                   lower=uplolist$lower, upper=uplolist$upper)
       
       if(res$convergence > 0)
         f1 <- list(estimate=NA, convergence=100)
@@ -308,7 +360,6 @@ fitDR <- function(x, dist, method="mle", start=NULL, ...)
       f1$bic <- -2*f1$loglik+log(f1$n)*npar
       
       f1$sd <- f1$vcov <- f1$cor <- NA
-      class(f1) <- c("DR", "fitdist")
       
     }else
     {
@@ -318,118 +369,10 @@ fitDR <- function(x, dist, method="mle", start=NULL, ...)
   }else
     stop("Unknown distribution for destruction rate models.")
   
+  #reorder components as fitdist object
+  f1 <- f1[c("estimate", "method", "sd", "cor", "vcov", "loglik", "aic", "bic", "n", "data", 
+             "distname", "fix.arg", "fix.arg.fun", "dots", "convergence", "discrete", "weights")]
+  class(f1) <- c("DR", "fitdist")
   f1
 }
 
-#likelihood function
-LLfunc <- function(obs, theta, dist)
-{
-  dist <- match.arg(dist, c("oiunif", "oistpareto", "oibeta", "oigbeta", "mbbefd", "MBBEFD"))
-  ddist <- paste0("d", dist)
-  sum(log(do.call(ddist, c(list(obs), as.list(theta)) ) ) )
-}
-
-#gradient of the likelihood function
-grLLfunc <- function(obs, theta, dist)
-{
-  dist <- match.arg(dist, c("mbbefd", "MBBEFD")) 
-  if(dist == "mbbefd")
-  {
-    g1 <- function(x, theta)
-    {
-      a <- theta[1]; b <- theta[2]
-      ifelse(x == 1, (b-1)/(a+1)/(a+b), (2*a+1)/(a*(a+1)) - 2/(a+b^x))
-    }
-    g2 <- function(x, theta)
-    {
-      a <- theta[1]; b <- theta[2]
-      ifelse(x == 1, a/(b*(a+b)), -x/b+1/(b*log(b))+2*a*x/(b*(a+b^x)))
-    }
-    c(sum(sapply(obs, g1, theta=theta)), sum(sapply(obs, g2, theta=theta)))
-  }else
-  {
-    stop("not yet implemented.")
-  }
-}
-
-#Hessian of the likelihood function
-heLLfunc <- function(obs, theta, dist)
-{
-  dist <- match.arg(dist, c("mbbefd", "MBBEFD")) 
-  if(dist == "mbbefd")
-  {
-    h11 <- function(x, theta)
-    {
-      a <- theta[1]; b <- theta[2]
-      ifelse(x == 1, 1/(a+b)^2-1/(a+1)^2, 2/(a+b^x)^2-1/a^2-1/(a+1)^2)
-    }
-    h21 <- function(x, theta)
-    {
-      a <- theta[1]; b <- theta[2]
-      ifelse(x == 1, 1/(a+b)^2, 2*x*b^(x-1)/(a+b^x)^2)
-    }
-    h22 <- function(x, theta)
-    {
-      a <- theta[1]; b <- theta[2]
-      ifelse(x == 1, 1/(a+b)^2-1/b^2, 
-             x/b^2-(log(b)+1)/(b^2*log(b)^2)-2*a*x/(b^2*(a+b^x))-2*a*x^2*b^x/(b^2*(a+b^x)^2))
-    }
-    rbind(c(sum(sapply(obs, h11, theta=theta)), sum(sapply(obs, h21, theta=theta))),
-    c(sum(sapply(obs, h21, theta=theta)), sum(sapply(obs, h22, theta=theta))))
-  }else
-  {
-    stop("not yet implemented.")
-  }
-}
-
-#to meet the standard 'fn' argument and specific name arguments, 
-
-#constraint function for MBBEFD(a,b)
-constrmbbefd <- function(x, fix.arg, obs, ddistnam)
-{
-  x[1]*(1-x[2]) #a*(1-b) >= 0
-}
-constrmbbefd1 <- function(x, fix.arg, obs, ddistnam)
-{
-  c(x[1]+1, -x[1], x[2]-1, x[1]*(1-x[2])) #-1 < a < 0, b > 1, a*(1-b) >= 0
-}
-constrmbbefd2 <- function(x, fix.arg, obs, ddistnam)
-{
-  c(x[1], x[1], 1-x[2], x[1]*(1-x[2])) #0 < a , 0 < b < 1, a*(1-b) >= 0
-}
-
-#constraint function for MBBEFD(g,b)
-constrMBBEFD <- function(x, fix.arg, obs, ddistnam)
-{
-  c(x[1]-1, x[2]) #g >= 1, b > 0
-}
-constrMBBEFD1 <- function(x, fix.arg, obs, ddistnam)
-{
-  c(x[1]-1, x[2]-1, x[1]*x[2]-1) #g > 1, b > 1, gb > 1
-}
-constrMBBEFD1jac <- function(x, fix.arg, obs, ddistnam)
-{
-  j <- matrix(0, 3, 2)
-  j[1,] <- c(1, 0)
-  j[2,] <- c(0, 1)
-  j[3,] <- c(x[2], x[1])
-  j
-}
-
-constrMBBEFD2 <- function(x, fix.arg, obs, ddistnam)
-{
-  c(x[1]-1, 1-x[2], x[2], 1-x[1]*x[2]) #g > 1, 1 > b > 0, gb < 1
-}
-constrMBBEFD2jac <- function(x, fix.arg, obs, ddistnam)
-{
-  j <- matrix(0, 4, 2)
-  j[1,] <- c(1, 0)
-  j[2,] <- c(0, -1)
-  j[3,] <- c(0, 1)
-  j[4,] <- c(-x[2], -x[1])
-  j
-}
-constrMBBEFDb <- function(x, fix.arg, obs, ddistnam)
-{
-  x[1] #b > 0
-}

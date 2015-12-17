@@ -2,7 +2,7 @@
 #likelihood function
 LLfunc <- function(obs, theta, dist)
 {
-  dist <- match.arg(dist, c("oiunif", "oistpareto", "oibeta", "oigbeta", "mbbefd", "MBBEFD"))
+  dist <- match.arg(dist, c("oiunif", "oistpareto", "oibeta", "oigbeta", "mbbefd", "MBBEFD", "unif", "stpareto", "beta", "gbeta"))
   ddist <- paste0("d", dist)
   sum(log(do.call(ddist, c(list(obs), as.list(theta)) ) ) )
 }

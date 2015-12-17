@@ -7,6 +7,9 @@
 \alias{ecgbeta}
 \alias{mgbeta}
 
+\alias{dgbeta1}
+
+
 \title{The generalized Beta of the first kind Distribution}
 \description{
   Density, distribution function, quantile function and random

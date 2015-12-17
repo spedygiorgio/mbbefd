@@ -63,13 +63,19 @@ fitDR(x, dist, method="mle", start=NULL, \dots)
         
     By default, direct optimization of the log-likelihood (or other criteria depending
     of the chosen method) is performed using \code{\link{optim}}, 
-    with the "Nelder-Mead" method for distributions characterized by more than one parameter
-    and the "BFGS" method for distributions characterized by only one parameter. 
-    Note that when errors are raised by \code{optim}, it's a good idea to start by adding 
-    traces during the optimization process by adding \code{control=list(trace=1, REPORT=1)}.
+    with the "Nelder-Mead" method for distributions characterized by more than 
+    one parameter and the "BFGS" method for distributions characterized by only 
+    one parameter. Note that when errors are raised by \code{optim}, it's a good 
+    idea to start by adding traces during the optimization process by adding 
+    \code{control=list(trace=1, REPORT=1)}.
     
-    The estimation process is carried out via \code{fitdist} from the \code{fitdistrplus} package
-    and the output object will inherit from the \code{"fitdist"} class.
+    A pre-fitting process is carried out for the following distributions
+    \code{"mbbefd"}, \code{"MBBEFD"} and \code{"oigbeta"} before
+    the main optimization.
+    
+    The estimation process is carried out via \code{fitdist} from the 
+    \code{fitdistrplus} package and the output object will inherit from the 
+    \code{"fitdist"} class.
     Therefore, the following generic methods are available \code{print}, \code{plot}, 
     \code{summary}, \code{quantile}, \code{logLik}, \code{vcov} and \code{coef}.
     

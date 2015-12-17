@@ -8,6 +8,10 @@
 \alias{mmbbefd}
 \alias{tlmbbefd}
 
+\alias{dmbbefd1}
+\alias{dmbbefd2}
+
+
 \alias{MBBEFD}
 \alias{dMBBEFD}
 \alias{pMBBEFD}
@@ -17,16 +21,19 @@
 \alias{mMBBEFD}
 \alias{tlMBBEFD}
 
+\alias{dMBBEFD1}
+\alias{dMBBEFD2}
 
 
 \title{
 The MBBEFD distribution (two parametrizations)
 }
 \description{
-These functions perform probabilistic analysis as well as random sampling on the MBBEFD distribution:
-the 1st parametrization MBBEFD(a,b) is implemented in <d,p,q,r>mbbefd,
-the 2nd parametrization MBBEFD(g,b) is implemented in <d,p,q,r>MBBEFD.
-
+These functions perform probabilistic analysis as well 
+as random sampling on the MBBEFD distribution:
+the 1st parametrization MBBEFD(a,b) is implemented in <d,p,q,r>\code{mbbefd},
+the 2nd parametrization MBBEFD(g,b) is implemented in <d,p,q,r>\code{MBBEFD}.
+We also provide raw moments, exposure curve function and total loss.
 }
 \usage{
 

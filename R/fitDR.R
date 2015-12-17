@@ -105,7 +105,7 @@ fitDR <- function(x, dist, method="mle", start=NULL, ...)
   {
     #starting values
     g <- 1/etl(x, na.rm=TRUE)
-    initparMBBEFD <- list(list(g=g, b=Trans.1Inf(0)), list(g=g, b=Trans.01(0)))
+    initparMBBEFD <- list(list(g=g, b=Trans.1Inf(0)), list(g=g, b=1/(2*g)))
     
     #try to improve initial value for b
     phalf <- mean(x <= 1/2)
@@ -115,8 +115,14 @@ fitDR <- function(x, dist, method="mle", start=NULL, ...)
     else if(any(b > 1))
       initparMBBEFD[[2]]["b"] <- max(b[b > 1])
       
-      
-    #print(unlist(initparMBBEFD))
+#     cat("initial values")  
+#     print(unlist(initparMBBEFD))
+#     cat("constr > 0 : 1st set\n")
+#     print(constrMBBEFD1(unlist(initparMBBEFD[[1]])))
+#     cat("constr > 0 : 2nd set\n")
+#     print(constrMBBEFD2(unlist(initparMBBEFD[[2]])))
+#     
+    
     prefit <- prefitDR.mle(x, "MBBEFD")
     if(all(!is.na(prefit[[1]])))
     { 
@@ -130,7 +136,13 @@ fitDR <- function(x, dist, method="mle", start=NULL, ...)
       if(initparMBBEFD[[2]]["b"] == 1)
         initparMBBEFD[[2]]["b"] <- 1/2
     }
-    #print(unlist(initparMBBEFD))
+#     cat("after prefit\n")
+#     print(unlist(initparMBBEFD))
+#     
+#     cat("constr > 0 : 1st set\n")
+#     print(constrMBBEFD1(unlist(initparMBBEFD[[1]])))
+#     cat("constr > 0 : 2nd set\n")
+#     print(constrMBBEFD2(unlist(initparMBBEFD[[2]])))
     
     #cat("g", g, "b", b, "\n")
     if(method == "mle")
@@ -139,7 +151,7 @@ fitDR <- function(x, dist, method="mle", start=NULL, ...)
       #domain : (g,b) in (1, +Inf) x (1, +Inf) with gb > 1
       alabama1 <- mledist(x, distr="MBBEFD", start=initparMBBEFD[[1]], 
                           custom.optim= constrOptim.nl, hin=constrMBBEFD1, 
-                          control.outer=list(trace= TRUE), hin.jac=constrMBBEFD1jac, silent=FALSE)
+                          control.outer=list(trace= FALSE), hin.jac=constrMBBEFD1jac, silent=TRUE)
       #domain : (g,b) in (1, +Inf) x (0, 1) with gb < 1
       alabama2 <- mledist(x, distr="MBBEFD", start=initparMBBEFD[[2]], 
                           custom.optim= constrOptim.nl, hin=constrMBBEFD2, 
@@ -267,22 +279,22 @@ fitDR <- function(x, dist, method="mle", start=NULL, ...)
     if(method == "mle")
     {
       #check the initial value
-      loglik0 <- fitdistrplus:::loglikelihood(unlist(start), NULL, xneq1, paste0("d", distneq1))
+      loglik0 <- LLfunc(xneq1, unlist(start), distneq1)
+        
       if(is.infinite(loglik0))
         stop("initial value of the log-likelihood is infinite.")
     
         #improve initial parameters for GB1
       if(distneq1 == "gbeta")
       {
-        #exp/log transform of the parameter
-        dgbeta2 <- function(x, shape0, shape1, shape2, log=FALSE)
-          dgbeta(x, exp(shape0), exp(shape1), exp(shape2), log=log)
         
-        f0 <- mledist(xneq1, dist="gbeta2", optim.method="BFGS", 
-                      control=list(trace=0, REPORT=1, maxit=100), start=lapply(start, log))
+        prefit <- prefitDR.mle(x, "oigbeta")
+        
+        #f0 <- mledist(xneq1, dist="gbeta2", optim.method="BFGS", 
+        #              control=list(trace=0, REPORT=1, maxit=100), start=lapply(start, log))
         #print(unlist(start))
-        if(all(!is.na(f0$estimate)))
-          start <- as.list(exp(f0$estimate))
+        if(all(!is.na(prefit)))
+          start <- as.list(prefit)
         #print(unlist(start))
         
       }

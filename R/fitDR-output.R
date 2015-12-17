@@ -1,10 +1,9 @@
 fitDR.addcomp <- function(x, theta, hessian=NULL, dist, method, convergence=0)
 {
-  f1 <- list()
+  f1 <- list(estimate=theta)
   #computes Hessian of -log Lik at estimate values
-  if(all(!is.na(theta)) && method == "mle")
+  if(all(!is.na(theta)) && method == "mle" && !is.null(hessian))
   {
-    
     if(all(!is.na(hessian)) && qr(hessian)$rank == NCOL(hessian)){
       f1$vcov <- solve(hessian)
       f1$sd <- sqrt(diag(f1$vcov))

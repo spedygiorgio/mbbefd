@@ -11,6 +11,8 @@ x <- rgbeta(n, 2, 2, 5/2)
 
 initpar <- list(shape0=2, shape1=2, shape2=5/2)
 
+if(FALSE)
+{
 #____________________________________________________________
 #test all computation methods
 ctr <- list(trace=0, REPORT=1, maxit=1000)
@@ -119,7 +121,7 @@ b1 <- bootdist(f1, niter=nboot, silent=TRUE)
 summary(b1)
 
 plot(b1, enhance=TRUE, trueval=c(2, 2, 5/2))
-
+}
 
 #____________________________________________________________
 #init value
@@ -131,6 +133,9 @@ s00 <- optimize(function(z)
   (mbbefd:::Theil.emp(x) - mbbefd:::Theil.theo.shape0(z, obs=x))^2, lower=0.01, upper=20)$minimum
 initpar1 <- c(list(shape0=1), as.list(fitdist(x, "beta", method="mme")$estimate))
 initpar2 <- c(list(shape0=s00), as.list(fitdist(x^s00, "beta", method="mme")$estimate))
+
+
+
 
 #____________________________________________________________
 

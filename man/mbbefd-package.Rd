@@ -23,7 +23,7 @@ The vignette shows code snippets to fit the distribution to empirical data.
 Package: \tab mbbefd\cr
 Type: \tab Package\cr
 Version: \tab 0.8\cr
-Date: \tab 2015-08-30\cr
+Date: \tab 2016-02-20\cr
 License: \tab GPL 2\cr
 }
 }

@@ -1,4 +1,5 @@
 Version 0.8
+20-02-2016
 Added data sets (aon and loss).
 Start an unified approach for paramater estimation
 based on the fitdist function from fitdistrplus.

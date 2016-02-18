@@ -105,13 +105,15 @@ fitDR <- function(x, dist, method="mle", start=NULL, ...)
   {
     #starting values
     g <- 1/etl(x, na.rm=TRUE)
+    if(is.infinite(g))
+      g <- 2
     initparMBBEFD <- list(list(g=g, b=Trans.1Inf(0)), list(g=g, b=1/(2*g)))
     
     #try to improve initial value for b
     phalf <- mean(x <= 1/2)
     b <- Re(polyroot(c(phalf, (1-g)*(1-phalf), - 1 +g*(1-phalf))))
     if(any(b > 0 | b < 1))
-      initparMBBEFD[[2]]["b"] <- max(b[b > 0 & b < 1])
+      initparMBBEFD[[2]]["b"] <- max(b[b > 0 | b < 1])
     else if(any(b > 1))
       initparMBBEFD[[2]]["b"] <- max(b[b > 1])
       
@@ -256,7 +258,8 @@ fitDR <- function(x, dist, method="mle", start=NULL, ...)
         
       }else if(distneq1 == "gbeta")
       {
-        shape00 <- optimize(function(z) (Theil.emp(x, na.rm=TRUE) - Theil.theo.shape0(z, obs=x))^2, lower=0.01, upper=20)$minimum
+        shape00 <- optimize(function(z) (Theil.emp(x, na.rm=TRUE) - Theil.theo.shape0(z, obs=x))^2, 
+                            lower=0.01, upper=100)$minimum
         start <- c(list(shape0=shape00), as.list(fitdist(x^shape00, "beta", method="mme")$estimate))
       }else
         stop("wrong non-inflated distribution.")
@@ -274,7 +277,6 @@ fitDR <- function(x, dist, method="mle", start=NULL, ...)
       }else
         stop("wrong non-inflated distribution.")
     }
-    #print(start)
       
     if(method == "mle")
     {
@@ -297,8 +299,10 @@ fitDR <- function(x, dist, method="mle", start=NULL, ...)
           start <- as.list(prefit)
         #print(unlist(start))
         
-      }
-      f1 <- fitdist(xneq1, distr=distneq1, method="mle", start=start, 
+        f1 <- fitdist(xneq1, distr=distneq1, method="mle", start=start, 
+                      optim.method="Nelder-Mead", ...)
+      }else
+        f1 <- fitdist(xneq1, distr=distneq1, method="mle", start=start, 
                   lower=uplolist$lower, upper=uplolist$upper, ...)
       if(f1$convergence != 0)
       {

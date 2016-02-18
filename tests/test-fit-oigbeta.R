@@ -4,7 +4,7 @@ library(fitdistrplus)
 
 #oigbeta
 n <- 1e3
-nboot <- 100
+nboot <- 1000
 nboot <- 10
 set.seed(12345)
 x <- roigbeta(n, 3, 2, 5/2, 1/6)

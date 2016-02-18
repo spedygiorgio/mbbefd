@@ -1,7 +1,8 @@
 library(mbbefd)
- 
+library(fitdistrplus)
+
 n <- 1e3
-nboot <- 100
+nboot <- 1000
 nboot <- 10
 set.seed(123456)
 x <- rMBBEFD(n, 8, 1/4)
@@ -21,4 +22,14 @@ points(8, 1/4, pch="x", col="black")
 
 b1 <- bootDR(f1, niter=nboot, silent=TRUE)
 plot(b1, enhance=TRUE, trueval=c(8, 1/4))
+
+
+set.seed(123456)
+x <- rMBBEFD(n, 2, 1/4)
+
+system.time(f1 <- fitDR(x, "MBBEFD"))
+
+
+b1 <- bootDR(f1, niter=nboot, silent=TRUE)
+plot(b1, enhance=TRUE, trueval=c(2, 1/4))
 

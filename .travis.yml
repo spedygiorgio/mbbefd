@@ -1,6 +1,9 @@
-Blanguage: r
+language: r
+r: devel
+sudo: true
+cache: packages
+
 warnings_are_errors: true
-sudo: required
 
 before_install:
   ## PPA for Rcpp and some other packages
@@ -9,8 +12,6 @@ before_install:
   - chmod 755 ./travis-tool.sh
   - ./travis-tool.sh bootstrap
   - ./travis-tool.sh install_aptget libgsl0-dev gsl-bin
-  - "export DISPLAY=:99.0" 
-  - "sh -e /etc/init.d/xvfb start"
 
 install:
   - ./travis-tool.sh install_deps

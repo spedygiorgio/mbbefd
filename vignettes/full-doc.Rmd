@@ -327,7 +327,7 @@ Well known exposure curves are those used by Swiss Re and Lloyd's.
 
 ## Classic distributions
 
-As already mentionned, the exposure curve function of $X$ is defined as the ratio of the limited expected value and the expectation.
+As already mentioned, the exposure curve function of $X$ is defined as the ratio of the limited expected value and the expectation.
 Since the loss $X$ is a positive random variable, the exposure curve is 
 $$
 G_X(d) = \frac{\int_0^d (1-F_X(x))dx }{\int_0^1 (1-F_X(x))dx }.
@@ -340,7 +340,7 @@ $$
 F_X(x) = \left(1- \frac{G_X'(x)}{G_X'(0)}\right)\ind_{[0,1[}(x) + \ind_{[1,+\infty[}(x),
 $$
 defining the exposure curve or the distribution function is equivalent.
-The exposure curve is also a concave increasing function, see e.g.~`r citep(bib['antal03'])`.
+The exposure curve is also a concave increasing function, see e.g.`r citep(bib['antal03'])`.
 
 ### Uniform distribution
 \label{sec:unif}
@@ -357,10 +357,10 @@ $$
 \label{sec:beta}
 
 A more interesting example is obtained for the Beta distribution on $I$ 
-(e.g.~`r citep(bib['kotzjohnsonbalak94v2'])`)
+(e.g.`r citep(bib['kotzjohnsonbalak94v2'])`)
 for which the density is $f_X(x) = x^{a-1}(1-x)^{b-1}/\beta(a,b)$ for $x\in ]0,1[$ and $a,b>0$
 where $\beta(.,.)$ denotes the 
-beta function, see e.g.~`r citep(bib['nist10'])`.
+beta function, see e.g.`r citep(bib['nist10'])`.
 The distribution function is obtained in terms of the incomplete beta ratio function 
 $F_X(x) = \beta(x;a,b)/\beta(a,b) = I(x;a,b)$.
 We get
@@ -419,7 +419,7 @@ $$
 
 ## The MBBEFD distribution, first parametrization
 
-We denote this first parametrization by $MBBEFD(a,b)$.
+We denote this first parametrization by $\mbox{MBBEFD}(a,b)$.
 We define the parameter domain $\calD_{a,b}$ as 
 \begin{equation}
 \calD_{a,b} = \{(a,b)\in\R^2, a+1>0, a(1-b)>0, b>0\}
@@ -494,7 +494,7 @@ q_X(p) =
 ### Moments
 Using the definition of the exposure curve, we have
 $E(X) = 1/G_X'(0).$
-The expectation for $MBBEFD(a,b)$ is
+The expectation for $\mbox{MBBEFD}(a,b)$ is
 $$
 E(X)=\frac{\ln(\frac{a+b}{a+1})}{\ln(b)} (a+1).
 $$
@@ -508,8 +508,8 @@ When $a=0$ or $b=1$, the expectation is simply $E(X)=1$.
 ### Parameter domain
 
 For fitting purposes and for verifying parameter constraints, 
-`r citep(bib['bernegger97'])` proposed a second parametrization $MBBEFD(g,b)$.
-Using the following parameter $g=1/p_{a,b}$, it is possible to reformulate the $MBBEFD(a,b)$.
+`r citep(bib['bernegger97'])` proposed a second parametrization $\mbox{MBBEFD}(g,b)$.
+Using the following parameter $g=1/p_{a,b}$, it is possible to reformulate the $\mbox{MBBEFD}(a,b)$.
 That is
 $$
 g= \frac{a+b}{(a+1)b}
@@ -710,7 +710,7 @@ The total gross net premium income (GNPI) is CHF $95,975,000$ in 2004,
 with an expected loss ratio of 55%. Therefore we have a view on the 
 mean expected loss cost.
 
-The risk profile given by the cedent is from the year 2002.
+The risk profile given by the cedant is from the year 2002.
 However, instead of re-indexing the historical data to 2004, we back-index
 the data to 2002 with a factor of $457/550=`r round(457/550,2)`$:
 $$

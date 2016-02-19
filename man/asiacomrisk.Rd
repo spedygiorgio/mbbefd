@@ -60,7 +60,7 @@ data(asiacomrisk)
 }
 
 \source{
-\href{http://irfrc.ntu.edu.sg/Research/completedprojects/Pages/Large-Commercial-Risks.aspx}{IRFRC}
+\url{http://irfrc.ntu.edu.sg/Research/completedprojects/Pages/Large-Commercial-Risks.aspx}
 }
 
 \references{
@@ -76,7 +76,7 @@ Property and Casualty Insurance Market},
 Working paper.
 
 Chavez-Demoulin, V., Embrechts, P., and Hofert, M. (2015).
-\emph{An extreme value approach for modeling operational risk losses depending on covariates.}
+\emph{An extreme value approach for modeling operational risk losses depending on covariates},
 The Journal of Risk and Insurance.
 
 }

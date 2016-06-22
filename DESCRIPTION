@@ -2,7 +2,7 @@ Package: mbbefd
 Type: Package
 Title: Maxwell Boltzmann Bose Einstein Fermi Dirac Distribution and
         Destruction Rate Modelling
-Version: 0.8-0
+Version: 0.8-1
 Authors@R: c(person("Giorgio", "Spedicato", role = c("aut", "cre"),
     email = "spedicato_giorgio@yahoo.it"),
     person("Christophe", "Dutang", role = "aut"),

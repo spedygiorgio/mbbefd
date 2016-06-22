@@ -1,4 +1,8 @@
-Version 0.8
+Version 0.8-1
+22-06-2016
+Minor bug fix appearing with the fitdistrplus package version >= 1.0-7
+
+Version 0.8-0
 19-02-2016
 Added data sets (aon and loss).
 Start an unified approach for paramater estimation (fitDR)

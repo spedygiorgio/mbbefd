@@ -39,11 +39,11 @@ fitDR <- function(x, dist, method="mle", start=NULL, ...)
       #domain : (a,b) in (-1, 0) x (1, +Inf)
       alabama1 <- mledist(x, distr="mbbefd", start=initparmbbefd[[1]], 
                         custom.optim= constrOptim.nl, hin=constrmbbefd1, 
-                        control.outer=list(trace= FALSE), gr=grLL)
+                        control.outer=list(trace= FALSE), gradient=grLL)
       #domain : (a,b) in (0, +Inf) x (0, 1)
       alabama2 <- mledist(x, distr="mbbefd", start=initparmbbefd[[2]], 
                         custom.optim= constrOptim.nl, hin=constrmbbefd2, 
-                        control.outer=list(trace= FALSE), gr=grLL)
+                        control.outer=list(trace= FALSE), gradient=grLL)
       
       if(alabama1$convergence == 100 && alabama2$convergence == 100)
         f1 <- alabama1
@@ -303,13 +303,14 @@ fitDR <- function(x, dist, method="mle", start=NULL, ...)
                       optim.method="Nelder-Mead", ...)
       }else
         f1 <- fitdist(xneq1, distr=distneq1, method="mle", start=start, 
-                  lower=uplolist$lower, upper=uplolist$upper, ...)
+                  lower=uplolist$lower, upper=uplolist$upper, 
+                  optim.method="L-BFGS-B", ...)
       if(f1$convergence != 0)
       {
          stop("error in convergence when fitting data.")
       }else
       {
-        f1$estimate <- c(f1$estimate, p1=p1) 
+        f1$estimate <- c(f1$estimate, "p1"=p1) 
         f1$n <- length(x)
         f1$distname <- dist
         f1$data <- x
@@ -320,8 +321,15 @@ fitDR <- function(x, dist, method="mle", start=NULL, ...)
         f1$aic <- -2*f1$loglik+2*npar
         f1$bic <- -2*f1$loglik+log(f1$n)*npar
         
-        f1$vcov <- rbind(cbind(as.matrix(f1$vcov), rep(0, npar-1)), 
+        if(!is.na(f1$vcov))
+        {
+          f1$vcov <- rbind(cbind(as.matrix(f1$vcov), rep(0, npar-1)), 
                          c(rep(0, npar-1), p1*(1-p1)))
+        }else
+        {
+          f1$vcov <- rbind(cbind(matrix(NA, npar-1, npar-1), rep(0, npar-1)), 
+                           c(rep(0, npar-1), p1*(1-p1)))
+        }
         dimnames(f1$vcov) <- list(names(f1$estimate), names(f1$estimate))
         
         f1$sd <- sqrt(diag(f1$vcov))

@@ -1,5 +1,5 @@
 
-fitDR <- function(x, dist, method="mle", start=NULL, ...)
+fitDR <- function(x, dist, method="mle", start=NULL, optim.method="default", ...)
 {
   if(any(is.na(x)))
     x <- x[!is.na(x)]
@@ -39,11 +39,11 @@ fitDR <- function(x, dist, method="mle", start=NULL, ...)
       #domain : (a,b) in (-1, 0) x (1, +Inf)
       alabama1 <- mledist(x, distr="mbbefd", start=initparmbbefd[[1]], 
                         custom.optim= constrOptim.nl, hin=constrmbbefd1, 
-                        control.outer=list(trace= FALSE), gradient=grLL)
+                        control.outer=list(trace= FALSE), gradient=grLL, ...)
       #domain : (a,b) in (0, +Inf) x (0, 1)
       alabama2 <- mledist(x, distr="mbbefd", start=initparmbbefd[[2]], 
                         custom.optim= constrOptim.nl, hin=constrmbbefd2, 
-                        control.outer=list(trace= FALSE), gradient=grLL)
+                        control.outer=list(trace= FALSE), gradient=grLL, ...)
       
       if(alabama1$convergence == 100 && alabama2$convergence == 100)
         f1 <- alabama1
@@ -206,10 +206,10 @@ fitDR <- function(x, dist, method="mle", start=NULL, ...)
     {
       if(method == "tlmme")
         method <- "mle"
+      if(optim.method == "default")
+        optim.method <- "Brent"
       f1 <- fitdist(x, distr=dist, method=method, start=start,
-                  lower=0, upper=1, ..., optim.method="Brent") #, control=list(trace=6, REPORT=1)
-    
-      
+                  lower=0, upper=1, ..., optim.method=optim.method) #, control=list(trace=6, REPORT=1)
     }else
       stop("not yet implemented")  
     
@@ -267,7 +267,7 @@ fitDR <- function(x, dist, method="mle", start=NULL, ...)
       if(distneq1 == "gbeta")
       {
         
-        prefit <- prefitDR.mle(x, "oigbeta")
+        prefit <- prefitDR.mle(xneq1, "oigbeta")
         
         #f0 <- mledist(xneq1, dist="gbeta2", optim.method="BFGS", 
         #              control=list(trace=0, REPORT=1, maxit=100), start=lapply(start, log))
@@ -275,42 +275,21 @@ fitDR <- function(x, dist, method="mle", start=NULL, ...)
         if(all(!is.na(prefit)))
           start <- as.list(prefit)
         #print(unlist(start))
-        
+        if(optim.method == "default")
+          optim.method <- "BFGS"
         f1 <- fitdist(xneq1, distr=distneq1, method="mle", start=start, 
-                      optim.method="Nelder-Mead", ...)
+                      optim.method=optim.method, ...)
       }else
+      {
+        if(optim.method == "default")
+          optim.method <- "L-BFGS-B"
         f1 <- fitdist(xneq1, distr=distneq1, method="mle", start=start, 
                   lower=uplolist$lower, upper=uplolist$upper, 
-                  optim.method="L-BFGS-B", ...)
+                  optim.method=optim.method, ...)
+      }
         f1$estimate <- c(f1$estimate, "p1"=p1) 
         f1 <- fitDR.addcomp(x=x, theta=f1$estimate, vcov=f1$vcov, dist=dist, method="mle", convergence=f1$convergence)
         
-        # f1$n <- length(x)
-        # f1$distname <- dist
-        # f1$data <- x
-        # 
-        # #gof stat
-        # f1$loglik <- LLfunc(obs=x, theta=f1$estimate, dist=dist)
-        # npar <- length(f1$estimate)
-        # f1$aic <- -2*f1$loglik+2*npar
-        # f1$bic <- -2*f1$loglik+log(f1$n)*npar
-        # 
-        # if(all(!is.na(f1$vcov)))
-        # {
-        #   f1$vcov <- rbind(cbind(as.matrix(f1$vcov), rep(0, npar-1)), 
-        #                  c(rep(0, npar-1), p1*(1-p1)))
-        # }else
-        # {
-        #   f1$vcov <- rbind(cbind(matrix(NA, npar-1, npar-1), rep(0, npar-1)), 
-        #                    c(rep(0, npar-1), p1*(1-p1)))
-        # }
-        # dimnames(f1$vcov) <- list(names(f1$estimate), names(f1$estimate))
-        # 
-        # f1$sd <- sqrt(diag(f1$vcov))
-        # f1$cor <- cov2cor(f1$vcov)
-        # 
-       
-      
     }else if(method == "tlmme")
     {
       start <- c(start, list(p1=p1))
@@ -348,20 +327,6 @@ fitDR <- function(x, dist, method="mle", start=NULL, ...)
       
       f1 <- fitDR.addcomp(x=x, theta=f1$estimate, hessian=f1$hessian, dist=dist, method="tlmme", convergence=f1$convergence)
       
-      # f1$method <- "tlmme"
-      # f1$data <- x
-      # f1$n <- length(x)
-      # f1$distname <- dist
-      # f1$fix.arg <- f1$fix.arg.fun <- f1$dots <- f1$weights <- NULL
-      # f1$discrete <- FALSE
-      # #gof stat
-      # f1$loglik <- LLfunc(obs=x, theta=f1$estimate, dist=dist)
-      # 
-      # f1$aic <- -2*f1$loglik+2*npar
-      # f1$bic <- -2*f1$loglik+log(f1$n)*npar
-      # 
-      # f1$sd <- f1$vcov <- f1$cor <- NA
-      
     }else
     {
       stop("not yet implemented.")
@@ -370,7 +335,7 @@ fitDR <- function(x, dist, method="mle", start=NULL, ...)
   }else
     stop("Unknown distribution for destruction rate models.")
   
-  #reorder components as fitdist object
+  #reorder components as a fitdist object
   f1 <- f1[c("estimate", "method", "sd", "cor", "vcov", "loglik", "aic", "bic", "n", "data", 
              "distname", "fix.arg", "fix.arg.fun", "dots", "convergence", "discrete", "weights")]
   class(f1) <- c("DR", "fitdist")

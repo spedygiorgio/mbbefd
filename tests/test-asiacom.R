@@ -1,22 +1,30 @@
 library(mbbefd)
 
 data(asiacomrisk)
-x <- pmin(asiacomrisk$FGU/asiacomrisk$TIV, 1)
+x <- asiacomrisk$DR
 x <- x[!is.na(x)]
 
 plot(ecdf(x))
 plot(eecf(x))
 etl(x)
 
+#test optim method
+if(FALSE)
+{
+  fitDR(x, "oistpareto", control=list(trace=TRUE))  
+  
 fitDR(x, "oibeta", control=list(trace=TRUE))
-#fitDR(x, "oigbeta", control=list(trace=TRUE))
+fitDR(x, "oibeta", control=list(trace=TRUE), optim.method="L-BFGS-B")
 
+fitDR(x, "oigbeta", control=list(trace=TRUE))
+fitDR(x, "oigbeta", control=list(trace=TRUE), optim.method="L-BFGS-B")
+fitDR(x, "oigbeta", control=list(trace=TRUE), optim.method="BFGS")
+}
 
-dlist <- c("oistpareto", "oibeta", "oigbeta")
-dlist <- c("oiunif", "oistpareto", "oibeta")
+dlist <- c("oiunif", "oistpareto", "oibeta", "oigbeta")
 flist <- lapply(dlist, function(d) {
-  print(d);
-  fitDR(x, d, method="mle")})
+  cat("distribution:", d, "\n");
+  fitDR(x, d, method="mle", optim.method=ifelse(d=="oigbeta", "BFGS", "default"))})
 names(flist) <- dlist
 
 

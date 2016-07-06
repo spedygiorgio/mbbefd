@@ -12,7 +12,7 @@
 }
 
 \usage{
-fitDR(x, dist, method="mle", start=NULL, \dots)
+fitDR(x, dist, method="mle", start=NULL, optim.method="default", \dots)
     
 }
 
@@ -30,6 +30,7 @@ fitDR(x, dist, method="mle", start=NULL, \dots)
     This argument may be omitted (default) for some distributions for which reasonable 
     starting values are computed (see the 'details' section of  
     \code{\link[fitdistrplus:fitdist]{mledist}}).}
+\item{optim.method}{\code{"default"} or an optimization method to pass to \code{\link{optim}}.}
 
 \item{\dots}{Further arguments to be passed to \code{"fitdist"}
     when \code{method != "tlmme"}.
@@ -61,13 +62,15 @@ fitDR(x, dist, method="mle", start=NULL, \dots)
     
 }
         
-    By default, direct optimization of the log-likelihood (or other criteria depending
+    For one-inflated distributions, 
+    by default, direct optimization of the log-likelihood (or other criteria depending
     of the chosen method) is performed using \code{\link{optim}}, 
-    with the "Nelder-Mead" method for distributions characterized by more than 
-    one parameter and the "BFGS" method for distributions characterized by only 
+    with the "L-BFGS-B" method for distributions characterized by more than 
+    one parameter and the "Brent" method for distributions characterized by only 
     one parameter. Note that when errors are raised by \code{optim}, it's a good 
     idea to start by adding traces during the optimization process by adding 
     \code{control=list(trace=1, REPORT=1)}.
+    For the MBBEFD distribution, \code{\link{constrOptim.nl}} is used.
     
     A pre-fitting process is carried out for the following distributions
     \code{"mbbefd"}, \code{"MBBEFD"} and \code{"oigbeta"} before
@@ -87,9 +90,7 @@ fitDR(x, dist, method="mle", start=NULL, \dots)
     from the \code{"fitdist"} class. That is a list with the following components:
     \item{estimate }{ the parameter estimates.}
     \item{method }{ the character string coding for the fitting method : 
-        \code{"mle"} for 'maximum likelihood estimation', \code{"mme"} for 'matching moment estimation',
-         \code{"qme"} for 'matching quantile estimation'
-    and \code{"mge"} for 'maximum goodness-of-fit estimation'.}
+        \code{"mle"} for 'maximum likelihood estimation', \code{"tlmme"} for 'matching total loss moment estimation'.}
     \item{sd}{ the estimated standard errors, \code{NA} if numerically not computable
         or \code{NULL} if not available.}
     \item{cor}{ the estimated correlation matrix, \code{NA} if numerically not computable
@@ -147,7 +148,6 @@ fitDR(x, dist, method="mle", start=NULL, \dots)
 
 \seealso{
     See \code{\link[fitdistrplus:mledist]{mledist}}, \code{\link[fitdistrplus:mmedist]{mmedist}}, 
-    \code{\link[fitdistrplus:qmedist]{qmedist}}, \code{\link[fitdistrplus:mgedist]{mgedist}} 
     for details on parameter estimation.
     See \code{\link[fitdistrplus:gofstat]{gofstat}} for goodness-of-fit statistics.
     See \code{\link[fitdistrplus:plotdist]{plotdist}}, 
@@ -191,7 +191,7 @@ x <- roibeta(n, 3, 2, 1/6)
 f1 <- fitDR(x, "oibeta", method="mle")
 summary(f1)
 
-plot(bootdist(f1, niter=20), enhance=TRUE, trueval=c(3, 2, 1/6))
+plot(bootdist(f1, niter=11), enhance=TRUE, trueval=c(3, 2, 1/6))
 
 }
 \keyword{distribution}

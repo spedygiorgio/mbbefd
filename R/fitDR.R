@@ -58,19 +58,6 @@ fitDR <- function(x, dist, method="mle", start=NULL, ...)
         else
           f1 <- alabama2 
         
-        
-#         #computes Hessian of -LL at estimate values
-#         f1hess <- -heLLfunc(obs=x, theta=f1$estimate, dist="mbbefd")
-#         
-#         if(all(!is.na(f1hess)) && qr(f1hess)$rank == NCOL(f1hess)){
-#           f1$vcov <- solve(f1hess)
-#           f1$sd <- sqrt(diag(f1$vcov))
-#           f1$cor <- cov2cor(f1$vcov)
-#         }else{
-#           f1$vcov <- NA
-#           f1$sd <- NA
-#           f1$cor <- NA                            
-#         }
       }
       f1 <- fitDR.addcomp(x=x, theta=f1$estimate, dist="mbbefd", method="mle", f1$convergence)
       
@@ -174,16 +161,6 @@ fitDR <- function(x, dist, method="mle", start=NULL, ...)
         else
           f1 <- alabama2 
         
-#         if(all(!is.na(f1$hessian)) && qr(f1$hessian)$rank == NCOL(f1$hessian)){
-#           f1$vcov <- solve(f1$hessian)
-#           f1$sd <- sqrt(diag(varcovar))
-#           f1$cor <- cov2cor(varcovar)
-#         }else{
-#           f1$vcov <- NA
-#           f1$sd <- NA
-#           f1$cor <- NA                            
-#         }
-#         
       }
       f1 <- fitDR.addcomp(x=x, theta=f1$estimate, hessian=f1$hessian, dist="MBBEFD", method="mle", f1$convergence)
       
@@ -305,37 +282,34 @@ fitDR <- function(x, dist, method="mle", start=NULL, ...)
         f1 <- fitdist(xneq1, distr=distneq1, method="mle", start=start, 
                   lower=uplolist$lower, upper=uplolist$upper, 
                   optim.method="L-BFGS-B", ...)
-      if(f1$convergence != 0)
-      {
-         stop("error in convergence when fitting data.")
-      }else
-      {
         f1$estimate <- c(f1$estimate, "p1"=p1) 
-        f1$n <- length(x)
-        f1$distname <- dist
-        f1$data <- x
+        f1 <- fitDR.addcomp(x=x, theta=f1$estimate, vcov=f1$vcov, dist=dist, method="mle", convergence=f1$convergence)
         
-        #gof stat
-        f1$loglik <- LLfunc(obs=x, theta=f1$estimate, dist=dist)
-        npar <- length(f1$estimate)
-        f1$aic <- -2*f1$loglik+2*npar
-        f1$bic <- -2*f1$loglik+log(f1$n)*npar
-        
-        if(!is.na(f1$vcov))
-        {
-          f1$vcov <- rbind(cbind(as.matrix(f1$vcov), rep(0, npar-1)), 
-                         c(rep(0, npar-1), p1*(1-p1)))
-        }else
-        {
-          f1$vcov <- rbind(cbind(matrix(NA, npar-1, npar-1), rep(0, npar-1)), 
-                           c(rep(0, npar-1), p1*(1-p1)))
-        }
-        dimnames(f1$vcov) <- list(names(f1$estimate), names(f1$estimate))
-        
-        f1$sd <- sqrt(diag(f1$vcov))
-        f1$cor <- cov2cor(f1$vcov)
-        
-      } 
+        # f1$n <- length(x)
+        # f1$distname <- dist
+        # f1$data <- x
+        # 
+        # #gof stat
+        # f1$loglik <- LLfunc(obs=x, theta=f1$estimate, dist=dist)
+        # npar <- length(f1$estimate)
+        # f1$aic <- -2*f1$loglik+2*npar
+        # f1$bic <- -2*f1$loglik+log(f1$n)*npar
+        # 
+        # if(all(!is.na(f1$vcov)))
+        # {
+        #   f1$vcov <- rbind(cbind(as.matrix(f1$vcov), rep(0, npar-1)), 
+        #                  c(rep(0, npar-1), p1*(1-p1)))
+        # }else
+        # {
+        #   f1$vcov <- rbind(cbind(matrix(NA, npar-1, npar-1), rep(0, npar-1)), 
+        #                    c(rep(0, npar-1), p1*(1-p1)))
+        # }
+        # dimnames(f1$vcov) <- list(names(f1$estimate), names(f1$estimate))
+        # 
+        # f1$sd <- sqrt(diag(f1$vcov))
+        # f1$cor <- cov2cor(f1$vcov)
+        # 
+       
       
     }else if(method == "tlmme")
     {
@@ -371,19 +345,22 @@ fitDR <- function(x, dist, method="mle", start=NULL, ...)
       {
         f1 <- list(estimate=res$par, convergence=0)
       }
-      f1$method <- "tlmme"
-      f1$data <- x
-      f1$n <- length(x)
-      f1$distname <- dist
-      f1$fix.arg <- f1$fix.arg.fun <- f1$dots <- f1$weights <- NULL
-      f1$discrete <- FALSE
-      #gof stat
-      f1$loglik <- LLfunc(obs=x, theta=f1$estimate, dist=dist)
       
-      f1$aic <- -2*f1$loglik+2*npar
-      f1$bic <- -2*f1$loglik+log(f1$n)*npar
+      f1 <- fitDR.addcomp(x=x, theta=f1$estimate, hessian=f1$hessian, dist=dist, method="tlmme", convergence=f1$convergence)
       
-      f1$sd <- f1$vcov <- f1$cor <- NA
+      # f1$method <- "tlmme"
+      # f1$data <- x
+      # f1$n <- length(x)
+      # f1$distname <- dist
+      # f1$fix.arg <- f1$fix.arg.fun <- f1$dots <- f1$weights <- NULL
+      # f1$discrete <- FALSE
+      # #gof stat
+      # f1$loglik <- LLfunc(obs=x, theta=f1$estimate, dist=dist)
+      # 
+      # f1$aic <- -2*f1$loglik+2*npar
+      # f1$bic <- -2*f1$loglik+log(f1$n)*npar
+      # 
+      # f1$sd <- f1$vcov <- f1$cor <- NA
       
     }else
     {

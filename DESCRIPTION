@@ -13,7 +13,7 @@ Description: Distributions that are typically used for exposure rating in
              The vignettes show code snippets to fit the distribution to
              empirical data.
 License: GPL-2
-Depends: R (>= 2.14), fitdistrplus (>= 1.0-5), alabama
+Depends: R (>= 3.2.0), fitdistrplus (>= 1.0-7), alabama
 ByteCompile: yes
 Suggests: testthat, copula, pander, knitcitations,
         rmarkdown, knitr, lattice

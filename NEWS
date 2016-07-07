@@ -1,5 +1,6 @@
 Version 0.8-1
-22-06-2016
+07-07-2016
+Update the overview man page (?mbbefd) and test files.
 Minor bug fix and warning removal appearing with the fitdistrplus package version >= 1.0-7
 
 Version 0.8-0
@@ -23,3 +24,7 @@ Version 0.6.2
 20-03-2015
 Christophe Dutang added as contributor.
 Introduced shifted truncated Pareto functions.
+
+Version 0.1
+30-10-2013
+Initial release on CRAN

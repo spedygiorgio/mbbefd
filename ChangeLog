@@ -1,3 +1,5 @@
+Version 0.8.5
+Minor changes to cope with fitdistrplus changes.
 Version 0.8
 20-02-2016
 Added data sets (aon and loss).

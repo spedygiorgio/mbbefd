@@ -4,9 +4,9 @@ fitDR.addcomp <- function(x, theta, hessian=NULL, dist, method, convergence=0, v
   #"estimate", "method", "sd", "cor", "vcov", "loglik", "aic", "bic", "n", "data", 
   #"distname", "fix.arg", "fix.arg.fun", "dots", "convergence", "discrete", "weights"
   
-  
   f1 <- list(estimate=theta, weights=NULL, dots=NULL, fix.arg=NULL, fix.arg.fun=NULL, dots=NULL)
   #other fitdist components
+  
   f1$convergence <- convergence
   f1$method <- method
   f1$n <- length(x)
@@ -48,12 +48,14 @@ fitDR.addcomp <- function(x, theta, hessian=NULL, dist, method, convergence=0, v
         f1$sd <- sqrt(diag(f1$vcov))
         f1$cor <- cov2cor(f1$vcov)
       }
-    }else
+    }
+    if(!"vcov" %in% names(f1))
     {
       f1$vcov <- rbind(cbind(matrix(NA, npar-1, npar-1), rep(0, npar-1)),
                        c(rep(0, npar-1), p1*(1-p1)))
       f1$sd <- f1$cor <- NA
     }
+    
     dimnames(f1$vcov) <- list(names(f1$estimate), names(f1$estimate))
   }
   #output

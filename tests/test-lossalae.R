@@ -11,7 +11,12 @@ flist <- lapply(dlist, function(d) {print(d);
   fitDR(x, d, method="mle")})
 names(flist) <- dlist
 
-gofstat(flist)
+gof1 <- gofstat(flist)
+
+mm <- rbind(KS = gof1$ks, CvM = gof1$cvm, AD = gof1$ad, AIC = gof1$aic, BIC = gof1$bic)
+rownames(mm) <- c("Kolmogorov-Smirnov statistic", "Cramer-von Mises statistic", 
+                  "Anderson-Darling statistic", "Aikake's Information Criterion", "Bayesian Information Criterion")
+
 
 cdfcomp(flist, do.points=FALSE, leg=dlist, addlegend = FALSE, lwd=1.5)
 legend("topleft", col=c("red", "green", "blue"), leg=dlist, lty=1:3, lwd=2, bty="n")

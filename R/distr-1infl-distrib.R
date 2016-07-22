@@ -6,7 +6,8 @@ doifun <- function(x, dfun, p1, log=FALSE, ...)
   if(!(p1 >= 0 && p1 <= 1))
     return(rep(NaN, length(x)))
   
-  res <- dfun(x, log=FALSE, ...)*(1 - p1)*(x != 1) + p1*(x == 1)
+  res <- rep(p1, length(x))
+  res[x != 1] <- dfun(x[x != 1], log=FALSE, ...)*(1 - p1)
   
   if(log)
     res <- log(res) 

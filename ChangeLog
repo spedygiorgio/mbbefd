@@ -1,5 +1,5 @@
 Version 0.8-6
-Bug fix in fitDR().
+Bug fix in fitDR() and doi(g)beta().
 Add test on smokedfish dataset.
 Version 0.8-5
 Minor changes to cope with fitdistrplus changes.

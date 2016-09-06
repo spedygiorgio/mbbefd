@@ -38,7 +38,7 @@ data(asiacomrisk)
 }
 
 \format{ 
-\code{asiacomrisk} contains 4 columns:
+\code{asiacomrisk} contains 7 columns:
 \describe{
     \item{\code{Period}}{A character string for the period: \code{"2000-2003"},
         \code{"2004-2008"}, \code{"2009-2010"}, \code{"2011-2013"}.}

@@ -6,8 +6,9 @@ n <- 1e4
 set.seed(567)
 x <- rmbbefd(n, 2, 1/2)
 y <- rmbbefd(n, -1/2, 2)
-
-
+xD4 <- rmbbefd(n, Inf, 1/3)
+xD3 <- rmbbefd(n, 0, 1/3)
+xD5 <- rmbbefd(n, -1, 3)
 
 #test CDF
 z <- 0:8/8
@@ -26,6 +27,25 @@ mmbbefd(1, 2, 1/2)
 
 mean(y)
 mmbbefd(1, -1/2, 2)
+
+mean(xD4)
+(1/3-1)/log(1/3)
+
+mean(xD3)
+mean(xD5)
+
+#second order moment
+mean(x^2)
+mmbbefd(2, 2, 1/2)
+
+mean(y^2)
+mmbbefd(2, -1/2, 2)
+
+mean(xD4^2)
+2*pgamma(1,2)*gamma(2)/log(1/3)^2
+
+mean(xD3^2)
+mean(xD5^2)
 
 #total loss
 etl(x)

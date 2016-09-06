@@ -18,11 +18,12 @@ rownames(mm) <- c("Kolmogorov-Smirnov statistic", "Cramer-von Mises statistic",
                   "Anderson-Darling statistic", "Aikake's Information Criterion", "Bayesian Information Criterion")
 
 
-cdfcomp(flist, do.points=FALSE, leg=dlist, addlegend = FALSE, lwd=1.5)
+cdfcomp(flist, do.points=FALSE, leg=dlist, addlegend = FALSE, lwd=1.5, main="Emp./theo. CDFs - insurance")
 legend("topleft", col=c("red", "green", "blue"), leg=dlist, lty=1:3, lwd=2, bty="n")
 
 
-cdfcomp(flist, do.points=FALSE, leg=dlist, xlogscale = TRUE, addlegend = FALSE, lwd=1.5)
+par(mar=c(4,4,2,1))
+cdfcomp(flist, do.points=FALSE, leg=dlist, xlogscale = TRUE, addlegend = FALSE, lwd=1.5, main="Emp./theo. CDFs - insurance")
 legend("topleft", col=c("red", "green", "blue"), leg=dlist, lty=1:3, lwd=2, bty="n")
 
 eccomp(flist, leg=dlist, do.points = FALSE, addlegend = FALSE, lwd=1.5)

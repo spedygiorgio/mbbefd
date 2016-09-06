@@ -128,13 +128,29 @@ mmbbefdR <- function(order, a, b)
   if(!(a +1 >0 && b > 0 && a*(1-b) >= 0))
     return(rep(NaN, length(order)))
   
-  if(order == 1)
-    return(log((a+b)/(a+1))/log(b)*(a+1))
-  else if(order == 2)
+  if(a == 0 || b == 1) #Dirac
   {
-    2*(a+1)/log(b)*(log(a+b) - gendilog(a,b))
+    return(1)
+  }else if(is.infinite(a))
+  {
+    if(order == 1)
+      return((b-1)/log(b))
+    else if(order == 2)
+      return(2*pgamma(-log(b),2)*gamma(2)/log(b)^2)
+    else
+      stop("not yet implemented.")
   }else
-    stop("not yet implemented.")
+  {
+    if(order == 1)
+      return(log((a+b)/(a+1))/log(b)*(a+1))
+    else if(order == 2)
+    {
+      2*(a+1)/log(b)*(log(a+b) - gendilog(a,b))
+    }else
+      stop("not yet implemented.")
+  }
+  
+  
 }
 	
 #total loss

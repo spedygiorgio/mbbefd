@@ -42,9 +42,11 @@ mean(y^2)
 mmbbefd(2, -1/2, 2)
 
 mean(xD4^2)
-2*pgamma(1,2)*gamma(2)/log(1/3)^2
+mmbbefd(2, Inf, 1/3)
 
 mean(xD3^2)
+mmbbefd(2, 0, 1/3)
+
 mean(xD5^2)
 
 #total loss

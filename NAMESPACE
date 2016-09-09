@@ -4,6 +4,7 @@ importFrom("utils", packageDescription)
 #for graphics
 importFrom("graphics", abline, plot, points,image, legend, lines, pairs)
 importFrom("grDevices", colorRampPalette)
+importFrom("stats", pgamma)
 
 #user version of the MBBEFD distribution
 export(dmbbefd, pmbbefd, qmbbefd, rmbbefd, ecmbbefd, mmbbefd, tlmbbefd)

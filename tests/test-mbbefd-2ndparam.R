@@ -21,11 +21,15 @@ cbind(eecf(x)(z), round(ecMBBEFD(z, 2, 1/5), 6))
 cbind(eecf(y)(z), round(ecMBBEFD(z, 3, 2), 6))
 
 #test mean
-mean(x)
-mMBBEFD(1, 2, 1/2)
+c(mean(x), mMBBEFD(1, 2, 1/5))
 
-mean(y)
-mMBBEFD(1, 3, 2)
+c(mean(y), mMBBEFD(1, 3, 2))
+
+#test E(X^2)
+c(mean(x^2), mMBBEFD(2, 2, 1/5))
+
+c(mean(y^2), mMBBEFD(2, 3, 2))
+
 
 #total loss
 etl(x)

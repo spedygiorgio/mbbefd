@@ -135,16 +135,18 @@ mMBBEFDR <- function(order, g, b)
 {
   if(!(g >= 1 && b >= 0))
     return(rep(NaN, length(order)))
+  if(any(order > 2))
+    stop("not yet implemented.")
   
   if(g == 1 || b == 0) #Dirac
   {
-    res <- rep(1, length(order))
+    res <- rep(1, 2)
   }else if(g == 1/b && b < 1) #bg=1
   {
     res <- c((b-1)/log(b), 2*pgamma(-log(b),2)*gamma(2)/log(b)^2)
   }else if(g > 1 && b == 1) #b=1
   {
-    res <- c(log(g)/(g-1), NA)
+    res <- c(log(g)/(g-1), 2/(g-1)-2*log(g)/(g-1)^2)
   }else
   {
     res1 <- log(g*b)*(1-b)/(log(b)*(1-g*b) )

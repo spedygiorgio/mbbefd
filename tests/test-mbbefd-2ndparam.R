@@ -6,8 +6,9 @@ n <- 1e4
 set.seed(567)
 x <- rMBBEFD(n, 2, 1/5)
 y <- rMBBEFD(n, 3, 2)
-
-
+x3 <- rMBBEFD(n, 3, 1)
+x4 <- rMBBEFD(n, 3, 1/3)
+x5 <- rMBBEFD(n, 3, 0)
 
 #test CDF
 z <- 0:8/8
@@ -25,11 +26,18 @@ c(mean(x), mMBBEFD(1, 2, 1/5))
 
 c(mean(y), mMBBEFD(1, 3, 2))
 
+c(mean(x3), mMBBEFD(1, 3, 1))
+c(mean(x4), mMBBEFD(1, 3, 1/3))
+c(mean(x5), mMBBEFD(1, 3, 0))
+
 #test E(X^2)
 c(mean(x^2), mMBBEFD(2, 2, 1/5))
 
 c(mean(y^2), mMBBEFD(2, 3, 2))
 
+c(mean(x3^2), mMBBEFD(2, 3, 1))
+c(mean(x4^2), mMBBEFD(2, 3, 1/3))
+c(mean(x5^2), mMBBEFD(2, 3, 0))
 
 #total loss
 etl(x)

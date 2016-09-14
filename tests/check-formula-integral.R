@@ -54,3 +54,14 @@ b <- 4
 integrate(f, b, 1, g=3, b=b)$value
 I(g=3, b=b)
 
+
+#Formula second order moment D3
+f <- function(x)
+    1/(1+(g-1)*sqrt(x))
+
+I <- function(g)
+    2/(g-1)-2*log(g)/(g-1)^2
+
+g <- 3.5
+integrate(f, 0, 1)
+I(3.5)

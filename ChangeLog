@@ -1,3 +1,5 @@
+Version 0.8-7
+Minor changes (simplified integration)
 Version 0.8-6
 Bug fix in fitDR() and doi(g)beta().
 Add test on smokedfish dataset.

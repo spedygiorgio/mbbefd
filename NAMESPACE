@@ -69,4 +69,4 @@ export(bootDR) #bootDR class inheriting from bootdist class
 importFrom(MASS, kde2d)
 
 importFrom(Rcpp,sourceCpp)
-useDynLib(mbbefd)
+useDynLib(mbbefd, .registration=TRUE)

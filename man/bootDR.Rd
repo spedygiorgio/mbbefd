@@ -27,7 +27,7 @@ bootDR(f, bootmethod="param", niter=1001, silent=TRUE)
 \details{
     Samples are drawn by parametric bootstrap (resampling from the distribution fitted by 
     \code{\link{fitDR}}) or nonparametric bootstrap (resampling with replacement from the 
-    data set). On each bootstrap sample the estimaiton process is 
+    data set). On each bootstrap sample the estimation process is 
     used to estimate bootstrapped values of parameters. When that function fails
     to converge, \code{NA} values are returned. Medians and 2.5 and 97.5 percentiles are 
     computed by removing \code{NA} values. 

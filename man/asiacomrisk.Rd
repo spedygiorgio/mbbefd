@@ -14,8 +14,8 @@ syndicates in London. This dataset is the result of the project co-lead by Dr Mi
 which can be referred to as the IRFRC LCR Dataset.
 
 
-As expected, the dataset is fully anonymised, as the LCR losses are aggregated along a
-few dimensions. First, data is categorised based on the World Bank's economic development
+As expected, the dataset is fully anonymized, as the LCR losses are aggregated along a
+few dimensions. First, data is categorized based on the World Bank's economic development
 classification. This means that losses either come from developed or developing
 countries. The second dimension used to aggregate the data is the time period covered.
 Data is grouped into (at least) two time-periods: the period before and after the 2008 crisis.
@@ -50,7 +50,7 @@ data(asiacomrisk)
     \item{\code{Usage}}{A character string for the type of exposure hit by the loss:
         \code{"Commercial"}, \code{"Energy"}, \code{"Manufacturing"},
         \code{"Misc."}, \code{"Residential"}.}
-    \item{\code{SubUsage}}{A character string for a precised type of exposure hit by the loss:
+    \item{\code{SubUsage}}{A character string for a precise type of exposure hit by the loss:
         \code{"Commercial"}, \code{"Energy"}, \code{"General industry"}, \code{"Metals/Mines/Chemicals"},
         \code{"Misc."}, \code{"Residential"}, \code{"Utility"}.}
     \item{\code{DR}}{A numeric for the destruction rate (FGU divided TIV capped to 1).}

@@ -1,5 +1,7 @@
 Version 0.8-8.1
 Removed vignette in inst... It will be autocreated
+Native routines registration fix
+Bumped requirements to R 3.4
 Version 0.8-8
 Native routines registration (compliance with R 3.4)
 Version 0.8-7

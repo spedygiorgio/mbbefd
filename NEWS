@@ -1,2 +1,4 @@
 Version 0.8.8.1
 Removed vignette in inst... It will be autocreated
+Other fixes for the registration
+Bumped requirements to R 3.4

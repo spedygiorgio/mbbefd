@@ -46,14 +46,14 @@ NULL
 #' 
 #' @export
 g2a <- function(g, b) {
-    .Call(mbbefd_g2a, g, b)
+    .Call(`_mbbefd_g2a`, g, b)
 }
 
 .rmbbefdC <- function(n, a, b) {
-    .Call(mbbefd_rmbbefdC, n, a, b)
+    .Call(`_mbbefd_rmbbefdC`, n, a, b)
 }
 
 .rMBBEFDC <- function(n, g, b) {
-    .Call(mbbefd_rMBBEFDC, n, g, b)
+    .Call(`_mbbefd_rMBBEFDC`, n, g, b)
 }
 

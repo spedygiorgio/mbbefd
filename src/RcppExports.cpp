@@ -7,7 +7,7 @@ using namespace Rcpp;
 
 // g2a
 double g2a(double g, double b);
-RcppExport SEXP mbbefd_g2a(SEXP gSEXP, SEXP bSEXP) {
+RcppExport SEXP _mbbefd_g2a(SEXP gSEXP, SEXP bSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -19,7 +19,7 @@ END_RCPP
 }
 // rmbbefdC
 NumericVector rmbbefdC(int n, double a, double b);
-RcppExport SEXP mbbefd_rmbbefdC(SEXP nSEXP, SEXP aSEXP, SEXP bSEXP) {
+RcppExport SEXP _mbbefd_rmbbefdC(SEXP nSEXP, SEXP aSEXP, SEXP bSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -32,7 +32,7 @@ END_RCPP
 }
 // rMBBEFDC
 NumericVector rMBBEFDC(int n, double g, double b);
-RcppExport SEXP mbbefd_rMBBEFDC(SEXP nSEXP, SEXP gSEXP, SEXP bSEXP) {
+RcppExport SEXP _mbbefd_rMBBEFDC(SEXP nSEXP, SEXP gSEXP, SEXP bSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -42,4 +42,16 @@ BEGIN_RCPP
     rcpp_result_gen = Rcpp::wrap(rMBBEFDC(n, g, b));
     return rcpp_result_gen;
 END_RCPP
+}
+
+static const R_CallMethodDef CallEntries[] = {
+    {"_mbbefd_g2a", (DL_FUNC) &_mbbefd_g2a, 2},
+    {"_mbbefd_rmbbefdC", (DL_FUNC) &_mbbefd_rmbbefdC, 3},
+    {"_mbbefd_rMBBEFDC", (DL_FUNC) &_mbbefd_rMBBEFDC, 3},
+    {NULL, NULL, 0}
+};
+
+RcppExport void R_init_mbbefd(DllInfo *dll) {
+    R_registerRoutines(dll, NULL, CallEntries, NULL, NULL);
+    R_useDynamicSymbols(dll, FALSE);
 }

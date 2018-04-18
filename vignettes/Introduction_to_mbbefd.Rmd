@@ -365,8 +365,7 @@ The distribution function is obtained in terms of the incomplete beta ratio func
 $F_X(x) = \beta(x;a,b)/\beta(a,b) = I(x;a,b)$.
 We get
 $$
-G_X(d) %= \frac{1 - I(d;a,b) \frac{b}{a+b} - \frac{d^a(1-d)^b}{(a+b)\beta(a,b)} }{a/(a+b)}
-= \frac{a+b}{a} - I(d;a,b) \frac{b}{a} - \frac{d^a(1-d)^b}{a\beta(a,b)},
+G_X(d) \beta(a,b;x) - \frac{x^a(1-x)^b}{a\beta(a,b)} + x(1-\beta(a,b;x)) \frac{a+b}{a},
 $$
 where $\beta(.;.,.)$ denotes the incomplete beta function.
 

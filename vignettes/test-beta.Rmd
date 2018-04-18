@@ -1,0 +1,73 @@
+---
+title: "check beta"
+author: "C. Dutang and G.A. Spedicato"
+date: "18/04/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Formula for beta(a,b)
+
+From loss models with their notation (which differs from the NIST 
+handbook of mathematical functions), we have
+$$
+E(X) = \frac{\Gamma(a+b)\Gamma(a+1)}{\Gamma(a)\Gamma(a+b+1)}
+= \frac{a}{a+b}
+$$
+and
+$$
+E(\min(X,d)) = \frac{a}{a+b}\beta(a+1,b;x) + x(1-\beta(a,b;x))
+$$
+where $\beta(.,.;.)$ denotes the incomplete beta function
+$$
+\beta(a,b;x)= \frac{\Gamma(a)\Gamma(b)}{\Gamma(a+b)} \int_0^x t^{a-1}(1-t)^{b-1}dt
+= \frac{\int_0^x t^{a-1}(1-t)^{b-1}dt}{\beta(a,b)}.
+$$
+Using (8.17.20) of NIST and recurrence relation of the beta function,
+$$
+\beta(a+1,b;x) = \beta(a,b;x) - \frac{x^a(1-x)^b}{a\beta(a,b)}
+$$
+Therefore the exposure curve is 
+\begin{eqnarray*}
+G(x) 
+&=& \frac{E(\min(X,x))}{E(X)}
+= \left(\frac{a}{a+b}\beta(a+1,b;x) + x(1-\beta(a,b;x)) \right)\frac{a+b}{a}
+= \beta(a+1,b;x) + x(1-\beta(a,b;x)) \frac{a+b}{a}
+\\
+&=&
+\beta(a,b;x) - \frac{x^a(1-x)^b}{a\beta(a,b)} + x(1-\beta(a,b;x)) \frac{a+b}{a}
+\end{eqnarray*}
+
+# Check by Monte-Carlo
+
+Intermediate result: Equation  (8.17.20) of NIST
+```{r}
+deltabetaincomp <- function(a,b,d)
+  -d^a*(1-d)^b/a/beta(a,b)
+deltatheo <- function(a,b,d)
+  pbeta(d,a+1,b)-pbeta(d,a,b)
+c(deltabetaincomp(pi, 1/pi, 4/5), deltatheo(pi, 1/pi, 4/5))
+```
+
+
+Theoretical value
+```{r, message=FALSE}
+library(mbbefd)
+theo <- function(a,b,d) 
+  d*(1 - pbeta(d,a,b))*{a+b}/{a}+pbeta(d,a,b)-{d^a*(1-d)^b}/{a*beta(a,b)}
+  
+theo2 <- function(a,b,d)
+  pbeta(d,a+1,b) + d*(1-pbeta(d,a,b))*(a+b)/a
+emp <- function(n, a, b, d)
+{
+  x <- rbeta(n, a, b)
+  mean(pmin(x,d))/mean(x)
+}
+c(theo(3,2,1/pi), theo2(3,2,1/pi), emp(1e6, 3,2,1/pi), ecbeta(1/pi, 3, 2))
+```
+
+
+

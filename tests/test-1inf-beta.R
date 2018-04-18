@@ -1,6 +1,6 @@
 library(mbbefd)
 
-#test of shifted truncated pareto distribution
+#test of 1-infl beta distribution
 n <- 1e4
 
 x <- roibeta(n, 2, 2, p1=1/2)

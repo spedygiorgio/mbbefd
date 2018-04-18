@@ -1,6 +1,6 @@
 library(mbbefd)
 
-#test of shifted truncated pareto distribution
+#test of uniform distribution
 n <- 1e4
 
 x <- roiunif(n, p1=1/2)

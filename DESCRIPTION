@@ -23,7 +23,7 @@ URL: http://github.com/spedygiorgio/mbbefd
 BugReports: http://github.com/spedygiorgio/mbbefd/issues
 VignetteBuilder: knitr
 NeedsCompilation: yes
-Packaged: 2017-02-22 12:41:28 UTC; Markus
+Packaged: 2018-05-08 12:41:28 UTC; Markus
 Author: Giorgio Spedicato [aut, cre],
   Christophe Dutang [aut],
   Markus Gesmann [ctb]

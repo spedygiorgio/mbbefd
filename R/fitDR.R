@@ -28,7 +28,10 @@ fitDR <- function(x, dist, method="mle", start=NULL, optim.method="default", ...
       if(initparmbbefd[[2]]["b"] == 1)
         initparmbbefd[[2]]["b"] <- 1/2
     }
-    #print(initparmbbefd)
+    if(!is.list(initparmbbefd[[1]]))
+      initparmbbefd[[1]] <- as.list(initparmbbefd[[1]])
+    if(!is.list(initparmbbefd[[2]]))
+      initparmbbefd[[2]] <- as.list(initparmbbefd[[2]])
     if(method == "mle")
     {
       
@@ -125,6 +128,10 @@ fitDR <- function(x, dist, method="mle", start=NULL, optim.method="default", ...
       if(initparMBBEFD[[2]]["b"] == 1)
         initparMBBEFD[[2]]["b"] <- 1/2
     }
+    if(!is.list(initparMBBEFD[[1]]))
+      initparMBBEFD[[1]] <- as.list(initparMBBEFD[[1]])
+    if(!is.list(initparMBBEFD[[2]]))
+      initparMBBEFD[[2]] <- as.list(initparMBBEFD[[2]])
 #     cat("after prefit\n")
 #     print(unlist(initparMBBEFD))
 #     

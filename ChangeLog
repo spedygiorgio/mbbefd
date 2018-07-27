@@ -1,50 +1,69 @@
-Version 0.8-8.2
+-Version 0.8-8.3
+Remove unused arguments
+Update starting values to meet requirements of next fitdistrplus version
+
+-Version 0.8-8.2
 Fix in docs
-Version 0.8-8.1
+
+-Version 0.8-8.1
 Removed vignette in inst... It will be autocreated
 Native routines registration fix
 Bumped requirements to R 3.4
-Version 0.8-8
+
+-Version 0.8-8
 Native routines registration (compliance with R 3.4)
-Version 0.8-7
+
+-Version 0.8-7
 Minor changes (simplified integration)
-Version 0.8-6
+
+-Version 0.8-6
 Bug fix in fitDR() and doi(g)beta().
 Add test on smokedfish dataset.
-Version 0.8-5
+
+-Version 0.8-5
 Minor changes to cope with fitdistrplus changes.
-Version 0.8
+
+-Version 0.8
 20-02-2016
 Added data sets (aon and loss).
 Start an unified approach for paramater estimation
 based on the fitdist function from fitdistrplus.
-Version 0.7
+
+-Version 0.7
 05-05-2015
 Markus Gesmann added as contributor, adding new vignette on exposure rating.
-Version 0.6.3
+
+-Version 0.6.3
 29-03-2015
 Fixed some calls to Rcpp code.
-Version 0.6.2
+
+-Version 0.6.2
 20-03-2015
 Christophe Dutang added as contributor.
 Introduced shifted truncated Pareto functions.
-Version 0.6.1
+
+-Version 0.6.1
 07-03-2015
 Aligned distribution function parameters' to R usual ones: pmbbefd accepts  (q, a, b, g) and not  (x, a, b, g) anymore.
 Improved vignettes.
+
 -Version 0.6.0.1
 01-03-2015
 Added to GitHub
+
 -Version 0.6.0
 16-02-2015
 Rcpp introduced
+
 -Version 0.5.0.1
 14-01-2015
 Inserted missing packages for LATEX
+
 -Version 0.5
 10-01-2015
 Fixed various bugs
 Added estimation section
 Updated vignettes
+
 -Version 0.1
 	First release of the package

@@ -2,7 +2,7 @@ Package: mbbefd
 Type: Package
 Title: Maxwell Boltzmann Bose Einstein Fermi Dirac Distribution and
         Destruction Rate Modelling
-Version: 0.8.8.2
+Version: 0.8.8.3
 Authors@R: c(person("Giorgio", "Spedicato", role = c("aut", "cre"),
     email = "spedicato_giorgio@yahoo.it"),
     person("Christophe", "Dutang", role = "aut"),
@@ -23,9 +23,5 @@ URL: http://github.com/spedygiorgio/mbbefd
 BugReports: http://github.com/spedygiorgio/mbbefd/issues
 VignetteBuilder: knitr
 NeedsCompilation: yes
-Packaged: 2018-05-08 12:41:28 UTC; Markus
-Author: Giorgio Spedicato [aut, cre],
-  Christophe Dutang [aut],
-  Markus Gesmann [ctb]
-Maintainer: Giorgio Spedicato <spedicato_giorgio@yahoo.it>
+Contact: Giorgio Spedicato <spedicato_giorgio@yahoo.it>
 RoxygenNote: 6.0.1

@@ -2,7 +2,9 @@
 title: "check beta"
 author: "C. Dutang and G.A. Spedicato"
 date: "18/04/2018"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}

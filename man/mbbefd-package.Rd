@@ -27,8 +27,8 @@ The vignette shows code snippets to fit the distribution to empirical data: \hre
 \tabular{ll}{
 Package: \tab mbbefd\cr
 Type: \tab Package\cr
-Version: \tab 0.8-8\cr
-Date: \tab 2017-02-22\cr
+Version: \tab 0.8-8-2\cr
+Date: \tab 2018-04-25\cr
 License: \tab GPL 2\cr
 }
 }

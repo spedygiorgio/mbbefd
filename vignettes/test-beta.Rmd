@@ -2,9 +2,11 @@
 title: "check beta"
 author: "C. Dutang and G.A. Spedicato"
 date: "18/04/2018"
-output:
-  pdf_document: default
-  html_document: default
+output: html_document
+vignette: |
+  %\VignetteIndexEntry{test-beta} 
+  %\VignetteEngine{knitr::rmarkdown} 
+  \usepackage[utf8]{inputenc}
 ---
 
 ```{r setup, include=FALSE}

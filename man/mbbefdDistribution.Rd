@@ -37,9 +37,9 @@ We also provide raw moments, exposure curve function and total loss.
 }
 \usage{
 
-dmbbefd(x, a, b, log=FALSE, g)
-pmbbefd(q, a, b, lower.tail = TRUE, log.p = FALSE, g)
-qmbbefd(p, a, b, lower.tail = TRUE, log.p = FALSE, g)
+dmbbefd(x, a, b, log=FALSE)
+pmbbefd(q, a, b, lower.tail = TRUE, log.p = FALSE)
+qmbbefd(p, a, b, lower.tail = TRUE, log.p = FALSE)
 rmbbefd(n, a, b)
 ecmbbefd(x, a, b)
 mmbbefd(order, a, b)

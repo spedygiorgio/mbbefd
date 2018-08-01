@@ -22,6 +22,7 @@ Imports: Rcpp, utils, actuar, gsl, MASS
 URL: http://github.com/spedygiorgio/mbbefd
 BugReports: http://github.com/spedygiorgio/mbbefd/issues
 VignetteBuilder: knitr
+SystemRequirements: GNU make
 NeedsCompilation: yes
 Contact: Giorgio Spedicato <spedicato_giorgio@yahoo.it>
 RoxygenNote: 6.0.1

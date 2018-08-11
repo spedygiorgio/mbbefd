@@ -1,10 +1,11 @@
+-Version 0.8.8.4
+Bumped requirement of Rcpp and R
+Added support for the unwind api of Rcpp https://www.r-bloggers.com/boost-the-speed-of-r-calls-from-rcpp/
 -Version 0.8-8.3
 Remove unused arguments
 Update starting values to meet requirements of next fitdistrplus version
-
 -Version 0.8-8.2
 Fix in docs
-
 -Version 0.8-8.1
 Removed vignette in inst... It will be autocreated
 Native routines registration fix

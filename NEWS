@@ -1,4 +1,3 @@
-Version 0.8.8.1
-Removed vignette in inst... It will be autocreated
-Other fixes for the registration
-Bumped requirements to R 3.4
+Version 0.8.8.4
+Bumped requirement of Rcpp and R
+Added support for the unwind api of Rcpp https://www.r-bloggers.com/boost-the-speed-of-r-calls-from-rcpp/

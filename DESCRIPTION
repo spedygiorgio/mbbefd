@@ -2,7 +2,7 @@ Package: mbbefd
 Type: Package
 Title: Maxwell Boltzmann Bose Einstein Fermi Dirac Distribution and
         Destruction Rate Modelling
-Version: 0.8.8.3
+Version: 0.8.8.4
 Authors@R: c(person("Giorgio", "Spedicato", role = c("aut", "cre"),
     email = "spedicato_giorgio@yahoo.it"),
     person("Christophe", "Dutang", role = "aut"),
@@ -13,12 +13,12 @@ Description: Distributions that are typically used for exposure rating in
              The vignettes show code snippets to fit the distribution to
              empirical data.
 License: GPL-2
-Depends: R (>= 3.4), fitdistrplus (>= 1.0-7), alabama
+Depends: R (>= 3.5), fitdistrplus (>= 1.0-7), alabama, Rcpp (>= 0.12.18)
 ByteCompile: yes
 Suggests: testthat, copula, pander, knitcitations,
         rmarkdown, knitr, lattice
 LinkingTo: Rcpp
-Imports: Rcpp, utils, actuar, gsl, MASS
+Imports: utils, actuar, gsl, MASS
 URL: http://github.com/spedygiorgio/mbbefd
 BugReports: http://github.com/spedygiorgio/mbbefd/issues
 VignetteBuilder: knitr

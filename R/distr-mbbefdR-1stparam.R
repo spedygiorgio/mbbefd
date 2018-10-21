@@ -4,10 +4,19 @@
 
 dmbbefdR <- function(x, a, b, log=FALSE)
 {
-  if(!(a +1 >0 && b > 0 && a*(1-b) >= 0))
+  if(is.infinite(b))
     return(rep(NaN, length(x)))
+  if(is.infinite(a))
+  {  
+    if(!(b > 0 && b < 1))
+      return(rep(NaN, length(x)))
+  }else if(a != -1)
+  {
+    if(!(a +1 >0 && b > 0 && a*(1-b) >= 0))
+      return(rep(NaN, length(x)))
+  }
   
-  if(a == 0 || b == 1) #Dirac
+  if(a == 0 || b == 1 || a == -1) #Dirac
   {
     res <- rep(0, length(x))
     res[x == 1] <- 1
@@ -29,10 +38,20 @@ dmbbefdR <- function(x, a, b, log=FALSE)
 	
 pmbbefdR <- function(q, a, b, lower.tail = TRUE, log.p = FALSE)
 {
-  if(!(a +1 >0 && b > 0 && a*(1-b) >= 0))
-    return(rep(NaN, length(q)))
   
-  if(a == 0 || b == 1) #Dirac
+  if(is.infinite(b))
+    return(rep(NaN, length(q)))
+  if(is.infinite(a))
+  {  
+    if(!(b > 0 && b < 1))
+      return(rep(NaN, length(q)))
+  }else if(a != -1)
+  {
+    if(!(a +1 >0 && b > 0 && a*(1-b) >= 0))
+      return(rep(NaN, length(q)))
+  }
+  
+  if(a == 0 || b == 1 || a == -1) #Dirac
   {
     res <- rep(0, length(q))
   }else if(is.infinite(a))
@@ -56,15 +75,24 @@ pmbbefdR <- function(q, a, b, lower.tail = TRUE, log.p = FALSE)
 	 
 qmbbefdR <- function(p, a, b, lower.tail = TRUE, log.p = FALSE)
 {
-  if(!(a +1 >0 && b > 0 && a*(1-b) >= 0))
+  if(is.infinite(b))
     return(rep(NaN, length(p)))
+  if(is.infinite(a))
+  {  
+    if(!(b > 0 && b < 1))
+      return(rep(NaN, length(p)))
+  }else if(a != -1)
+  {
+    if(!(a +1 >0 && b > 0 && a*(1-b) >= 0))
+      return(rep(NaN, length(p)))
+  }
   
   if(!lower.tail)
     p <- 1-p
   if(log.p) 
     p <- exp(p) 
   
-  if(a == 0 || b == 1) #Dirac
+  if(a == 0 || b == 1 || a == -1) #Dirac
   {
     res <- rep(0, length(p))
     res[p > 0] <- 1
@@ -87,18 +115,37 @@ qmbbefdR <- function(p, a, b, lower.tail = TRUE, log.p = FALSE)
   
 rmbbefdR <- function(n, a, b)
 {
-  if(!(a +1 >0 && b > 0 && a*(1-b) >= 0))
-    return(rep(NaN, n))
+  if(is.infinite(b))
+    return(rep(NaN, length(n)))
+  if(is.infinite(a))
+  {  
+    if(!(b > 0 && b < 1))
+      return(rep(NaN, length(n)))
+  }else if(a != -1)
+  {
+    if(!(a +1 >0 && b > 0 && a*(1-b) >= 0))
+      return(rep(NaN, length(n)))
+  }
+
   qmbbefdR(runif(n, 0, 1), a, b)
 }
 	
 	
 ecmbbefdR <- function(x, a, b)
 {
-  if(!(a +1 >0 && b > 0 && a*(1-b) >= 0))
+  if(is.infinite(b))
     return(rep(NaN, length(x)))
+  if(is.infinite(a))
+  {  
+    if(!(b > 0 && b < 1))
+      return(rep(NaN, length(x)))
+  }else if(a != -1)
+  {
+    if(!(a +1 >0 && b > 0 && a*(1-b) >= 0))
+      return(rep(NaN, length(x)))
+  }
   
-  if(a == 0 || b == 1) #Dirac
+  if(a == 0 || b == 1 || a == -1) #Dirac
   {
     res <- x
   }else if(is.infinite(a))
@@ -117,12 +164,21 @@ ecmbbefdR <- function(x, a, b)
 #moment
 mmbbefdR <- function(order, a, b)
 {
-  if(!(a +1 >0 && b > 0 && a*(1-b) >= 0))
+  if(is.infinite(b))
     return(rep(NaN, length(order)))
+  if(is.infinite(a))
+  {  
+    if(!(b > 0 && b < 1))
+      return(rep(NaN, length(order)))
+  }else if(a != -1)
+  {
+    if(!(a +1 >0 && b > 0 && a*(1-b) >= 0))
+      return(rep(NaN, length(order)))
+  }
   if(any(order > 2))
     stop("not yet implemented.")
   
-  if(a == 0 || b == 1) #Dirac
+  if(a == 0 || b == 1 || a == -1) #Dirac
   {
     res <- rep(1, 2)
   }else if(is.infinite(a))
@@ -138,8 +194,18 @@ mmbbefdR <- function(order, a, b)
 #total loss
 tlmbbefdR <- function(a, b)
 {
-  if(!(a +1 >0 && b > 0 && a*(1-b) >= 0))
+  if(is.infinite(b))
     return(NaN)
+  if(is.infinite(a))
+  {  
+    if(!(b > 0 && b < 1))
+      return(NaN)
+  }else if(a != -1)
+  {
+    if(!(a +1 >0 && b > 0 && a*(1-b) >= 0))
+      return(NaN)
+  }
+  
   if(is.infinite(a))
     res <- b
   else

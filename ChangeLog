@@ -3,6 +3,7 @@ Bumped requirement of Rcpp and R
 Added support for the unwind api of Rcpp https://www.r-bloggers.com/boost-the-speed-of-r-calls-from-rcpp/
 Update automatic naming of legend in eccomp() (similar update for fitdistrplus)
 Bug fix: Update testing parameter value of mbbefd(a,b) for inconsistent value
+Add a lines method for eecf object and update the man page
 -Version 0.8-8.3
 Remove unused arguments
 Update starting values to meet requirements of next fitdistrplus version

@@ -33,6 +33,7 @@ print.eecf <- function (x, digits = getOption("digits") - 2L, ...)
   print(attr(x, "call"), ...)
   xx <- environment(x)$"x"
   n <- environment(x)$"nobs"
+  
   i1 <- 1L:min(3L,n)
   i2 <- if(n >= 4L) max(4L, n-1L):n else integer()
   cat(" x[1:",n,"] = ", numform(xx[i1]),
@@ -42,11 +43,12 @@ print.eecf <- function (x, digits = getOption("digits") - 2L, ...)
 
 summary.eecf <- function(object, ...)
 {
-  n <- environment(object)$"nobs"
   xx <- environment(object)$"x"
+  n <- environment(object)$"nobs"
+  
   header <- paste("Empirical Exposure Curve Function:   ", n,
                   "unique values with summary\n")
-  structure(summary(xx, ...),
+  structure(summary(xx, digits = max(3, getOption("digits")-3), ...),
             header = header, class = "summary.eecf")
 }
 
@@ -58,12 +60,19 @@ print.summary.eecf <- function(x, ...)
   invisible(x)
 }
 
-plot.eecf <- function(x, ..., ylab="Gn(x)", verticals = FALSE, do.points=TRUE,
-                      col.01line = "gray70", pch = 19, main=NULL, ylim=NULL)
+plot.eecf <- function(x, ..., ylab="Gn(x)", do.points=TRUE, 
+                      col.01line = "gray70", pch = 19, main=NULL,
+                      ylim=NULL, add=FALSE)
 {
   n <- environment(x)$"nobs"
   xx <- environment(x)$"x"
   yy <- environment(x)$"Gx"
+  #add left-hand point
+  if(length(xx) != n)
+    stop("wrong x attribute")
+  xx <- c(0, xx)
+  yy <- c(0, yy)
+  
   #from plot.stepfun called for plot.ecdf
   if(missing(main))
   main <- {
@@ -73,20 +82,24 @@ plot.eecf <- function(x, ..., ylab="Gn(x)", verticals = FALSE, do.points=TRUE,
   if(missing(ylim))
     ylim <- c(0, 1)
   
-#   print(head(cbind(xx, yy)))
-#   print(dim(cbind(xx, yy)))
-#   print(sum(is.na(xx)))
-#   print(sum(is.infinite(xx)))
-#   print(sum(is.na(yy)))
-#   print(sum(is.infinite(yy)))
-#   
-  #TO UPDATE : remove vertical lines
-  plot(xx, yy, type = "s", ylab = ylab, main=main, ylim=ylim, ...)
-  if(do.points) points(xx, yy, pch = pch)
-  abline(h = 1, col = col.01line, lty = 2)
-  abline(a = 0, b = 1, col = col.01line, lty = 2)
+  #unlike ecdf, eecf is a continuous function
+  if(!add)
+  {  
+    plot(xx, yy, type = "l", ylab = ylab, main=main, ylim=ylim, ...)
+    if(do.points) points(xx[-1], yy[-1], pch = pch, ...)
+    abline(h = 1, col = col.01line, lty = 2)
+    abline(a = 0, b = 1, col = col.01line, lty = 2)
+  }else
+  {
+    lines(xx, yy, type="l", ...)
+    if(do.points) points(xx[-1], yy[-1], pch = pch, ...)
+  }
   #terminates with invisible()
 }
+
+lines.eecf <- function(x, ...)
+  plot(x, add=TRUE, ...)
+  
 
 
 #total loss

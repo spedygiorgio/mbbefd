@@ -31,7 +31,7 @@ The vignette shows code snippets to fit the distribution to empirical data: \hre
 \tabular{ll}{
 Package: \tab mbbefd\cr
 Type: \tab Package\cr
-Version: \tab 0.8.8.3\cr
+Version: \tab 0.8.8.4\cr
 License: \tab GPL-2\cr
 }
 
@@ -43,7 +43,7 @@ License: \tab GPL-2\cr
 Maintainer: \packageMaintainer{mbbefd}
 }
 \references{
-BERNEGGER, STEFAN. THE SWISS RE EXPOSURE CURVES AND THE MBBEFD DISTRIBUTION CLASS. Astin Bulletin (1997): 99.
+Bernegger, Stefan. The Swiss Re Exposure Curves And The MBBEFD Distribution Class. ASTIN Bulletin (1997) 27:1, p99.
 }
 \keyword{ package }
 \seealso{

@@ -53,7 +53,7 @@ pMBBEFDR <- function(q, g, b, lower.tail = TRUE, log.p = FALSE)
     res <- 1- (1-b)/((g-1)*b^(1-q) + 1-g*b)
   }
   res[q >= 1] <- 1
-  res[q < 0] <- 0
+  res[q <= 0] <- 0 #GS: modified 9/12/2018
   
   if(!lower.tail)
     res <- 1-res

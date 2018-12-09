@@ -62,7 +62,7 @@ pmbbefdR <- function(q, a, b, lower.tail = TRUE, log.p = FALSE)
     res <- a * ( (a+1) / (a + b^q) - 1) 
   }
   res[q >= 1] <- 1
-  res[q < 0] <- 0
+  res[q <= 0] <- 0 #modified 9/12/2018
 
   if(!lower.tail)
     res <- 1-res

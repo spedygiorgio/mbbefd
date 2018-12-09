@@ -1,3 +1,6 @@
+-Version 0.8.8.5
+Added ORCID
+res[q <= 0] <- 0, from res[q < 0] <- 0
 -Version 0.8.8.4
 Bumped requirement of Rcpp and R
 Added support for the unwind api of Rcpp https://www.r-bloggers.com/boost-the-speed-of-r-calls-from-rcpp/

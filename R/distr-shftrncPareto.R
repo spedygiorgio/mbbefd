@@ -22,7 +22,7 @@ pstpareto <- function(q, a, lower.tail = TRUE, log.p = FALSE)
   
   res <- (1 - (q+1)^(-a))/(1-2^(-a))
   res[q >= 1] <- 1
-  res[q < 0] <- 0
+  res[q <= 0] <- 0
   
   if(!lower.tail)
     res <- 1-res

@@ -61,7 +61,7 @@ Finally, we provide an example of pricing of XL contract.
 
 First lets assume we have perfect information, i.e. we know the loss distribution for a certain risk.
 
-To keep it simple I assume the loss distribution is log-normal with
+To keep it simple we assume the loss distribution is log-normal with
 a mean ($M$) of 65 and a coefficient of variation ($CV$) of 30%. 
 The corresponding log-normal parameters $\mu$ and $\sigma$ can be derived via:
 
@@ -75,7 +75,7 @@ $$
 The following chart shows the corresponding probability density curve 
 $f(x)$, cumulative distribution function $F(x)$ and survival function $S(x)=1-F(x)$. 
 
-```{r, fig.height=2.5, fig.width=6, echo=FALSE, warning=FALSE}
+```{r, fig.height=2.5, fig.width=6, echo=FALSE, warning=FALSE, fig.align="center"}
 library(lattice)
 n <- 100
 Loss <- seq(1, 150, length=n)
@@ -121,20 +121,20 @@ $$
 
 ## Limited Expected Loss
 
-Let's further assume that losses are limited by $\alpha$ in my contract. Then
+Let's further assume that losses are limited by $\alpha$ in the contract. Then
 the limited expected value (LEV), written as $E[X \wedge \alpha]$, is given as
 
 $$
 E[X \wedge \alpha] = \int_0^\alpha x \, f(x) dx + \int_\alpha^\infty \alpha \, f(x) dx
 $$
 
-To evaluate this sum of integrals I recall that $F(x)=\int f(x) dx$ and $F(\infty)=1$. Hence:
+To evaluate this sum of integrals we recall that $F(x)=\int f(x) dx$ and $F(\infty)=1$. Hence:
 
 $$
 \int_\alpha^\infty \alpha \, f(x) dx = \alpha \int_\alpha^\infty f(x) dx = \alpha - \alpha F(\alpha)
 $$
 
-The integration by parts theorem $\int u(x) v'(x) \, dx = u(x) v(x) - \int v(x) \, u'(x)  dx$ helps me with the first part of the integral:
+The integration by parts theorem $\int u(x) v'(x) \, dx = u(x) v(x) - \int v(x) \, u'(x)  dx$ helps with the first part of the integral:
 
 $$
 \int_0^\alpha x \, f(x) dx = \alpha F(\alpha) - \int_0^\alpha F(x) dx
@@ -152,7 +152,7 @@ or the area under the survival function up to $\alpha$. In the example
 below the limit $\alpha$ was set to 100.
 
 
-```{r LEV, fig.height=2.5, fig.width=5, echo=FALSE}
+```{r LEV, fig.height=2.5, fig.width=5, echo=FALSE, fig.align="center"}
 alpha <- 100
 xyplot(Value ~ Loss | Type, 
        data=subset(dat, !Type %in% "PDF: f(x)"), 
@@ -181,10 +181,10 @@ xyplot(Value ~ Loss | Type,
 
 ## Loss Cost of a Layer 
 
-Suppose I want to insure the layer of claims between 80 and 100.
+Suppose we want to insure the layer of claims between 80 and 100.
 
 
-```{r LEV2, fig.height=2.5, fig.width=5, echo=FALSE}
+```{r LEV2, fig.height=2.5, fig.width=5, echo=FALSE, fig.align="center"}
 alpha1 <- 80
 alpha2 <- 100
 xyplot(Value ~ Loss | Type, 
@@ -295,7 +295,7 @@ $$
 
 For our example, using a log-normal distribution and a MPL of 200 we get:
 
-```{r ExposureCurve, dev.args=list(pointsize=8), fig.height=3, fig.width=3}
+```{r ExposureCurve, dev.args=list(pointsize=8), fig.height=3, fig.width=3, fig.align="center"}
 MPL <- 200
 ExpectedLoss <- 65
 Deductible <- seq(0, MPL, 1)
@@ -657,7 +657,8 @@ There is also a bootstrap procedure implemented in the \pkg{bootDR} function.
 
 Let us fit some distributions with a simulated dataset based on a mixture
 of two distributions (regular beta and mbbefd).
-```{r simufit, echo=TRUE, fig.height=5, fig.width=5, warning=FALSE}
+
+```{r simufit, echo=TRUE, warning=FALSE}
 library(mbbefd)
 set.seed(123456)
 x <- c(rbeta(50, 3, 1/2), rmbbefd(50, 1/2, 1/10))
@@ -665,10 +666,19 @@ f1 <- fitDR(x, "mbbefd", method="mle")
 summary(f1)
 b1 <- bootDR(f1, niter=20)
 summary(b1)
-par(mfrow=c(1, 2))
-denscomp(f1, demp=TRUE)
-plot(b1, enhance=TRUE)
 ```
+
+```{r denplot, echo=FALSE, fig.height=3.5, fig.width=4, fig.align="center"}
+par(cex.main=0.8,  cex.lab=0.8, cex.axis=0.8, cex=0.8)
+denscomp(f1, demp=TRUE, main="Histogram and theoretical densities")
+```
+
+```{r bootstrapplot,echo=FALSE, fig.height=3.5, fig.width=3.5, fig.align="center"}
+par(cex.main=0.8,  cex.lab=0.8, cex.axis=0.8, mar=c(2,2,2,2))
+plot(b1, enhance=TRUE, main="Bootstrapped value of parameters")
+```
+
+
 The graph correspond respectively to the histogram (and empirical density)
 against the fitted density and a two-dimensional level curve and scatter plot
 for bootstrap parameters.
@@ -677,30 +687,33 @@ As in the \pkg{fitdistrplus} package, we can compare multiple fits on the
 same graph or with the same statistics. We just have to pass a list of
 \pkg{"DR"} objects.
 
-```{r simufit2, echo=TRUE, fig.height=5, fig.width=10, warning=FALSE}
+```{r simufit2, echo=TRUE, fig.height=5, fig.width=10, warning=FALSE, fig.align="center"}
 f2 <- fitDR(x, "oibeta", method="mle")
 f3 <- fitDR(x, "oiunif", method="mle")
 gofstat(list(f1, f2, f3))
 par(mfrow=c(1, 2))
 cdfcomp(list(f1, f2, f3), leg=c("mbbefd", "oibeta", "oiunif"))
-denscomp(list(f1, f2, f3), leg=c("mbbefd", "oibeta", "oiunif"), ylim=c(0,4), xleg="topleft")
+denscomp(list(f1, f2, f3), leg=c("mbbefd", "oibeta", "oiunif"), 
+         ylim=c(0,4), xleg="topleft")
 ```
 
 Of course, we can also compare the different fitted exposure curves
 using the function \pkg{eccomp}. That is
-```{r simufit3, echo=TRUE, fig.height=5, fig.width=5, warning=FALSE}
+
+```{r simufit3, echo=TRUE, fig.height=3.5, fig.width=3.5, warning=FALSE, fig.align="center"}
+par(cex=0.8)
 eccomp(list(f1, f2, f3), leg=c("mbbefd", "oibeta", "oiunif"), do.points=FALSE)
 ```
 
 
 
-## Computation of rate on line (example)
-
+## Computation of premium rate (example)
 
 The following example data is taken from the earlier Swiss Re
 technical paper above. 
 It is the aim to find the risk premium for a per risk WXL cover 
 (fire only) with the limits
+
 $$
 \mbox{CHF } 3,500,000 \mbox{ xs CHF } 1,500,000
 $$
@@ -712,6 +725,7 @@ mean expected loss cost.
 The risk profile given by the cedant is from the year 2002.
 However, instead of re-indexing the historical data to 2004, we back-index
 the data to 2002 with a factor of $457/550=`r round(457/550,2)`$:
+
 $$
 \mbox{CHF } `r format(3500000*457/550, big.mark=",")` 
 \mbox{ xs CHF } `r format(1500000*457/550, big.mark=",")`
@@ -761,7 +775,7 @@ no reinsurance premium needs to be calculated.
 
 ### Losses above deductible, but below limit
 
-As an example I use the band that has a maximum MPL of CHF 4m, 
+As an example we use the band that has a maximum MPL of CHF 4m, 
 with a mean MPL gross loss of CH 3.5m and gross premium of CH 1.194m.
 
 The client would retain 1,246/3,500=`r round(retainedDed*100,1)`% of the 
@@ -772,7 +786,7 @@ Therefore the reinsurance premium for this band is 1,194k $\cdot$ `r round((100-
 
 ### Losses above limit
 
-Here I select the band with a maximum MPL of CHF 90m and a mean gross
+Here we  select the band with a maximum MPL of CHF 90m and a mean gross
 MPL of  CHF 81m. Because of the limit of CHF `r round(L, 1)` only that amount matters. From the exposure curve we can read
 of again the average proportion of loss paid by the cedant
 `r round(ecMBBEFD(D/L, b=swissRe(4)['b'], g=swissRe(4)['g']),1)`%. 
@@ -784,16 +798,15 @@ premium that is attached to the risk below the limit: 4,155k/8,100k $\cdot$
 Multiplying the premium with the reinsurer's share of the loss gives
 us a premium of CHF `r round(4155/81000*1918*(1-ecMBBEFD(D/L, b=swissRe(4)['b'], g=swissRe(4)['g'])),1)`k.
 
-### Rate on Line
+### Premium Rate
 
-For the overall portfolio we can calculate the rate on line, which is the loss cost
-of the layer compared to the total loss cost, using the expected loss ratio of 55%:
+For the overall portfolio we can calculate the premium rate, using the expected loss ratio of 55%:
 
 ```{r SwissRe2}
-XL_ROL <- function(Deductible, Limit, MaxMPL, 
+Premium_rate <- function(Deductible, Limit, MaxMPL, 
                    MeanMPL, GrossPremium, C, ULR){
   DedPerMPL <- Deductible / ifelse(MaxMPL < Deductible, Deductible, 
-                                   ifelse(MaxMPL<Limit, MaxMPL, Limit))
+                                   ifelse(MaxMPL<Limit, MeanMPL, Limit))
   LossShare <- 1 - apply(cbind(DedPerMPL, C), 1, 
                          function(x){ 
                            ecMBBEFD(x[1], 
@@ -807,15 +820,15 @@ XL_ROL <- function(Deductible, Limit, MaxMPL,
   sum(XL_Premium)/sum(NetPremium)*ULR
 }
 
-rol <- XL_ROL(Deductible = D,
-              Limit = L,
-              MaxMPL = ClientData$MaxMPL,
-              MeanMPL = ClientData$MeanMPLGrossLoss,
-              GrossPremium = ClientData$GrossPremium,
-              C=ClientData$ExposureCurve, ULR=0.55)
+pr <- Premium_rate(Deductible = D,
+                   Limit = L,
+                   MaxMPL = ClientData$MaxMPL,
+                   MeanMPL = ClientData$MeanMPLGrossLoss,
+                   GrossPremium = ClientData$GrossPremium,
+                   C=ClientData$ExposureCurve, ULR=0.55)
 ```
 
-Applying the function to our data we get a rate on line of `r round(rol*100,2)`%.
+Applying the function to our data we get a premium rate of `r round(pr*100,2)`%.
 Differences to the Swiss Re paper are a result of rounding errors.
 
 

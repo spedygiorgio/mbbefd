@@ -563,7 +563,7 @@ The improper density function is for $x\in ]0,1[$
 \begin{equation}
 \tilde f_X(x) = 
 \systL
-- \frac{(1-b)\ln(b)b^{1-x}}{((g-1)b^{1-x}+1-gb)^2}  & \text{ if } g>1, b\neq 1, b\neq 1/g \\
+ -\frac{(1-b)(g-1)\ln(b)b^{1-x}}{((g-1)b^{1-x}+1-gb)^2}  & \text{ if } g>1, b\neq 1, b\neq 1/g \\
 \frac{g-1}{(1+(g-1)x)^2} & \text{ if } g>1, b= 1 \\
 -\ln(b) b^x  & \text{ if } g>1, bg= 1 \\
 0 & \text{ if } g=1 \text{ or } b= 0

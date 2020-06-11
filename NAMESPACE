@@ -67,10 +67,10 @@ export(fitDR) #fitDR class inheriting from fitdist class
 export(bootDR) #bootDR class inheriting from bootdist class
 
 #temporary 
-importFrom(MASS, kde2d)
+importFrom("MASS", kde2d)
 
 #data
 #export(aon,asiacomrisk,)
 
-importFrom(Rcpp,sourceCpp)
+importFrom("Rcpp", sourceCpp)
 useDynLib(mbbefd, .registration=TRUE)

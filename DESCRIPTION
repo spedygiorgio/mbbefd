@@ -23,8 +23,4 @@ BugReports: http://github.com/spedygiorgio/mbbefd/issues
 VignetteBuilder: knitr
 SystemRequirements: GNU make
 NeedsCompilation: yes
-<<<<<<< HEAD
-=======
-Contact: Giorgio Alfredo Spedicato <spedicato_giorgio@yahoo.it>
->>>>>>> c198f90974c1b3ca4b9568a5c696c5dfd70b8953
 RoxygenNote: 6.0.1

@@ -1,3 +1,14 @@
 language: r
-  sudo: false
-  cache: packages
+r:
+  - devel
+sudo: false
+cache: packages
+warnings_are_errors: true
+cran: http://cran.rstudio.com
+addons:
+  apt:
+    update: true
+    packages:
+      - libgs-dev
+      - qpdf
+      - ghostscript

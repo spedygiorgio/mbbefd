@@ -28,10 +28,10 @@ header-includes:
 
 ```{r setup, echo=FALSE, message=FALSE, warning=FALSE}
 library("mbbefd")
-library("knitcitations")
-cleanbib()
-options("citation_format" = "pandoc")
-bib <- read.bibtex("mbbefd.bib")
+#library("knitcitations")
+#cleanbib()
+#options("citation_format" = "pandoc")
+#bib <- read.bibtex("mbbefd.bib")
 library(lattice)
 my.settings <- canonical.theme(color=FALSE)
 my.settings[['fontsize']] = list(text = 8, points = 4)
@@ -44,14 +44,14 @@ my.settings[['strip.border']]$col<- "black"
 # Introduction and general notation
 
 Exposure rating is a tool for insurance pricing that allocates premium to bands
-of damage ratios or severity of losses. First ideas were published in `r citep(bib['salzmann1963'])`. It is often used to price non-proportional
+of damage ratios or severity of losses. First ideas were published in [@salzmann1963]. It is often used to price non-proportional
 reinsurance contracts, such as excess of loss (XL) reinsurance. 
 
 Exposure rating uses the loss experience of a similar portfolio of policies to estimate the expected losses of the portfolio to be covered. The method is frequently used as a benchmark when there is no sufficient credible claims history from the client.
 
 In this vignette, we first present the general notation and concepts of loss modelling.
 Secondly, we focus on destruction models implemented in the \pkg{mbbefd} package. 
-One popular model uses the MBBEFD distribution introduced by `r citep(bib['bernegger97'])`.
+One popular model uses the MBBEFD distribution introduced by [@bernegger97].
 Finally, we provide an example of pricing of XL contract.
 
 
@@ -329,7 +329,7 @@ $$
 F_X(x) = \left(1- \frac{G_X'(x)}{G_X'(0)}\right)\ind_{[0,1[}(x) + \ind_{[1,+\infty[}(x),
 $$
 defining the exposure curve or the distribution function is equivalent.
-The exposure curve is also a concave increasing function, see e.g. `r citep(bib['antal03'])`.
+The exposure curve is also a concave increasing function, see e.g. [@antal03].
 
 ### Uniform distribution
 \label{sec:unif}
@@ -346,10 +346,10 @@ $$
 \label{sec:beta}
 
 A more interesting example is obtained for the Beta distribution on $I$ 
-(e.g.`r citep(bib['kotzjohnsonbalak94v2'])`)
+(e.g.[@kotzjohnsonbalak94v2]
 for which the density is $f_X(x) = x^{a-1}(1-x)^{b-1}/\beta(a,b)$ for $x\in ]0,1[$ and $a,b>0$
 where $\beta(.,.)$ denotes the 
-beta function, see e.g.`r citep(bib['nist10'])`.
+beta function, see e.g.[@nist10].
 The distribution function is obtained in terms of the incomplete beta ratio function 
 $F_X(x) = \beta(x;a,b)/\beta(a,b) = I(x;a,b)$.
 We get
@@ -490,13 +490,14 @@ When $a=0$ or $b=1$, the expectation is simply $E(X)=1$.
 
 
 ## The MBBEFD distribution, second parametrization
+
 \label{sec:mbbefd2p}
 
 
 ### Parameter domain
 
 For fitting purposes and for verifying parameter constraints, 
-`r citep(bib['bernegger97'])` proposed a second parametrization $\mbox{MBBEFD}(g,b)$.
+[@bernegger97] proposed a second parametrization $\mbox{MBBEFD}(g,b)$.
 Using the following parameter $g=1/p_{a,b}$, it is possible to reformulate the $\mbox{MBBEFD}(a,b)$.
 That is
 $$
@@ -575,6 +576,7 @@ q_X(p) =
 
 
 ### Moments
+
 Let us compute the first two moments.
 $$
 E(X) = 1/G_X'(0) = 

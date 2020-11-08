@@ -5,7 +5,7 @@ date: "`r Sys.Date()`"
 output: 
   pdf_document:
     number_sections: true
-    keep_tex: true
+    keep_tex: FALSE
 bibliography: mbbefd.bib
 vignette: |
   %\VignetteIndexEntry{Exposure rating, destruction rate models and the mbbefd package} 

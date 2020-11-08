@@ -3,3 +3,7 @@
 ^\.travis\.yml$
 ^\.travis_old\.yml$
 ^data-raw$
+vignettes/figure/
+vignettes/*\.tex
+vignettes/*\.md
+vignettes/test-beta.Rmd

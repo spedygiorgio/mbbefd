@@ -14,7 +14,7 @@ Description: Distributions that are typically used for exposure rating in
 License: GPL-2
 Depends: R (>= 3.6), fitdistrplus (>= 1.0-7), alabama, Rcpp (>= 0.12.18)
 ByteCompile: yes
-Suggests: testthat, copula, pander, rmarkdown, knitr, lattice
+Suggests: testthat, pander, rmarkdown, knitr, lattice
 LinkingTo: Rcpp
 Imports: utils, actuar, gsl, MASS
 URL: http://github.com/spedygiorgio/mbbefd

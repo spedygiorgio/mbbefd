@@ -2,20 +2,25 @@
 Correct the vignette, in particular typo in Equation (10)
 Change the maintainer 
 remove of the knitrcitations dependency
+
 -Version 0.8.8.5
 Added ORCID
 res[q <= 0] <- 0, from res[q < 0] <- 0
+
 -Version 0.8.8.4
 Bumped requirement of Rcpp and R
 Added support for the unwind api of Rcpp https://www.r-bloggers.com/boost-the-speed-of-r-calls-from-rcpp/
 Update automatic naming of legend in eccomp() (similar update for fitdistrplus)
 Bug fix: Update testing parameter value of mbbefd(a,b) for inconsistent value
 Add a lines method for eecf object and update the man page
+
 -Version 0.8-8.3
 Remove unused arguments
 Update starting values to meet requirements of next fitdistrplus version
+
 -Version 0.8-8.2
 Fix in docs
+
 -Version 0.8-8.1
 Removed vignette in inst... It will be autocreated
 Native routines registration fix

@@ -38,7 +38,7 @@ data(lossalaefull)
   Understanding relationships using copulas.
   \emph{North American Actuarial Journal}, \bold{2}, 1--15.
   
-  \url{http://lstat.kuleuven.be/Wiley/}
+  \url{https://lstat.kuleuven.be/Wiley/}
   
 }
 \references{

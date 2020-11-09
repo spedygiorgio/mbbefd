@@ -221,7 +221,7 @@ to a limit of 80 is called an increased limit factor (ILF):
 (ILF <- integrate(S, 0, 100)$value / integrate(S, 0, 80)$value)
 ```
 
-Therefore we would expect the LEV to increase by `r round((ILF-1)*100,1)`% as
+Therefore we would expect the LEV to increase by $3.5\%$ as
 the limit increases from 80 to 100.
 
 Note ILFs are often used for pricing casualty business.
@@ -713,11 +713,11 @@ mean expected loss cost.
 
 The risk profile given by the cedant is from the year 2002.
 However, instead of re-indexing the historical data to 2004, we back-index
-the data to 2002 with a factor of $457/550=`r round(457/550,2)`$:
+the data to 2002 with a factor of $457/550=0.83$:
 
 $$
-\mbox{CHF } `r format(3500000*457/550, big.mark=",")` 
-\mbox{ xs CHF } `r format(1500000*457/550, big.mark=",")`
+\mbox{CHF } 2,908,182
+\mbox{ xs CHF } 1,246,364
 $$
  
 The data presented below is from the client, with pre-selected
@@ -767,28 +767,28 @@ no reinsurance premium needs to be calculated.
 As an example we use the band that has a maximum MPL of CHF 4m, 
 with a mean MPL gross loss of CH 3.5m and gross premium of CH 1.194m.
 
-The client would retain $1,246/3,500=`r round(retainedDed*100,1)`\%$ of the 
+The client would retain $1,246/3,500=35.6\%$ of the 
 maximum MPL. Using our exposure curve we can read of that this would reduce our 
-expected claims burden by $`r round(retainedLoss*100,1)`\%$.
+expected claims burden by $35.6\%$.
 
 Therefore the reinsurance premium for this band is 1,194k 
-$\cdot `r round((100-retainedLoss*100),1)`\% =`r round(prem,1)`k$. 
+$\cdot 20.5\% =244.8k$. 
 
 ### Losses above limit
 
 Here we  select the band with a maximum MPL of CHF 90m and a mean gross
-MPL of  CHF 81m. Because of the limit of CHF $`r round(L, 1)`$ only that 
+MPL of  CHF 81m. Because of the limit of CHF $4154.5$ only that 
 amount matters. From the exposure curve we can read
 of again the average proportion of loss paid by the cedant
-$`r round(ecMBBEFD(D/L, b=swissRe(4)['b'], g=swissRe(4)['g']),1)`\%$. 
+$0.8\%$. 
 
 To calculate the premium we first have to derive the proportion of
 premium that is attached to the risk below the limit: 4,155k/8,100k 
-$\cdot 1,918k=`r round(4155/81000*1918,1)`k$.
+$\cdot 1,918k=98.4k$.
 
 Multiplying the premium with the reinsurer's share of the loss gives
 us a premium of CHF 
-$`r round(4155/81000*1918*(1-ecMBBEFD(D/L, b=swissRe(4)['b'], g=swissRe(4)['g'])),1)`k$.
+$23.4k$.
 
 ### Premium Rate
 
@@ -820,7 +820,7 @@ pr <- Premium_rate(Deductible = D,
                    C=ClientData$ExposureCurve, ULR=0.55)
 ```
 
-Applying the function to our data we get a premium rate of $`r round(pr*100,2)`%$.
+Applying the function to our data we get a premium rate of $1.47\%$.
 Differences to the Swiss Re paper result from rounding errors.
 
 

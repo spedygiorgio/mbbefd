@@ -154,7 +154,7 @@ fitDR(x, dist, method="mle", start=NULL, optim.method="default", \dots)
     \code{\link[fitdistrplus:graphcomp]{graphcomp}} for graphs.
     See \code{\link{bootDR}} for bootstrap procedures 
     See \code{\link{optim}} for base R optimization procedures.
-    See \code{\link[fitdistrplus:quantiles]{quantile.fitdist}}, another generic function, which calculates 
+    See \code{\link[fitdistrplus:quantile]{quantile.fitdist}}, another generic function, which calculates 
     quantiles from the fitted distribution.
     See \code{\link{quantile}} for base R quantile computation.
 }

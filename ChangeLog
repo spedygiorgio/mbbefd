@@ -1,6 +1,10 @@
+-Version 0.8.10
+Fix a warning due to a missing link in documentation 
+object 'fitDR.Rd': '[fitdistrplus:quantiles]{quantile.fitdist}'
+
 -Version 0.8.9.1
 Correct the vignette, in particular typo in Equation (10)
-Change the maintainer 
+Change the maintainer from G.A. Spedicato to C. Dutang
 remove of the knitrcitations dependency
 
 -Version 0.8.8.5

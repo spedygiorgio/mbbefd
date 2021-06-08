@@ -2,7 +2,7 @@ Package: mbbefd
 Type: Package
 Title: Maxwell Boltzmann Bose Einstein Fermi Dirac Distribution and
         Destruction Rate Modelling
-Version: 0.8.9.2
+Version: 0.8.10
 Authors@R: c(
     person("Christophe", "Dutang", role = c("aut", "cre"), email = "christophe.dutang@ensimag.fr", comment = c(ORCID = "0000-0001-6732-1501")),
     person("Giorgio", "Spedicato", role = "aut", email = "spedicato_giorgio@yahoo.it", comment = c(ORCID = "0000-0002-0315-8888")),
@@ -10,9 +10,10 @@ Authors@R: c(
 Description: Distributions that are typically used for exposure rating in
              general insurance, in particular to price reinsurance contracts.
              The vignette shows code snippets to fit the distribution to
-             empirical data. See e.g. Bernegger (1997) <doi:10.2143/AST.27.1.563208>.
+             empirical data. See, e.g., Bernegger (1997) <doi:10.2143/AST.27.1.563208>
+             freely available on-line.
 License: GPL-2
-Depends: R (>= 3.6), fitdistrplus (>= 1.0-7), alabama, Rcpp (>= 0.12.18)
+Depends: R (>= 3.6), fitdistrplus (>= 1.1-4), alabama, Rcpp (>= 0.12.18)
 ByteCompile: yes
 Suggests: testthat, pander, rmarkdown, knitr, lattice
 LinkingTo: Rcpp

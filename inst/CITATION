@@ -1,0 +1,20 @@
+citHeader("To cite fitdistrplus in publications use:")
+
+citEntry(entry = "Manual",
+  title        = "mbbefd: {Maxwell} {Boltzmann} {Bose} {Einstein} {Fermi} {Dirac} Distribution and Destruction Rate Modelling",
+  author       = "Christophe Dutang and Giorgio Spedicato",
+  year         = "2021",
+  url          = "https://cran.r-project.org/package=mbbefd",
+  note         = "R package version 0.8.10",	
+  textVersion  =
+  paste("Christophe Dutang and Giorgio Spedicato (2021).",
+        "mbbefd: Maxwell Boltzmann Bose Einstein Fermi Dirac
+  Distribution and Destruction Rate Modelling.",
+        "R package version 0.8.10",
+        "URL https://cran.r-project.org/package=mbbefd")
+)
+
+
+citFooter("Please cite both the package and R when using them for data analysis.",
+	  "See also", sQuote("citation()"),
+	  "for citing R.")

@@ -17,7 +17,8 @@
   }
   \subsection{WARNING FIX}{
     \itemize{
-      \item{Remove/update old URLs.}
+      \item{Remove/update old URLs in man page.}
+      \item{Remove URLs in README.}
     }
   }
 }

@@ -26,21 +26,11 @@ previous distributions is also provided.
 The vignette shows code snippets to fit the distribution to empirical data: \href{../doc/introduction_to_mbbefd.pdf}{Exposure rating, destruction rate models and the mbbefd package}.
 
 }
-\details{
 
-\tabular{ll}{
-Package: \tab mbbefd\cr
-Type: \tab Package\cr
-Version: \tab 0.8.9.2\cr
-License: \tab GPL-2\cr
-}
-
-
-}
 \author{
-\packageAuthor{mbbefd}
 
-Maintainer: \packageMaintainer{mbbefd}
+Christophe Dutang (maintainer), Giorgio Spedicato, Markus Gesmann
+
 }
 \references{
 Bernegger, Stefan. The Swiss Re Exposure Curves And The MBBEFD Distribution Class. ASTIN Bulletin (1997) 27:1, p99,
@@ -49,7 +39,7 @@ Bernegger, Stefan. The Swiss Re Exposure Curves And The MBBEFD Distribution Clas
 \keyword{ package }
 \seealso{
 See \code{\link{mbbefd-distr}} for the MBBEFD distribution;\cr
-see \code{\link{swissRe}}, \code{\link{exposureCurve}} for exposure curves;\cr
-see \code{\link{gbeta}}, \code{\link{stpareto}} for finite-support distributions;\cr
-see \code{\link{oidistribution}}, \code{\link{oibeta}}, \code{\link{oigbeta}}, \code{\link{oiunif}}, \code{\link{oistpareto}} for one-inflated distributions.
+\code{\link{swissRe}}, \code{\link{exposureCurve}} for exposure curves;\cr
+\code{\link{gbeta}}, \code{\link{stpareto}} for finite-support distributions;\cr
+\code{\link{oidistribution}}, \code{\link{oibeta}}, \code{\link{oigbeta}}, \code{\link{oiunif}}, \code{\link{oistpareto}} for one-inflated distributions.
 }

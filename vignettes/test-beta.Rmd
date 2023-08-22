@@ -1,11 +1,17 @@
 ---
-title: "check beta"
+title: "Some check of beta distribution"
 author: "C. Dutang and G.A. Spedicato"
 date: "18/04/2018"
-output: html_document
+output: 
+  bookdown::html_document2:
+    base_format: rmarkdown::html_vignette
+    fig_caption: yes
+    toc: true
+    number_sections: yes
 vignette: |
   %\VignetteIndexEntry{test-beta} 
   %\VignetteEngine{knitr::rmarkdown} 
+  %!\VignetteEncoding{UTF-8}
   \usepackage[utf8]{inputenc}
 ---
 

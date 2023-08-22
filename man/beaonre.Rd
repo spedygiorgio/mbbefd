@@ -27,14 +27,11 @@ data(beaonre)
 
 }
 
-\source{ 
-\url{https://lstat.kuleuven.be/Wiley/}
-}
-
 \references{ 
 Dataset used in Beirlant, Dierckx, Goegebeur and Matthys (1999),
 \emph{Tail index estimation and an exponential regression model}, 
-Extremes 2, 177-200.
+Extremes 2, 177-200,
+\doi{10.1023/A:1009975020370}.
 
 
  }

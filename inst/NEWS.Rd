@@ -18,7 +18,7 @@
   \subsection{WARNING FIX}{
     \itemize{
       \item{Remove/update old URLs in man page.}
-      \item{Remove URLs in README.}
+      \item{Remove URLs in README using badger package.}
     }
   }
 }

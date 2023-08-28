@@ -9,9 +9,7 @@ Compute the empirical total loss.
 
 }
 \usage{
-
 etl(x, na.rm=FALSE)
-
 
 }
 
@@ -29,15 +27,16 @@ that is observations that equal 1.
 \value{
 A numeric value or a vector.
 }
-\references{
-TODO
-}
 \author{
 Dutang Christophe
 }
 
 \examples{
-#TODO
+x <- c(1, 0.000495134903027804, 0.787229130724068, 0.71154311082138, 
+0.0669802789251427, 0.310872967333683, 1, 1, 1, 1, 0.162030982251957, 
+1, 1, 0.322530106394859, 1, 1, 1, 0.60805410798081, 0.660941675188664, 1)
 
+#empirical total loss (true value is 1/2)
+etl(x)
 }
 

@@ -1,5 +1,6 @@
 \name{mbbefd-distr}
 \alias{mbbefd-distr}
+\alias{mbbefd}
 \alias{dmbbefd}
 \alias{pmbbefd}
 \alias{qmbbefd}
@@ -45,7 +46,6 @@ ecmbbefd(x, a, b)
 mmbbefd(order, a, b)
 tlmbbefd(a, b)
 
-
 dMBBEFD(x, g, b, log=FALSE)
 pMBBEFD(q, g, b, lower.tail = TRUE, log.p = FALSE)
 qMBBEFD(p, g, b, lower.tail = TRUE, log.p = FALSE)
@@ -53,7 +53,6 @@ rMBBEFD(n, g, b)
 ecMBBEFD(x, g, b)
 mMBBEFD(order, g, b)
 tlMBBEFD(g, b)
-
 
 }
 
@@ -89,7 +88,9 @@ it shall be remebered that \eqn{g=\frac{1}{p_1}=\frac{a+b}{\left(a+1\right)*b}}.
 A numeric value or a vector.
 }
 \references{
-BERNEGGER, STEFAN. THE SWISS RE EXPOSURE CURVES AND THE MBBEFD DISTRIBUTION CLASS. Astin Bulletin (1997): 99.
+BERNEGGER, STEFAN (1997). 
+\emph{The Swiss Re Exposure Curves And The MBBEFD Distribution Class}, 
+ASTIN Bulletin, 27(1), pp99-111, \doi{https://doi.org/10.2143/AST.27.1.563208}.
 }
 \author{
 Giorgio Spedicato,

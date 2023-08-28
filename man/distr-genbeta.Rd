@@ -57,21 +57,26 @@ order of the raw moment.
 
 \references{
   Becker, R. A., Chambers, J. M. and Wilks, A. R. (1988)
-  \emph{The New S Language}.
-  Wadsworth & Brooks/Cole.
+  \emph{The New S Language},  Wadsworth & Brooks/Cole,
+  \doi{10.1201/9781351074988}.
 
   Abramowitz, M. and Stegun, I. A. (1972)
   \emph{Handbook of Mathematical Functions.} New York: Dover.
   Chapter 6: Gamma and Related Functions.
 
   Johnson, N. L., Kotz, S. and Balakrishnan, N. (1995)
-  \emph{Continuous Univariate Distributions}, volume 2, especially
-  chapter 25. Wiley, New York.
+  \emph{Continuous Univariate Distributions}, Volume 2, especially
+  Chapter 25. Wiley, New York, \doi{10.1080/00224065.1996.11979675}.
 }
 \seealso{
   \link{Distributions} for other standard distributions.
 }
 \examples{
-#TODO
+
+#density
+curve(dgbeta(x, 3, 2, 3))
+
+#cdf
+curve(pgbeta(x, 3, 2, 3))
 }
 \keyword{distribution}

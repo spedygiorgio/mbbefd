@@ -1,12 +1,11 @@
 importFrom("utils", packageDescription)
-#exportPattern("^[[:alpha:]]+")
 
 #for graphics
 importFrom("graphics", abline, plot, points,image, legend, lines, pairs)
 importFrom("grDevices", colorRampPalette)
 importFrom("stats", pgamma)
 
-#user version of the MBBEFD distribution
+#user-friendly version of the MBBEFD distribution
 export(dmbbefd, pmbbefd, qmbbefd, rmbbefd, ecmbbefd, mmbbefd, tlmbbefd)
 export(dMBBEFD, pMBBEFD, qMBBEFD, rMBBEFD, ecMBBEFD, mMBBEFD, tlMBBEFD)
 
@@ -15,7 +14,7 @@ export(dmbbefd1, dmbbefd2, dMBBEFD1, dMBBEFD2, dgbeta1)
 
 export(g2a) #backward compatibility
 
-#C++ version of the MBBEFD distribution (not exported)
+#C++ version of the MBBEFD distribution (not exported - debug only)
 #export(mbbefdExposure, rmbbefdC, qmbbefdC, dmbbefd2, pmbbefd2, dG) #deprecated functions
 #export(rmbbefdCpp, rMBBEFDCpp)
 
@@ -32,7 +31,7 @@ importFrom("stats", dbeta, dunif, integrate,
            pbeta, punif, qbeta, qunif, rbeta, 
            rbinom, runif, constrOptim, cov2cor, median, optim,
               optimize, quantile, var)
-importFrom("actuar", munif, levunif, mbeta, levbeta) #d,p,q,r in base R
+importFrom("actuar", munif, levunif, mbeta, levbeta) #d,p,q,r functions in base R
 export(ecunif)
 export(ecbeta)
 importFrom("gsl", dilog) #dilogarithm function used variance
@@ -68,9 +67,6 @@ export(bootDR) #bootDR class inheriting from bootdist class
 
 #temporary 
 importFrom("MASS", kde2d)
-
-#data
-#export(aon,asiacomrisk,)
 
 importFrom("Rcpp", sourceCpp)
 useDynLib(mbbefd, .registration=TRUE)

@@ -52,15 +52,14 @@ logical; if \code{TRUE} (default), probabilities are \eqn{P[X <= x]}, otherwise,
 
 }
 \details{
-TODO!
+The distribution is based on the Pareto 2 truncated at 1. The distribution function is given
+by \eqn{P(X<=x) = (1-(x+1)^(-a))/(1-2^(-a)).}
 
 }
 \value{
 A numeric value or a vector.
 }
-\references{
-TODO
-}
+
 \author{
 Dutang Christophe
 }
@@ -69,9 +68,10 @@ Dutang Christophe
 }
 \examples{
 
-dstpareto(0:4/4, 2)
+#density
+curve(dstpareto(x, 3))
 
-pstpareto(0:4/4, 1/2)
-
+#cdf
+curve(pstpareto(x, 3))
 }
 \keyword{distribution}

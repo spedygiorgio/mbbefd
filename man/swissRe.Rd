@@ -21,7 +21,9 @@ The four Swiss Re Y1-Y4 are defined for c=1.5, 2, 3, 4. In addition c=5 coincide
 A named two dimensional vector
 }
 \references{
-BERNEGGER, STEFAN. THE SWISS RE EXPOSURE CURVES AND THE MBBEFD DISTRIBUTION CLASS. Astin Bulletin (1997): 99.
+BERNEGGER, STEFAN (1997). 
+\emph{The Swiss Re Exposure Curves And The MBBEFD Distribution Class}, 
+ASTIN Bulletin, 27(1), pp99-111, \doi{https://doi.org/10.2143/AST.27.1.563208}.
 }
 \author{
 Giorgio Spedicato

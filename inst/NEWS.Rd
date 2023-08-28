@@ -8,11 +8,14 @@
       \item{Merge ChangeLog and NEWS files.}
       \item{Now use Rd format for NEWS file.}
       \item{Now use HTML2 for the vignette 'test-beta'.}
+      \item{Add DOIs for some references.}
+      \item{Clean-up NAMESPACE file.}
     }
   }
   \subsection{TYPO}{
     \itemize{
       \item{Remove package version in the overall man page.}
+      \item{Remove TODOs in man pages.}
     }
   }
   \subsection{WARNING FIX}{

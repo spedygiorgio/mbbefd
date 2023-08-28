@@ -1,6 +1,5 @@
 \name{mbbefd-package}
 \alias{mbbefd-package}
-\alias{mbbefd}
 \docType{package}
 \title{
 \packageTitle{mbbefd}
@@ -33,8 +32,9 @@ Christophe Dutang (maintainer), Giorgio Spedicato, Markus Gesmann
 
 }
 \references{
-Bernegger, Stefan. The Swiss Re Exposure Curves And The MBBEFD Distribution Class. ASTIN Bulletin (1997) 27:1, p99,
-\doi{10.2143/AST.27.1.563208}.
+BERNEGGER, STEFAN (1997). 
+\emph{The Swiss Re Exposure Curves And The MBBEFD Distribution Class}, 
+ASTIN Bulletin, 27(1), pp99-111, \doi{https://doi.org/10.2143/AST.27.1.563208}.
 }
 \keyword{ package }
 \seealso{

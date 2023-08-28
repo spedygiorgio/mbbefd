@@ -70,6 +70,11 @@ Dutang Christophe
 \code{\link{mbbefd-distr}} and \code{\link{oidistribution}}.
 }
 \examples{
-#TODO
+
+#density
+curve(doigbeta(x, 3, 2, 3, 1/3), n=200)
+
+#cdf
+curve(poigbeta(x, 3, 2, 3, 1/3), n=200)
 }
 \keyword{distribution}

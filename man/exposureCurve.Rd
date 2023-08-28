@@ -34,10 +34,12 @@ parameters for the uniform distribution.
 A numeric value
 }
 \references{
-BERNEGGER, STEFAN. THE SWISS RE EXPOSURE CURVES AND THE MBBEFD DISTRIBUTION CLASS. Astin Bulletin (1997): 99.
+BERNEGGER, STEFAN (1997). 
+\emph{The Swiss Re Exposure Curves And The MBBEFD Distribution Class}, 
+ASTIN Bulletin, 27(1), pp99-111, \doi{https://doi.org/10.2143/AST.27.1.563208}.
 }
 \author{
-Giorgio Spedicato
+Giorgio Spedicato, 
 Christophe Dutang
 }
 \seealso{

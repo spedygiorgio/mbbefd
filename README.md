@@ -19,6 +19,14 @@ install.packages('mbbefd')
 devtools::install_github('spedygiorgio/mbbefd')
 ```
 
+## Documentation
+
+Please find helps in the vignette and 
+```
+library(mbbefd)
+help("mbbefd-package")
+```
+
 ## Citation
 
 If you use `mbbefd`, you should cite: <br />

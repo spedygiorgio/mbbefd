@@ -29,12 +29,12 @@ fitDR(x, dist, method="mle", start=NULL, optim.method="default", \dots)
     or a function of data computing initial values and returning a named list.
     This argument may be omitted (default) for some distributions for which reasonable 
     starting values are computed (see the 'details' section of  
-    \code{\link[fitdistrplus:fitdist]{mledist}}).}
+    \code{\link[fitdistrplus]{mledist}}).}
 \item{optim.method}{\code{"default"} or an optimization method to pass to \code{\link{optim}}.}
 
 \item{\dots}{Further arguments to be passed to \code{"fitdist"}
     when \code{method != "tlmme"}.
-    See \code{\link[fitdistrplus:fitdist]{fitdist}} for details on parameter estimation.}
+    See \code{\link[fitdistrplus]{fitdist}} for details on parameter estimation.}
 }
 
 \details{
@@ -47,8 +47,8 @@ fitDR(x, dist, method="mle", start=NULL, optim.method="default", \dots)
 \describe{
     \item{When \code{method="mle"}}{
     Maximum likelihood estimation consists in maximizing the log-likelihood.
-    A numerical optimization is carried out in \code{\link{mledist}} via \code{optim}
-    to find the best values (see \code{\link{mledist}} for details).
+    A numerical optimization is carried out in \code{\link[fitdistrplus]{mledist}} via \code{optim}
+    to find the best values (see \code{\link[fitdistrplus]{mledist}} for details).
     For one-inflated distributions, the probability parameter is estimated
     by a closed-form formula and other parameters use a two-optimization procedures.
     }
@@ -57,7 +57,7 @@ fitDR(x, dist, method="mle", start=NULL, optim.method="default", \dots)
     total loss as well as theoretical and empirical moments.
     The theoretical and the empirical moments are matched numerically, 
     by minimization of the sum of squared differences between observed and theoretical 
-    quantities (see \code{\link{mmedist}} for details).
+    quantities (see \code{\link[fitdistrplus]{mmedist}} for details).
     }
     
 }
@@ -70,7 +70,7 @@ fitDR(x, dist, method="mle", start=NULL, optim.method="default", \dots)
     one parameter. Note that when errors are raised by \code{optim}, it's a good 
     idea to start by adding traces during the optimization process by adding 
     \code{control=list(trace=1, REPORT=1)}.
-    For the MBBEFD distribution, \code{\link{constrOptim.nl}} is used.
+    For the MBBEFD distribution, \code{\link[alabama]{constrOptim.nl}} is used.
     
     A pre-fitting process is carried out for the following distributions
     \code{"mbbefd"}, \code{"MBBEFD"} and \code{"oigbeta"} before
@@ -107,11 +107,11 @@ fitDR(x, dist, method="mle", start=NULL, optim.method="default", \dots)
         if there are no such parameters. }
     \item{fix.arg.fun}{the function used to set the value of \code{fix.arg} or \code{NULL}.}    
     \item{discrete}{ the input argument or the automatic definition by the function to be passed
-        to functions \code{\link{gofstat}}, \code{\link{plotdist}} 
-        and \code{\link{cdfcomp}}. }
-    \item{dots}{ the list of  further arguments passed in \dots to be used in \code{\link{bootdist}} 
-        in iterative calls to \code{\link{mledist}}, \code{\link{mmedist}},
-        \code{\link{qmedist}}, \code{\link{mgedist}} or 
+        to functions \code{\link[fitdistrplus]{gofstat}}, \code{\link[fitdistrplus]{plotdist}} 
+        and \code{\link[fitdistrplus]{cdfcomp}}. }
+    \item{dots}{ the list of  further arguments passed in \dots to be used in \code{\link[fitdistrplus]{bootdist}} 
+        in iterative calls to \code{\link[fitdistrplus]{mledist}}, \code{\link[fitdistrplus]{mmedist}},
+        \code{\link[fitdistrplus]{qmedist}}, \code{\link[fitdistrplus]{mgedist}} or 
         \code{NULL} if no such arguments.}
     \item{weights}{the vector of weigths used in the estimation process or \code{NULL}.}    
 
@@ -128,12 +128,12 @@ fitDR(x, dist, method="mle", start=NULL, optim.method="default", \dots)
     }
     \item{\code{plot}}{
     The plot of an object of class "fitDR" returned by \code{fitdist} uses the function 
-    \code{\link{plotdist}}. An object of class "fitdist" or a list of objects of class
+    \code{\link[fitdistrplus]{plotdist}}. An object of class "fitdist" or a list of objects of class
     "fitDR" corresponding to various fits using the same data set may also be plotted
-    using a cdf plot (function \code{\link{cdfcomp}}),
-    a density plot(function \code{\link{denscomp}}),
-    a density Q-Q plot (function \code{\link{qqcomp}}),
-    or a P-P plot (function \code{\link{ppcomp}}).
+    using a cdf plot (function \code{\link[fitdistrplus]{cdfcomp}}),
+    a density plot(function \code{\link[fitdistrplus]{denscomp}}),
+    a density Q-Q plot (function \code{\link[fitdistrplus]{qqcomp}}),
+    or a P-P plot (function \code{\link[fitdistrplus]{ppcomp}}).
     }
     \item{\code{logLik}}{ Extracts the estimated log-likelihood from the \code{"fitDR"} object.
     }

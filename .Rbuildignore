@@ -7,5 +7,3 @@ vignettes/figure/
 vignettes/*\.tex
 vignettes/*\.md
 vignettes/test-beta.Rmd
-AUTHORS
-LICENCE

@@ -8,8 +8,16 @@ set.seed(123456)
 x <- rMBBEFD(n, 8, 1/4)
 
 system.time(f1 <- fitDR(x, "MBBEFD"))
-
 summary(f1)
+
+#should be similar
+f0 <- fitdist(x, "MBBEFD", start= list(g=4, b=1/2))
+summary(f0)
+
+fitDR(x, "MBBEFD")
+mledist(x, "MBBEFD", start= list(g=4, b=1/2))$hessian
+
+
 cdfcomp(f1, do.points=FALSE)
 qqcomp(f1)
 

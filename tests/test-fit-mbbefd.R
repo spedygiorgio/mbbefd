@@ -7,11 +7,18 @@ nboot <- 10
 set.seed(123456)
 lossrate <- rmbbefd(n, 1/2, 1/10)
 
-f1 <- fitDR(lossrate, "mbbefd")
 
+f1 <- fitDR(lossrate, "mbbefd")
 summary(f1)
+
+#should be similar
+f0 <- fitdist(lossrate, "mbbefd", start= list(a=1/4, b=1/4))
+summary(f0)
+
+
 cdfcomp(f1, do.points=FALSE)
 qqcomp(f1)
+vcov(f1)
 
 
 # llsurface(plot.min=c(0, 0), plot.max=c(2, 1/2), plot.arg=c("a", "b"), obs=lossrate, distr="mbbefd", nlevels=25)

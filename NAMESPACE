@@ -3,7 +3,6 @@ importFrom("utils", packageDescription)
 #for graphics
 importFrom("graphics", abline, plot, points,image, legend, lines, pairs)
 importFrom("grDevices", colorRampPalette)
-importFrom("stats", pgamma)
 
 #user-friendly version of the MBBEFD distribution
 export(dmbbefd, pmbbefd, qmbbefd, rmbbefd, ecmbbefd, mmbbefd, tlmbbefd)
@@ -27,10 +26,11 @@ export(swissRe)
 
 
 #finite-support distributions 
-importFrom("stats", dbeta, dunif, integrate, 
-           pbeta, punif, qbeta, qunif, rbeta, 
-           rbinom, runif, constrOptim, cov2cor, median, optim,
-              optimize, quantile, var)
+importFrom("stats", dbeta, pbeta, qbeta, rbeta, 
+           dunif, punif, qunif, runif, 
+           rbinom, pgamma, 
+           optim, optimHess, constrOptim, integrate, optimize, 
+           cov2cor, median, quantile, var)
 importFrom("actuar", munif, levunif, mbeta, levbeta) #d,p,q,r functions in base R
 export(ecunif)
 export(ecbeta)
@@ -60,7 +60,7 @@ S3method(lines, eecf)
 export(eccomp)
 
 #fitting methods
-importFrom("fitdistrplus", fitdist, mledist)
+importFrom("fitdistrplus", fitdist, mledist, mmedist)
 importFrom("alabama", constrOptim.nl) #only for MBBEFD
 export(fitDR) #fitDR class inheriting from fitdist class
 export(bootDR) #bootDR class inheriting from bootdist class

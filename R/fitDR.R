@@ -170,7 +170,6 @@ fitDR <- function(x, dist, method="mle", start=NULL, optim.method="default", ...
         fHess <- try(optimHess(par=f1$estimate, fn=minusLL, obs=x, gr=grLL), silent=FALSE)
         if(inherits(fHess, "try-error"))
           fHess <- NULL
-        print(fHess)
       }
       f1 <- fitDR.addcomp(x=x, theta=f1$estimate, hessian=fHess, vcov=NULL,
                           dist="MBBEFD", method="mle", convergence=f1$convergence)
@@ -209,9 +208,6 @@ fitDR <- function(x, dist, method="mle", start=NULL, optim.method="default", ...
   {
     if(is.null(start))
       start <- list(p1=etl(x))
-    
-    #print(LLfunc(x, start$p1, dist))
-    
     if(method %in% c("mle", "tlmme"))
     {
       if(method == "tlmme")
@@ -280,9 +276,6 @@ fitDR <- function(x, dist, method="mle", start=NULL, optim.method="default", ...
         
         prefit <- prefitDR.mle(xneq1, "oigbeta")
         
-        #f0 <- mledist(xneq1, dist="gbeta2", optim.method="BFGS", 
-        #              control=list(trace=0, REPORT=1, maxit=100), start=lapply(start, log))
-        #print(unlist(start))
         if(all(!is.na(prefit)))
           start <- as.list(prefit)
         #print(unlist(start))

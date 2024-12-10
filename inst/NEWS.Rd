@@ -5,14 +5,18 @@
 \section{CHANGES IN \pkg{mbbefd} VERSION 0.8.13}{
   \subsection{NEW}{
     \itemize{
-      \item{.}
+      \item{Rewrite entirely the internal function \code{fitDR.addcomp()} 
+      to correctly compute asymptotic covariance matrix.}
+      \item{In \code{fitDR()}, the covariance matrix is now computed for 
+      MBBEFD (2nd parametrization) and is correctly computer for other distributions.}
+      \item{Remove some tests from the targz build.}
     }
   }
 }
 \section{CHANGES IN \pkg{mbbefd} VERSION 0.8.12}{
   \subsection{NOTE FIX}{
     \itemize{
-      \item{remove missing links.}
+      \item{Remove missing links.}
     }
   }
 }

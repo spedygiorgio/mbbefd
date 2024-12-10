@@ -9,3 +9,5 @@ vignettes/*\.md
 vignettes/test-beta.Rmd
 AUTHORS
 LICENCE
+tests/check-formula*.R
+tests/test-mbbefd-*.R

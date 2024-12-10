@@ -30,6 +30,6 @@ help("mbbefd-package")
 ## Citation
 
 If you use `mbbefd`, you should cite: <br />
-Christophe Dutang, Giorgio Spedicato (2023). 
+Christophe Dutang, Giorgio Spedicato (2024). 
 *mbbefd: Maxwell Boltzmann Bose Einstein Fermi Dirac Distribution and Destruction Rate Modelling.*
 R package.

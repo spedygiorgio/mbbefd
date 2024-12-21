@@ -8,8 +8,9 @@
       \item{Rewrite entirely the internal function \code{fitDR.addcomp()} 
       to correctly compute asymptotic covariance matrix.}
       \item{In \code{fitDR()}, the covariance matrix is now computed for 
-      MBBEFD (2nd parametrization) and is correctly computer for other distributions.}
+      MBBEFD (2nd parametrization) and is correctly computed for other distributions.}
       \item{Remove some tests from the targz build.}
+      \item{Cleanup \code{NEWS} file.}
     }
   }
 }
@@ -23,11 +24,11 @@
 \section{CHANGES IN \pkg{mbbefd} VERSION 0.8.11}{
   \subsection{NEW}{
     \itemize{
-      \item{Merge ChangeLog and NEWS files.}
-      \item{Now use Rd format for NEWS file.}
+      \item{Merge \code{ChangeLog} and \code{NEWS} files.}
+      \item{Now use Rd format for \code{NEWS} file.}
       \item{Now use HTML2 for the vignette 'test-beta'.}
       \item{Add DOIs for some references.}
-      \item{Clean-up NAMESPACE file.}
+      \item{Clean-up \code{NAMESPACE} file.}
     }
   }
   \subsection{TYPO}{
@@ -39,7 +40,7 @@
   \subsection{WARNING FIX}{
     \itemize{
       \item{Remove/update old URLs in man page.}
-      \item{Remove URLs in README using badger package.}
+      \item{Remove URLs in \code{README} using badger package.}
     }
   }
 }
@@ -47,7 +48,8 @@
 \section{CHANGES IN \pkg{mbbefd} VERSION 0.8.10}{
   \subsection{WARNING FIX}{
     \itemize{
-      \item{Fix a warning due to a missing link in documentation object from 'fitDR.Rd': to fitdistrplus.quantile.}
+      \item{Fix a warning due to a missing link in documentation object from \code{fitDR.Rd}: 
+      to \code{fitdistrplus.quantile()}.}
     }
   }
 }
@@ -82,9 +84,9 @@
 \section{CHANGES IN \pkg{mbbefd} VERSION 0.8-8.4}{
   \subsection{NEW}{
     \itemize{
-      \item{Bumped requirement of Rcpp and R.}
-      \item{Added support for the unwind api of Rcpp \url{https://www.r-bloggers.com/2018/07/boost-the-speed-of-r-calls-from-rcpp/}.}
-      \item{Update automatic naming of legend in eccomp() (similar update for fitdistrplus).}
+      \item{Bumped requirement of \code{Rcpp} and \code{R}.}
+      \item{Added support for the unwind api of \code{Rcpp} \url{https://www.r-bloggers.com/2018/07/boost-the-speed-of-r-calls-from-rcpp/}.}
+      \item{Update automatic naming of legend in \code{eccomp()} (similar update for fitdistrplus).}
       \item{Add a lines method for eecf object and update the man page.}
     }
   }
@@ -145,7 +147,7 @@
 \section{CHANGES IN \pkg{mbbefd} VERSION 0.8-6}{
   \subsection{BUG FIX}{
     \itemize{
-      \item{fix in fitDR() and doi(g)beta().}
+      \item{fix in \code{fitDR()} and \code{doi(g)beta()}.}
       \item{Add corresponding test on smokedfish dataset.}
     }
   }
@@ -196,7 +198,8 @@
 \section{CHANGES IN \pkg{mbbefd} VERSION 0.6.1}{
   \subsection{NEW}{
     \itemize{
-      \item{Harmonize distribution parameters' to R usual ones: pmbbefd accepts  (q, a, b, g) and no longer (x, a, b, g).}
+      \item{Harmonize distribution parameters' to R usual ones: \code{pmbbefd()} 
+      accepts  (q, a, b, g) and no longer (x, a, b, g).}
       \item{Improved vignettes.}
     }
   }

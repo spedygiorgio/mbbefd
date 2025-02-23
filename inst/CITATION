@@ -1,6 +1,6 @@
 citHeader("To cite fitdistrplus in publications use:")
 
-year <- sub("-.*", "", meta$Date)
+year <- 2024
 note <- sprintf("R package version %s", meta$Version)
 
 bibentry(bibtype = "Manual",

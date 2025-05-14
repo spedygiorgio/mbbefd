@@ -17,7 +17,7 @@ Depends: R (>= 3.6), fitdistrplus (>= 1.1-4), alabama, Rcpp (>= 0.12.18)
 ByteCompile: yes
 Suggests: testthat, pander, rmarkdown, knitr, lattice
 LinkingTo: Rcpp
-Imports: utils, actuar, gsl, MASS
+Imports: utils, actuar, MASS
 URL: https://github.com/spedygiorgio/mbbefd
 BugReports: https://github.com/spedygiorgio/mbbefd/issues
 VignetteBuilder: knitr

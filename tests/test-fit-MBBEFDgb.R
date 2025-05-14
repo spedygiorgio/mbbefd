@@ -14,10 +14,6 @@ summary(f1)
 f0 <- fitdist(x, "MBBEFD", start= list(g=4, b=1/2))
 summary(f0)
 
-fitDR(x, "MBBEFD")
-mledist(x, "MBBEFD", start= list(g=4, b=1/2))$hessian
-
-
 cdfcomp(f1, do.points=FALSE)
 qqcomp(f1)
 
@@ -36,7 +32,7 @@ set.seed(123456)
 x <- rMBBEFD(n, 2, 1/4)
 
 system.time(f1 <- fitDR(x, "MBBEFD"))
-
+summary(f1)
 
 b1 <- bootDR(f1, niter=nboot, silent=TRUE)
 plot(b1, enhance=TRUE, trueval=c(2, 1/4))

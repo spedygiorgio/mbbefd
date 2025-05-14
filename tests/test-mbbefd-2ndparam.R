@@ -1,87 +1,195 @@
 library(mbbefd)
 
-#test of MBBEFD(a,b) distribution
+#test of MBBEFD(g,b) distribution
 n <- 1e4
-
 set.seed(567)
-x <- rMBBEFD(n, 2, 1/5)
-y <- rMBBEFD(n, 3, 2)
-x3 <- rMBBEFD(n, 3, 1)
-x4 <- rMBBEFD(n, 3, 1/3)
-x5 <- rMBBEFD(n, 3, 0)
 
-#test CDF
-z <- 0:8/8
-cbind(ecdf(x)(z), round(pMBBEFD(z, 2, 1/5), 6))
+#### D0 ####
 
-cbind(ecdf(y)(z), round(pMBBEFD(z, 3, 2), 6))
+g <- 2 ; b <- 3
+obs <- rMBBEFD(n, g, b)
 
-#test EC
-cbind(eecf(x)(z), round(ecMBBEFD(z, 2, 1/5), 6))
+c(tlMBBEFD(g, b), mean(obs==1))
 
-cbind(eecf(y)(z), round(ecMBBEFD(z, 3, 2), 6))
-
-#test mean
-c(mean(x), mMBBEFD(1, 2, 1/5))
-
-c(mean(y), mMBBEFD(1, 3, 2))
-
-c(mean(x3), mMBBEFD(1, 3, 1))
-c(mean(x4), mMBBEFD(1, 3, 1/3))
-c(mean(x5), mMBBEFD(1, 3, 0))
-
-#test E(X^2)
-c(mean(x^2), mMBBEFD(2, 2, 1/5))
-
-c(mean(y^2), mMBBEFD(2, 3, 2))
-
-c(mean(x3^2), mMBBEFD(2, 3, 1))
-c(mean(x4^2), mMBBEFD(2, 3, 1/3))
-c(mean(x5^2), mMBBEFD(2, 3, 0))
-
-#total loss
-etl(x)
-tlMBBEFD(2, 1/2)
-
-
-etl(y)
-tlMBBEFD(3, 2)
-
-
-#test quantile
-cbind(quantile(x, probs=0:10/10), round(qMBBEFD(0:10/10, 2, 1/5), 6))
-cbind(quantile(y, probs=0:10/10), round(qMBBEFD(0:10/10, 3, 2), 6))
-
-
-z <- seq(0, 1, length=101)
-plot(z, pMBBEFD(z, 3, 2), type="l", ylim=c(0, 1-tlMBBEFD(3, 2)))
-
-plot(z, qMBBEFD(z, 3, 2), type="l", xlim=c(0, 1-tlMBBEFD(3, 2)))
-
-
-
-#test density
-
-integrate(dMBBEFD, 0, 1, g=2, b=1/5)
-pMBBEFD(1-1e-6, 2, 1/5)
-
-
-integrate(dMBBEFD, 0, 1, g=3, b=2)
-pMBBEFD(1-1e-6, 3, 2)
-
-
-z <- 0:8/8
-
-d <- function(z) approxfun(density(x)$x, density(x)$y)(z)
-cbind(d(z), dMBBEFD(z, 2, 1/5))
-
-d <- function(z) approxfun(density(y)$x, density(y)$y)(z)
-cbind(d(z), dMBBEFD(z, 3, 2))
+plot(ecdf(obs))
+curve(pMBBEFD(x, g, b), add=TRUE, col="blue")
 
 z <- sort(c(1, seq(-0.1,1.1, length=101)))
-plot(density(x), ylim=c(0,1))
-lines(z, dMBBEFD(z, 2, 1/5), col="red")
+plot(density(obs))
+lines(z, dMBBEFD(z, g, b), col="blue")
+
+curve(quantile(obs, prob=x))
+curve(qMBBEFD(x, g, b), add=TRUE, col="blue")
+
+plot(eecf(obs), do.points = FALSE)
+curve(ecMBBEFD(x, g, b), add=TRUE, col="blue")
+
+k <- 1:10
+cbind(k, mMBBEFD(k, g, b), sapply(k, function(k) mean(obs^k)))
 
 
-plot(density(y), ylim=c(0,3))
-lines(z, dMBBEFD(z, 3, 2), col="red")
+
+#### D1 ####
+
+g <- 2 ; b <- 1/3
+obs <- rMBBEFD(n, g, b)
+
+c(tlMBBEFD(g, b), mean(obs==1))
+
+plot(ecdf(obs))
+curve(pMBBEFD(x, g, b), add=TRUE, col="blue")
+
+z <- sort(c(1, seq(-0.1,1.1, length=101)))
+plot(density(obs))
+lines(z, dMBBEFD(z, g, b), col="blue")
+
+curve(quantile(obs, prob=x))
+curve(qMBBEFD(x, g, b), add=TRUE, col="blue")
+
+plot(eecf(obs), do.points = FALSE)
+curve(ecMBBEFD(x, g, b), add=TRUE, col="blue")
+
+k <- 1:10
+cbind(k, mMBBEFD(k, g, b), sapply(k, function(k) mean(obs^k)))
+
+
+#### D2 ####
+
+g <- 2 ; b <- 0
+obs <- rMBBEFD(n, g, b)
+
+c(tlMBBEFD(g, b), mean(obs==1))
+
+plot(ecdf(obs))
+curve(pMBBEFD(x, g, b), add=TRUE, col="blue")
+
+z <- sort(c(1, seq(-0.1,1.1, length=101)))
+plot(density(obs))
+lines(z, dMBBEFD(z, g, b), col="blue")
+
+curve(quantile(obs, prob=x))
+curve(qMBBEFD(x, g, b), add=TRUE, col="blue")
+
+plot(eecf(obs), do.points = FALSE)
+curve(ecMBBEFD(x, g, b), add=TRUE, col="blue")
+
+k <- 1:10
+cbind(k, mMBBEFD(k, g, b), sapply(k, function(k) mean(obs^k)))
+
+
+#### D3 ####
+
+g <- 2 ; b <- 1
+obs <- mbbefd:::rMBBEFDR(n, g, b)
+obs <- rMBBEFD(n, g, b)
+
+c(tlMBBEFD(g, b), mean(obs==1))
+
+plot(ecdf(obs))
+curve(pMBBEFD(x, g, b), add=TRUE, col="blue")
+
+z <- sort(c(1, seq(-0.1,1.1, length=101)))
+plot(density(obs))
+lines(z, dMBBEFD(z, g, b), col="blue")
+
+curve(quantile(obs, prob=x))
+curve(qMBBEFD(x, g, b), add=TRUE, col="blue")
+
+plot(eecf(obs), do.points = FALSE)
+curve(ecMBBEFD(x, g, b), add=TRUE, col="blue")
+
+k <- 1:10
+cbind(k, mMBBEFD(k, g, b), sapply(k, function(k) mean(obs^k)))
+
+
+#### D4 ####
+
+g <- 2 ; b <- Inf
+obs <- mbbefd:::rMBBEFDR(n, g, b)
+
+c(tlMBBEFD(g, b), mean(obs==1))
+
+plot(ecdf(obs))
+curve(pMBBEFD(x, g, b), add=TRUE, col="blue")
+
+z <- sort(c(1, seq(-0.1,1.1, length=101)))
+plot(density(obs))
+lines(z, dMBBEFD(z, g, b), col="blue")
+
+curve(quantile(obs, prob=x))
+curve(qMBBEFD(x, g, b), add=TRUE, col="blue")
+
+plot(eecf(obs), do.points = FALSE)
+curve(ecMBBEFD(x, g, b), add=TRUE, col="blue")
+
+k <- 1:10
+cbind(k, mMBBEFD(k, g, b), sapply(k, function(k) mean(obs^k)))
+
+#### D5 ####
+
+g <- Inf ; b <- 1/2
+obs <- mbbefd:::rMBBEFDR(n, g, b)
+
+c(tlMBBEFD(g, b), mean(obs==1))
+
+plot(ecdf(obs))
+curve(pMBBEFD(x, g, b), add=TRUE, col="blue")
+
+z <- sort(c(1, seq(-0.1,1.1, length=101)))
+plot(density(obs))
+lines(z, dMBBEFD(z, g, b), col="blue")
+
+curve(quantile(obs, prob=x))
+curve(qMBBEFD(x, g, b), add=TRUE, col="blue")
+
+plot(eecf(obs), do.points = FALSE)
+curve(ecMBBEFD(x, g, b), add=TRUE, col="blue")
+
+k <- 1:10
+cbind(k, mMBBEFD(k, g, b), sapply(k, function(k) mean(obs^k)))
+
+#### D6 ####
+
+g <- 1 ; b <- 1/2
+obs <- mbbefd:::rMBBEFDR(n, g, b)
+
+c(tlMBBEFD(g, b), mean(obs==1))
+
+plot(ecdf(obs))
+curve(pMBBEFD(x, g, b), add=TRUE, col="blue")
+
+z <- sort(c(1, seq(-0.1,1.1, length=101)))
+plot(density(obs))
+lines(z, dMBBEFD(z, g, b), col="blue")
+
+curve(quantile(obs, prob=x))
+curve(qMBBEFD(x, g, b), add=TRUE, col="blue")
+
+plot(eecf(obs), do.points = FALSE)
+curve(ecMBBEFD(x, g, b), add=TRUE, col="blue")
+
+k <- 1:10
+cbind(k, mMBBEFD(k, g, b), sapply(k, function(k) mean(obs^k)))
+
+#### D7 ####
+
+g <- 2 ; b <- 1/2
+obs <- mbbefd:::rMBBEFDR(n, g, b)
+
+c(tlMBBEFD(g, b), mean(obs==1))
+
+plot(ecdf(obs))
+curve(pMBBEFD(x, g, b), add=TRUE, col="blue")
+
+z <- sort(c(1, seq(-0.1,1.1, length=101)))
+plot(density(obs))
+lines(z, dMBBEFD(z, g, b), col="blue")
+
+curve(quantile(obs, prob=x))
+curve(qMBBEFD(x, g, b), add=TRUE, col="blue")
+
+plot(eecf(obs), do.points = FALSE)
+curve(ecMBBEFD(x, g, b), add=TRUE, col="blue")
+
+k <- 1:10
+cbind(k, mMBBEFD(k, g, b), sapply(k, function(k) mean(obs^k)))

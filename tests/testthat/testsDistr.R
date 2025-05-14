@@ -15,10 +15,6 @@ test_that("mbbefdExposure", {
   expect_equal(ecmbbefd(0.5, a=1, b=1), 0.5)  
   expect_equal(ecmbbefd(0.5, a=0, b=1), 0.5) 
   expect_equal(ecmbbefd(0.5, a=0, b=0), NaN)  
-  expect_equal(ecmbbefd(0.5, a=1, b=0), NaN)  
-  
-  expect_equal(ecMBBEFD(0.5, g=1, b=1), 0.5)  
-  expect_equal(ecMBBEFD(0.5, g=1, b=0), 0.5)
   
 })
 

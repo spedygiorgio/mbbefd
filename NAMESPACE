@@ -34,7 +34,7 @@ importFrom("stats", dbeta, pbeta, qbeta, rbeta,
 importFrom("actuar", munif, levunif, mbeta, levbeta) #d,p,q,r functions in base R
 export(ecunif)
 export(ecbeta)
-importFrom("gsl", dilog) #dilogarithm function used variance
+#importFrom("gsl", dilog) #dilogarithm function used variance
 export(dstpareto, pstpareto, qstpareto, rstpareto, ecstpareto, mstpareto)
 export(dgbeta, pgbeta, qgbeta, rgbeta, ecgbeta, mgbeta)
 

@@ -22,7 +22,8 @@ and the generalized beta distributions.
 Due to the presence of a total loss, a one-inflated version of the
 previous distributions is also provided.
 
-The vignette shows code snippets to fit the distribution to empirical data: \href{../doc/introduction_to_mbbefd.pdf}{Exposure rating, destruction rate models and the mbbefd package}.
+The vignette shows code snippets to fit the distribution to empirical data: 
+\href{../doc/Introduction.pdf}{Exposure rating, destruction rate models and the mbbefd package}.
 
 }
 

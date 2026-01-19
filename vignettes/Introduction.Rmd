@@ -71,7 +71,7 @@ $$
 The following chart shows the corresponding probability density curve 
 $f(x)$, cumulative distribution function $F(x)$ and survival function $S(x)=1-F(x)$. 
 
-```{r cdfsurv, fig.height=2.5, fig.width=6, echo=FALSE, warning=FALSE, fig.align="center"}
+```{r cdfsurv, fig.height=2.5, fig.width=6, echo=FALSE, warning=FALSE, fig.align="center", fig.cap="PDF, CDF and SF of a lognormal distribution"}
 n <- 100
 Loss <- seq(1, 150, length=n)
 mu <- 4.13
@@ -140,7 +140,7 @@ or the area under the survival function up to $\alpha$. In the example
 below the limit $\alpha$ was set to 100.
 
 
-```{r LEV, fig.height=2.5, fig.width=5, echo=FALSE, fig.align="center"}
+```{r LEV, fig.height=2.5, fig.width=5, echo=FALSE, fig.align="center", fig.cap="limited expected value"}
 alpha <- 100
 fxy <- function(x,y,...){
          x1 <- as.numeric(x[x<=alpha])
@@ -173,7 +173,7 @@ xyplot(Value ~ Loss | Type,
 Suppose we want to insure the layer of claims between 80 and 100.
 
 
-```{r LEV2, fig.height=2.5, fig.width=5, echo=FALSE, fig.align="center"}
+```{r LEV2, fig.height=2.5, fig.width=5, echo=FALSE, fig.align="center", fig.cap="Loss Cost of a Layer"}
 alpha1 <- 80
 alpha2 <- 100
 xyplot(Value ~ Loss | Type, 
@@ -284,9 +284,9 @@ $$
 G(d) = \frac{E[X \wedge d]}{E[X]}.
 $$
 
-For our example, using a log-normal distribution and a MPL of 200 we get:
+For our example, using a log-normal distribution and a MPL of 200 we get
 
-```{r ExposureCurve, dev.args=list(pointsize=8), fig.height=3, fig.width=3, fig.align="center"}
+```{r ExposureCurve, dev.args=list(pointsize=8), fig.height=3, fig.width=3, fig.align="center", fig.cap="Exposure curve"}
 MPL <- 200
 ExpectedLoss <- 65
 Deductible <- seq(0, MPL, 1)
@@ -656,16 +656,16 @@ set.seed(123456)
 x <- c(rbeta(50, 3, 1/2), rmbbefd(50, 1/2, 1/10))
 f1 <- fitDR(x, "mbbefd", method="mle")
 summary(f1)
-b1 <- bootDR(f1, niter=20)
+b1 <- bootDR(f1, niter=25)
 summary(b1)
 ```
 
-```{r denplot, echo=FALSE, fig.height=3.5, fig.width=4, fig.align="center"}
+```{r denplot, echo=FALSE, fig.height=4, fig.width=4, fig.align="center", fig.cap="Histogram, fitted density"}
 par(cex.main=0.8,  cex.lab=0.8, cex.axis=0.8, cex=0.8)
-denscomp(f1, demp=TRUE, main="Histogram and theoretical densities")
+denscomp(f1, demp=TRUE, main="Histogram and fitted density", xlegend="topright")
 ```
 
-```{r bootstrapplot,echo=FALSE, fig.height=5, fig.width=5, fig.align="center"}
+```{r bootstrapplot,echo=FALSE, fig.height=6, fig.width=6, fig.align="center", fig.cap="Bootstrap heatmap and scatter plot"}
 par(cex.main=0.8,  cex.lab=0.8, cex.axis=0.8, mar=c(2,2,2,2))
 plot(b1, enhance=TRUE, main="Bootstrapped value of parameters")
 ```
@@ -679,11 +679,16 @@ As in the \pkg{fitdistrplus} package, we can compare multiple fits on the
 same graph or with the same statistics. We just have to pass a list of
 \pkg{"DR"} objects.
 
-```{r simufit2, echo=TRUE, fig.height=5, fig.width=10, warning=FALSE, fig.align="center"}
+```{r simufit1}
 f2 <- fitDR(x, "oibeta", method="mle")
 f3 <- fitDR(x, "oiunif", method="mle")
 gofstat(list(f1, f2, f3))
-par(mfrow=c(1, 2))
+```
+
+
+
+```{r simufit2, echo=FALSE, fig.height=4, fig.width=7, warning=FALSE, fig.align="center", fig.cap="comparison on cdf and pdf plots"}
+par(mfrow=c(1, 2), cex.main=0.8,  cex.lab=0.8, cex.axis=0.8, mar=c(2,2,2,2))
 cdfcomp(list(f1, f2, f3), leg=c("mbbefd", "oibeta", "oiunif"))
 denscomp(list(f1, f2, f3), leg=c("mbbefd", "oibeta", "oiunif"), 
          ylim=c(0,4), xleg="topleft")
@@ -692,7 +697,7 @@ denscomp(list(f1, f2, f3), leg=c("mbbefd", "oibeta", "oiunif"),
 Of course, we can also compare the different fitted exposure curves
 using the function \pkg{eccomp}. That is
 
-```{r simufit3, echo=TRUE, fig.height=3.5, fig.width=3.5, warning=FALSE, fig.align="center"}
+```{r simufit3, echo=FALSE, fig.height=4, fig.width=4, warning=FALSE, fig.align="center", fig.cap="Comparison on exposure curves"}
 par(cex=0.8)
 eccomp(list(f1, f2, f3), leg=c("mbbefd", "oibeta", "oiunif"), do.points=FALSE)
 ```

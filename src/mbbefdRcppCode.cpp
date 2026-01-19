@@ -138,7 +138,7 @@ NumericVector rMBBEFDC(int n, double g, double b) {
       else
         out[i] = u/((1-u)*(g-1));
     }
-  }else if(b > 0 & g > 1)
+  }else if(b > 0 && g > 1)
   {
     for(int i=0; i<n; i++)
     {

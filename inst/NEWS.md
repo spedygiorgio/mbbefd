@@ -5,6 +5,7 @@
   * Rewrite entirely the d, p, q, r functions for MBBEFD in order to allow a parameter vector.
   * Convert `NEWS` file in markdown.
   * Remove the use of `dilog()` from package `gsl`.
+  * Remove a NOTE in R CMD CHECK with a missing link in a man page.
 
 ## CHANGES IN `mbbefd` VERSION 0.8.13
 

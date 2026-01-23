@@ -2,7 +2,8 @@
 
 ## CHANGES IN `mbbefd` VERSION 0.8.15
 
-  * bug fix issue in `fitDR()` for distribution `oibeta` with total-loss-moment-matching estimation
+  * bug fix issue in `fitDR()` for distribution `oibeta` with total-loss-moment-matching estimation.
+  * add a `control` argument for `fitDR()` which allows different levels of estimation traces.
 
 # `mbbefd` NEWS
 

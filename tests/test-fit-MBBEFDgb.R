@@ -11,8 +11,12 @@ system.time(f1 <- fitDR(x, "MBBEFD"))
 summary(f1)
 
 #should be similar
-f0 <- fitdist(x, "MBBEFD", start= list(g=4, b=1/2))
-summary(f0)
+if(FALSE)
+{
+  f0 <- fitDR(x, "MBBEFD", start= list(g=4, b=1/2), control=list(trace=1))
+  fitDR(x, "MBBEFD", start= list(g=4, b=1/2), control=list(trace=2))
+  fitDR(x, "MBBEFD", start= list(g=4, b=1/2), method="tlmme", control=list(trace=2))
+}
 
 cdfcomp(f1, do.points=FALSE)
 qqcomp(f1)

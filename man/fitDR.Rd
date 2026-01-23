@@ -12,8 +12,8 @@
 }
 
 \usage{
-fitDR(x, dist, method="mle", start=NULL, optim.method="default", \dots)
-    
+fitDR(x, dist, method="mle", start=NULL, optim.method="default", 
+  control = list(trace = 0), \dots)
 }
 
 \arguments{
@@ -31,6 +31,13 @@ fitDR(x, dist, method="mle", start=NULL, optim.method="default", \dots)
     starting values are computed (see the 'details' section of  
     \code{\link[fitdistrplus]{mledist}}).}
 \item{optim.method}{\code{"default"} or an optimization method to pass to \code{\link{optim}}.}
+\item{control}{a control argument passed to \code{\link{optim}} and/or 
+  \code{\link[control]{constrOptim.nl}} both control parameters can be set.
+  The trace level \code{control$trace} is decreased by one when passed to
+  those optimization functions, i.e., \code{control=list(trace=1)}
+  displays high-level traces of \code{fitDR()} but not of optimization functions;
+  \code{control=list(trace=2)} or higher add traces from optimization functions.
+  }
 
 \item{\dots}{Further arguments to be passed to \code{"fitdist"}
     when \code{method != "tlmme"}.
@@ -57,7 +64,8 @@ fitDR(x, dist, method="mle", start=NULL, optim.method="default", \dots)
     total loss as well as theoretical and empirical moments.
     The theoretical and the empirical moments are matched numerically, 
     by minimization of the sum of squared differences between observed and theoretical 
-    quantities (see \code{\link[fitdistrplus]{mmedist}} for details).
+    quantities via \code{\link[control]{constrOptim.nl}}
+    as in \code{\link[fitdistrplus]{mmedist}}.
     }
     
 }
@@ -69,8 +77,8 @@ fitDR(x, dist, method="mle", start=NULL, optim.method="default", \dots)
     one parameter and the "Brent" method for distributions characterized by only 
     one parameter. Note that when errors are raised by \code{optim}, it's a good 
     idea to start by adding traces during the optimization process by adding 
-    \code{control=list(trace=1, REPORT=1)}.
-    For the MBBEFD distribution, \code{\link[alabama]{constrOptim.nl}} is used.
+    \code{control=list(trace=2)}.
+    
     
     A pre-fitting process is carried out for the following distributions
     \code{"mbbefd"}, \code{"MBBEFD"} and \code{"oigbeta"} before
@@ -127,13 +135,17 @@ fitDR(x, dist, method="mle", start=NULL, optim.method="default", \dots)
     parameter estimates and the correlation matrix between parameter estimates.
     }
     \item{\code{plot}}{
-    The plot of an object of class "fitDR" returned by \code{fitdist} uses the function 
-    \code{\link[fitdistrplus]{plotdist}}. An object of class "fitdist" or a list of objects of class
-    "fitDR" corresponding to various fits using the same data set may also be plotted
+    The plot of an object of class \code{"fitDR"}returned by \code{fitdist} uses the function 
+    \code{\link[fitdistrplus]{plotdist}}. 
+    }
+    \item{\code{*comp}}{ An object of class \code{"fitdist"} or a list of objects of class
+    \code{"fitDR"} corresponding to various fits using the same data set may also be plotted
     using a cdf plot (function \code{\link[fitdistrplus]{cdfcomp}}),
     a density plot(function \code{\link[fitdistrplus]{denscomp}}),
     a density Q-Q plot (function \code{\link[fitdistrplus]{qqcomp}}),
     or a P-P plot (function \code{\link[fitdistrplus]{ppcomp}}).
+    There is also empirical exposure curve plot (\code{\link{eecf}}) 
+    available via (function \code{\link{eccomp}})
     }
     \item{\code{logLik}}{ Extracts the estimated log-likelihood from the \code{"fitDR"} object.
     }
@@ -147,10 +159,10 @@ fitDR(x, dist, method="mle", start=NULL, optim.method="default", \dots)
 }
 
 \seealso{
-    See \code{\link[fitdistrplus:mledist]{mledist}}, \code{\link[fitdistrplus:mmedist]{mmedist}}, 
+    See \code{\link[fitdistrplus]{mledist}}, \code{\link[fitdistrplus]{mmedist}}, 
     for details on parameter estimation.
-    See \code{\link[fitdistrplus:gofstat]{gofstat}} for goodness-of-fit statistics.
-    See \code{\link[fitdistrplus:plotdist]{plotdist}}, 
+    See \code{\link[fitdistrplus]{gofstat}} for goodness-of-fit statistics.
+    See \code{\link[fitdistrplus]{plotdist}}, 
     \code{\link[fitdistrplus:graphcomp]{graphcomp}} for graphs.
     See \code{\link{bootDR}} for bootstrap procedures 
     See \code{\link{optim}} for base R optimization procedures.
@@ -184,12 +196,15 @@ Christophe Dutang.
 
 # (1) fit of a one-inflated beta distribution by maximum likelihood estimation
 #
-n <- 1e3
+n <- 500
 set.seed(12345)
 x <- roibeta(n, 3, 2, 1/6)
 
 f1 <- fitDR(x, "oibeta", method="mle")
 summary(f1)
+coef(f1)
+cdfcomp(f1)
+eccomp(f1)
 
 plot(bootdist(f1, niter=11), enhance=TRUE, trueval=c(3, 2, 1/6))
 

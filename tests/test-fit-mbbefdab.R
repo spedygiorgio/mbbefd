@@ -12,8 +12,12 @@ f1 <- fitDR(lossrate, "mbbefd")
 summary(f1)
 
 #should be similar
-f0 <- fitdist(lossrate, "mbbefd", start= list(a=1/4, b=1/4))
-summary(f0)
+if(FALSE)
+{
+  f0 <- fitDR(lossrate, "mbbefd", start= list(a=1/4, b=1/4), control=list(trace=1))
+  fitDR(lossrate, "mbbefd", start= list(a=1/4, b=1/4), control=list(trace=2))
+}
+
 
 
 cdfcomp(f1, do.points=FALSE)

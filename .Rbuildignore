@@ -3,11 +3,14 @@
 ^\.travis\.yml$
 ^\.travis_old\.yml$
 ^data-raw$
+AUTHORS
+LICENCE
 vignettes/figure/
 vignettes/*\.tex
 vignettes/*\.md
 vignettes/test-beta.Rmd
-AUTHORS
-LICENCE
 tests/check-formula*
 tests/test-mbbefd-*
+tests/t-brvehinsdr.R
+R/data-documentData-old.R
+share/

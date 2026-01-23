@@ -10,8 +10,11 @@ set.seed(12345)
 x <- roigbeta(n, 3, 2, 5/2, 1/6)
 
 
-f1 <- fitDR(x, "oigbeta", method="mle", control=list(trace=1, REPORT=1, maxit=500)) #
+f1 <- fitDR(x, "oigbeta", method="mle", control=list(trace=1, maxit=500)) #
 summary(f1)
+
+if(FALSE)
+  fitDR(x, "oigbeta", method="mle", control=list(trace=2, maxit=500))
 
 b1 <- bootDR(f1, niter=nboot, silent=TRUE)
 summary(b1)

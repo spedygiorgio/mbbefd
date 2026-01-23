@@ -12,7 +12,7 @@ fitDR <- function(x, dist, method="mle", start=NULL, optim.method="default", ...
   {
     initparmbbefd <- list(list(a=Trans.m10(0), b=Trans.1Inf(0)), 
                           list(a=Trans.0Inf(0), b=Trans.01(0)))
-    #print(initparmbbefd)
+    
     prefit <- prefitDR.mle(x, "mbbefd")
     #domain : (a,b) in (-1, 0) x (1, +Inf)
     if(all(!is.na(prefit[[1]])))
@@ -225,7 +225,7 @@ fitDR <- function(x, dist, method="mle", start=NULL, optim.method="default", ...
     xneq1 <- x[x != 1]
     distneq1 <- substr(dist, 3, nchar(dist))
     
-    uplolist <- list(upper=Inf, lower=0)
+    
     if(is.null(start))
     {
       if(distneq1 == "stpareto")
@@ -264,13 +264,14 @@ fitDR <- function(x, dist, method="mle", start=NULL, optim.method="default", ...
       
     if(method == "mle")
     {
+      uplolist <- list(upper=Inf, lower=0)
       #check the initial value
       loglik0 <- LLfunc(xneq1, unlist(start), distneq1)
         
       if(is.infinite(loglik0))
         stop("initial value of the log-likelihood is infinite.")
     
-        #improve initial parameters for GB1
+      #improve initial parameters for GB1
       if(distneq1 == "gbeta")
       {
         
@@ -278,7 +279,7 @@ fitDR <- function(x, dist, method="mle", start=NULL, optim.method="default", ...
         
         if(all(!is.na(prefit)))
           start <- as.list(prefit)
-        #print(unlist(start))
+        
         if(optim.method == "default")
           optim.method <- "BFGS"
         f1 <- fitdist(xneq1, distr=distneq1, method="mle", start=start, 
@@ -299,14 +300,17 @@ fitDR <- function(x, dist, method="mle", start=NULL, optim.method="default", ...
     {
       start <- c(start, list(p1=p1))
       npar <- length(start)
-      
+      #param should be positive, and p1 <= 1
+      uplolist <- list(upper=c(rep(Inf, npar-1), 1), lower=0)
+                       
       DIFF2 <- function(par, obs) 
       {
+        #true 
         PX1 <- do.call(paste0("tl", dist), as.list(par))
         EX <- do.call(paste0("m", dist), as.list(c(order=1, par)))
         if(npar <= 2)
           return( (EX - mean(obs))^2 + (PX1 - etl(obs))^2 )
-        
+
         if(npar >= 3)
           EX2 <- do.call(paste0("m", dist), as.list(c(order=2, par)))
         if(npar >= 4)
@@ -319,15 +323,13 @@ fitDR <- function(x, dist, method="mle", start=NULL, optim.method="default", ...
         else
           stop("not implemented")
       }
-          
       res <- optim(par=unlist(start), fn=DIFF2, obs=x, method="L-BFGS-B", 
-                   lower=uplolist$lower, upper=uplolist$upper)
-      
-      if(res$convergence > 0)
-        f1 <- list(estimate=NA, convergence=100)
+                   lower=uplolist$lower, upper=uplolist$upper, ...)
+      if(res$convergence > 0 && res$value > sqrt(.Machine$double.eps))
+        f1 <- list(estimate=rep(NA, npar), convergence=100, hessian=NULL)
       else
       {
-        f1 <- list(estimate=res$par, convergence=0)
+        f1 <- list(estimate=res$par, convergence=0, hessian=NULL)
       }
       f1 <- fitDR.addcomp(x=x, theta=f1$estimate, hessian=f1$hessian, vcov=NULL,
                           dist=dist, method="tlmme", convergence=f1$convergence)

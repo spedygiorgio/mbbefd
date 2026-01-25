@@ -4,6 +4,8 @@ fitDR <- function(x, dist, method="mle", start=NULL, optim.method="default", con
   
   if(any(is.na(x)))
     x <- x[!is.na(x)]
+  if(length(x) <= 0)
+    stop("There is no data in 'x' argument (possibly after removing NA).")
   if(any(x < 0 | x > 1))
     stop("Values outside [0,1] are not supported in fitDR.")
   method <- match.arg(method, c("mle", "tlmme"))
@@ -11,9 +13,9 @@ fitDR <- function(x, dist, method="mle", start=NULL, optim.method="default", con
   
   #make control parameters as in optim()
   con4optim <- list(trace = 0, fnscale = 1, maxit = 100L, abstol = -Inf, 
-              reltol = sqrt(.Machine$double.eps), alpha = 1, beta = 0.5, 
-              gamma = 2, REPORT = 1, warn.1d.NelderMead = TRUE, type = 1, 
-              lmm = 5, factr = 1e+07, pgtol = 0, tmax = 10, temp = 10)
+                    reltol = sqrt(.Machine$double.eps), alpha = 1, beta = 0.5, 
+                    gamma = 2, REPORT = 1, warn.1d.NelderMead = TRUE, type = 1, 
+                    lmm = 5, factr = 1e+07, pgtol = 0, tmax = 10, temp = 10)
   idx <- names(control) %in% names(con4optim)
   con4optim[names(control)[idx]] <- control[names(control)[idx]]
   con4optim$trace <- max(con4optim$trace -1, 0) #decrease trace level
@@ -75,11 +77,11 @@ fitDR <- function(x, dist, method="mle", start=NULL, optim.method="default", con
       #domain : (a,b) in (-1, 0) x (1, +Inf)
       alabama1 <- mledist(x, distr="mbbefd", start=initparmbbefd[[1]], custom.optim= constrOptim.nl, 
                           hin=constrmbbefd1, control.outer=con4constrOptim.nl, gradient=grLL, 
-                        calcvcov=FALSE, silent = con4constrOptim.nl$trace == 0, ...)
+                          calcvcov=FALSE, silent = con4constrOptim.nl$trace == 0, ...)
       #domain : (a,b) in (0, +Inf) x (0, 1)
       alabama2 <- mledist(x, distr="mbbefd", start=initparmbbefd[[2]], custom.optim= constrOptim.nl, 
                           hin=constrmbbefd2, control.outer=con4constrOptim.nl, gradient=grLL, 
-                        calcvcov=FALSE, silent = con4constrOptim.nl$trace == 0, ...)
+                          calcvcov=FALSE, silent = con4constrOptim.nl$trace == 0, ...)
       fHess <- NULL
       if(alabama1$convergence == 100 && alabama2$convergence == 100)
         f1 <- alabama1
@@ -261,7 +263,7 @@ fitDR <- function(x, dist, method="mle", start=NULL, optim.method="default", con
       }
     }else
       stop("not yet implemented")  
-      
+    
   }else if(dist == "oiunif")
   {
     if(is.null(start))
@@ -278,7 +280,7 @@ fitDR <- function(x, dist, method="mle", start=NULL, optim.method="default", con
       if(optim.method == "default")
         optim.method <- "Brent"
       f1 <- fitdist(x, distr=dist, method=method, start=start, calcvcov=TRUE, 
-                  lower=0, upper=1, control=con4optim, ..., optim.method=optim.method) 
+                    lower=0, upper=1, control=con4optim, ..., optim.method=optim.method) 
       if(control$trace > 0)
       {
         cat("\toptimal parameter value after fitdist()\n")
@@ -301,17 +303,26 @@ fitDR <- function(x, dist, method="mle", start=NULL, optim.method="default", con
       }else if(distneq1 == "beta")
       {
         n <- length(xneq1)
-        m <- mean(xneq1, na.rm=TRUE)
-        v <- (n - 1)/n*var(xneq1, na.rm=TRUE)
-        aux <- m*(1-m)/v - 1
-        start <- list(shape1=m*aux, shape2=(1-m)*aux)
+        if(n > 1)
+        {
+          m <- mean(xneq1, na.rm=TRUE)
+          v <- (n - 1)/n*var(xneq1, na.rm=TRUE)
+          aux <- m*(1-m)/v - 1
+          start <- list(shape1=m*aux, shape2=(1-m)*aux)
+        }else
+          start <- list(shape1=1, shape2=1) #i.e. uniform distribution
         
       }else if(distneq1 == "gbeta")
       {
-        shape00 <- optimize(function(z) (Theil.emp(x, na.rm=TRUE) - Theil.theo.shape0(z, obs=x))^2, 
-                            lower=0.01, upper=100)$minimum
-        otherpar00 <- mmedist(x^shape00, "beta", method="mme", calcvcov = FALSE, control=con4optim)
-        start <- c(list(shape0=shape00), as.list(otherpar00$estimate))
+        n <- length(xneq1)
+        if(n > 1)
+        {
+          shape00 <- optimize(function(z) (Theil.emp(x, na.rm=TRUE) - Theil.theo.shape0(z, obs=x))^2, 
+                              lower=0.01, upper=100)$minimum
+          otherpar00 <- mmedist(x^shape00, "beta", method="mme", calcvcov = FALSE, control=con4optim)
+          start <- c(list(shape0=shape00), as.list(otherpar00$estimate))
+        }else
+          start <- list(shape0=1, shape1=1, shape2=1) #i.e. uniform distribution
       }else
         stop("wrong non-inflated distribution.")
     }else
@@ -338,22 +349,24 @@ fitDR <- function(x, dist, method="mle", start=NULL, optim.method="default", con
       uplolist <- list(upper=Inf, lower=0)
       #check the initial value
       loglik0 <- LLfunc(xneq1, unlist(start), distneq1)
-        
+      
       if(is.infinite(loglik0))
-        stop("initial value of the log-likelihood is infinite.")
-    
+        warning("initial value of the log-likelihood is infinite.")
+      
       #improve initial parameters for GB1
       if(distneq1 == "gbeta")
       {
-        
-        prefit <- prefitDR.mle(xneq1, "oigbeta")
-        
-        if(all(!is.na(prefit)))
-          start <- as.list(prefit)
-        if(control$trace > 0)
+        if(length(xneq1) > 1)
         {
-          cat("\tinitial parameter value after prefit()\n")
-          print(unlist(start))
+          prefit <- prefitDR.mle(xneq1, "oigbeta")
+          
+          if(all(!is.na(prefit)))
+            start <- as.list(prefit)
+          if(control$trace > 0)
+          {
+            cat("\tinitial parameter value after prefit()\n")
+            print(unlist(start))
+          }
         }
         if(optim.method == "default")
           optim.method <- "BFGS"
@@ -364,18 +377,18 @@ fitDR <- function(x, dist, method="mle", start=NULL, optim.method="default", con
         if(optim.method == "default")
           optim.method <- "L-BFGS-B"
         f1 <- fitdist(xneq1, distr=distneq1, method="mle", start=start, 
-                  lower=uplolist$lower, upper=uplolist$upper, control=con4optim,
-                  optim.method=optim.method, calcvcov=TRUE, ...)
+                      lower=uplolist$lower, upper=uplolist$upper, control=con4optim,
+                      optim.method=optim.method, calcvcov=TRUE, ...)
       }
-        f1$estimate <- c(f1$estimate, "p1"=p1) 
-        f1 <- fitDR.addcomp(x=x, theta=f1$estimate, hessian=f1$hessian, vcov=NULL,
-                            dist=dist, method="mle", convergence=f1$convergence)
-        if(control$trace > 0)
-        {
-          cat("\toptimal parameter value after fitdist()\n")
-          print(f1$estimate)
-        }  
-        
+      f1$estimate <- c(f1$estimate, "p1"=p1) 
+      f1 <- fitDR.addcomp(x=x, theta=f1$estimate, hessian=f1$hessian, vcov=NULL,
+                          dist=dist, method="mle", convergence=f1$convergence)
+      if(control$trace > 0)
+      {
+        cat("\toptimal parameter value after fitdist()\n")
+        print(f1$estimate)
+      }  
+      
     }else if(method == "tlmme")
     {
       start <- c(start, list(p1=p1))
@@ -387,7 +400,7 @@ fitDR <- function(x, dist, method="mle", start=NULL, optim.method="default", con
       npar <- length(start)
       #param should be positive, and p1 <= 1
       uplolist <- list(upper=c(rep(Inf, npar-1), 1), lower=0)
-                       
+      
       DIFF2 <- function(par, obs) 
       {
         #true 
@@ -395,7 +408,7 @@ fitDR <- function(x, dist, method="mle", start=NULL, optim.method="default", con
         EX <- do.call(paste0("m", dist), as.list(c(order=1, par)))
         if(npar <= 2)
           return( (EX - mean(obs))^2 + (PX1 - etl(obs))^2 )
-
+        
         if(npar >= 3)
           EX2 <- do.call(paste0("m", dist), as.list(c(order=2, par)))
         if(npar >= 4)

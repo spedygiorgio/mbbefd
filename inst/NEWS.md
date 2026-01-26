@@ -2,10 +2,15 @@
 
 ## CHANGES IN `mbbefd` VERSION 0.8.15
 
-  * bug fix issue in `fitDR()` for distribution `oibeta` with total-loss-moment-matching estimation.
+### NEW
+
+  * allow parallel computation `bootDR()` as in `bootdist()`.  
   * add a `control` argument for `fitDR()` which allows different levels of estimation traces.
   * add components for `fitDR()` outputs in order to make correct bootstrap estimations in `bootDR()`.
-  * allow parallel computation `bootDR()` as in `bootdist()`.  
+
+### BUG FIX 
+
+  * bug fix issue in `fitDR()` for distribution `oibeta` with total-loss-moment-matching estimation.
 
 # `mbbefd` NEWS
 

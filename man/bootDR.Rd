@@ -11,7 +11,8 @@
 
 \usage{
 
-bootDR(f, bootmethod="param", niter=1001, silent=TRUE)
+bootDR(f, bootmethod="param", niter=1001, silent=TRUE,
+  parallel = c("no", "snow", "multicore"), ncpus)
 
 }
 
@@ -21,7 +22,11 @@ bootDR(f, bootmethod="param", niter=1001, silent=TRUE)
   for a parametric resampling and \code{"nonparam"} for a nonparametric resampling of data.}
 \item{niter}{ The number of samples drawn by bootstrap.  }
 \item{silent}{A logical to remove or show warnings and errors when bootstraping.}
-
+\item{parallel}{The type of parallel operation to be used, \code{"snow"} or \code{"multicore"}
+  (the second one not being available on Windows),
+  or \code{"no"} if no parallel operation.}
+\item{ncpus}{Number of processes to be used in parallel operation : 
+  typically one would fix it to the number of available CPUs.}
 }
 
 \details{
@@ -68,17 +73,20 @@ Generic functions:
     \item{\code{plot}}{
     The plot shows the bootstrap estimates with \code{\link{stripchart}} function
     for univariate parameters and \code{\link{plot}} function for multivariate parameters.
-    }           
+    }
+    \item{\code{density}}{
+    \code{density} computes the empirical density of \code{"bootDR"} objects using the
+    \code{\link{density}} function (with Gaussian kernel by default). 
+    It returns an object of class \code{\link[fitdistrplus]{density.bootdist}} for which \code{print}
+    and \code{plot} methods are provided.
+    }
     
-}
-        
+  }
 }
         
 
 \seealso{ 
-    See \code{\link[fitdistrplus:mledist]{mledist}}, \code{\link[fitdistrplus:mmedist]{mmedist}}, 
-    \code{\link[fitdistrplus:qmedist]{qmedist}}, \code{\link[fitdistrplus:mgedist]{mgedist}} 
-    for details on parameter estimation.
+    See \code{\link[fitdistrplus:mledist]{mledist}} for details on parameter estimation.
     See \code{\link[fitdistrplus:bootdist]{bootdist}} for details on generic function.
     See \code{\link{fitDR}} for estimation procedures.
     
@@ -90,7 +98,7 @@ Cullen AC and Frey HC (1999), \emph{Probabilistic techniques in exposure assessm
 Plenum Press, USA, pp. 181-241.
 
 Delignette-Muller ML and Dutang C (2015), \emph{fitdistrplus: An R Package for Fitting Distributions}.
-Journal of Statistical Software, 64(4), 1-34.
+Journal of Statistical Software, 64(4), 1-34, \doi{https://doi.org/10.18637/jss.v064.i04}.
 }
 
 
@@ -100,11 +108,17 @@ Christophe Dutang
 
 
 \examples{
-# We choose a low number of bootstrap replicates in order to satisfy CRAN running times
-# constraint.
-# For practical applications, we recommend to use at least niter=501 or niter=1001.
 
+\dontrun{
+n <- 1e3
+set.seed(12345)
+x <- roigbeta(n, 3, 2, 5/2, 1/6)
 
+f1 <- fitDR(x, "oigbeta", method="mle") 
+b1 <- bootDR(f1, niter=100, silent=TRUE)
+summary(b1)
+plot(b1)
+}
 
 }
 

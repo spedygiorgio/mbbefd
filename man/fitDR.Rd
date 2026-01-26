@@ -9,6 +9,7 @@
  The latter is also known as minimizing distance estimation.
  Generic methods are \code{print}, \code{plot}, 
 \code{summary}, \code{quantile}, \code{logLik}, \code{vcov} and \code{coef}.
+  For bootstrap, use \code{bootDR}.
 }
 
 \usage{
@@ -30,22 +31,19 @@ fitDR(x, dist, method="mle", start=NULL, optim.method="default",
     This argument may be omitted (default) for some distributions for which reasonable 
     starting values are computed (see the 'details' section of  
     \code{\link[fitdistrplus]{mledist}}).}
-\item{optim.method}{\code{"default"} or an optimization method to pass to \code{\link{optim}}.}
+\item{optim.method}{\code{"default"} or an optimization method to pass 
+    to \code{\link{optim}} or \code{\link[alabama]{constrOptim.nl}}.}
 \item{control}{a control argument passed to \code{\link{optim}} and/or 
-  \code{\link[control]{constrOptim.nl}} both control parameters can be set.
-  The trace level \code{control$trace} is decreased by one when passed to
-  those optimization functions, i.e., \code{control=list(trace=1)}
-  displays high-level traces of \code{fitDR()} but not of optimization functions;
-  \code{control=list(trace=2)} or higher add traces from optimization functions.
-  }
-
-\item{\dots}{Further arguments to be passed to \code{"fitdist"}
-    when \code{method != "tlmme"}.
+    \code{\link[alabama]{constrOptim.nl}} both control parameters can be set.
+    The trace level \code{control$trace} is decreased by one when passed to
+    those optimization functions, i.e., \code{control=list(trace=1)}
+    displays high-level traces of \code{fitDR()} but not of optimization functions;
+    \code{control=list(trace=2)} or higher add traces from optimization functions.}
+\item{\dots}{Further arguments to be passed to \code{"fitdist"} when \code{method != "tlmme"}.
     See \code{\link[fitdistrplus]{fitdist}} for details on parameter estimation.}
 }
 
 \details{
-
     The fitted distribution (\code{dist}) has its d, p, q, r functions defined in the
     man page: \code{\link{oiunif}}, \code{\link{oistpareto}}, \code{\link{oibeta}}, 
     \code{\link{oigbeta}}, \code{\link{mbbefd}}, \code{\link{MBBEFD}}.
@@ -64,7 +62,7 @@ fitDR(x, dist, method="mle", start=NULL, optim.method="default",
     total loss as well as theoretical and empirical moments.
     The theoretical and the empirical moments are matched numerically, 
     by minimization of the sum of squared differences between observed and theoretical 
-    quantities via \code{\link[control]{constrOptim.nl}}
+    quantities via \code{\link[alabama]{constrOptim.nl}}
     as in \code{\link[fitdistrplus]{mmedist}}.
     }
     
@@ -96,8 +94,8 @@ fitDR(x, dist, method="mle", start=NULL, optim.method="default",
 \value{ 
     \code{fitDR} returns an object of class \code{"fitDR"} inheriting 
     from the \code{"fitdist"} class. That is a list with the following components:
-    \item{estimate }{ the parameter estimates.}
-    \item{method }{ the character string coding for the fitting method : 
+    \item{estimate}{ the parameter estimates.}
+    \item{method}{ the character string coding for the fitting method : 
         \code{"mle"} for 'maximum likelihood estimation', \code{"tlmme"} for 'matching total loss moment estimation'.}
     \item{sd}{ the estimated standard errors, \code{NA} if numerically not computable
         or \code{NULL} if not available.}
@@ -117,11 +115,13 @@ fitDR(x, dist, method="mle", start=NULL, optim.method="default",
     \item{discrete}{ the input argument or the automatic definition by the function to be passed
         to functions \code{\link[fitdistrplus]{gofstat}}, \code{\link[fitdistrplus]{plotdist}} 
         and \code{\link[fitdistrplus]{cdfcomp}}. }
-    \item{dots}{ the list of  further arguments passed in \dots to be used in \code{\link[fitdistrplus]{bootdist}} 
-        in iterative calls to \code{\link[fitdistrplus]{mledist}}, \code{\link[fitdistrplus]{mmedist}},
-        \code{\link[fitdistrplus]{qmedist}}, \code{\link[fitdistrplus]{mgedist}} or 
-        \code{NULL} if no such arguments.}
+    \item{dots}{ further arguments used in \code{fitdist} or \code{NULL} otherwise.}
+    \item{convergence}{ the convergence code: 0 indicates successful completion, for positive values
+        see \code{\link{optim}} or \code{\link[alabama]{constrOptim.nl}}.}
+    \item{discrete}{ always \code{FALSE}.}
     \item{weights}{the vector of weigths used in the estimation process or \code{NULL}.}    
+    \item{optim.method}{ the optimization method used in \code{fitDR} and \code{bootdist}.}
+    \item{control}{ the control parameters used in \code{fitDR} and \code{bootdist}.}
 
     Generic functions:
 \describe{       
@@ -154,6 +154,8 @@ fitDR(x, dist, method="mle", start=NULL, optim.method="default",
     }
     \item{\code{coef}}{ Extracts the fitted coefficients from the \code{"fitDR"} object.
     }
+    \item{\code{bootDR}}{ Computes bootstrap procedures dedicated to \code{"fitDR"} object 
+    as in \code{bootdist}.}
 }
 
 }
@@ -176,14 +178,14 @@ Cullen AC and Frey HC (1999), \emph{Probabilistic techniques in exposure assessm
 Plenum Press, USA, pp. 81-155.
 
 Venables WN and Ripley BD (2002), \emph{Modern applied statistics with S}.
-Springer, New York, pp. 435-446.
+Springer, New York, pp. 435-446, \doi{10.1007/978-0-387-21706-2}.
 
 Vose D (2000), \emph{Risk analysis, a quantitative guide}.
 John Wiley & Sons Ltd, Chischester, England, pp. 99-143.
 
 Delignette-Muller ML and Dutang C (2015), 
 \emph{fitdistrplus: An R Package for Fitting Distributions}.
-Journal of Statistical Software, 64(4), 1-34.
+Journal of Statistical Software, 64(4), 1-34, \doi{https://doi.org/10.18637/jss.v064.i04}.
 
 }
 

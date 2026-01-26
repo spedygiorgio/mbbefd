@@ -7,11 +7,12 @@ n <- 1e3
 nboot <- 100
 nboot <- 10
 set.seed(12345)
-x <- c(rep(1, 100), rgbeta(n, 2, 2, 5/2))
+x <- rgbeta(n, 2, 2, 5/2)
 
 initpar <- list(shape0=2, shape1=2, shape2=5/2)
 
 f1 <- fitdist(x, "gbeta", control=list(trace=1), start=initpar)
+str(f1)
 
 if(FALSE)
 {

@@ -1,8 +1,10 @@
-fitDR.addcomp <- function(x, theta, hessian=NULL, dist, method, convergence=0, vcov=NULL)
+fitDR.addcomp <- function(x, theta, hessian=NULL, dist, method, convergence=0, vcov=NULL, 
+                          optim.method="default", control=list())
 {
   #components will be
   #"estimate", "method", "sd", "cor", "vcov", "loglik", "aic", "bic", "n", "data", 
   #"distname", "fix.arg", "fix.arg.fun", "dots", "convergence", "discrete", "weights"
+  #"optim.method", "control"
   
   f1 <- list(estimate=theta, weights=NULL, dots=NULL, fix.arg=NULL, fix.arg.fun=NULL)
   #other fitdist components
@@ -12,6 +14,8 @@ fitDR.addcomp <- function(x, theta, hessian=NULL, dist, method, convergence=0, v
   f1$data <- x
   f1$distname <- dist
   f1$discrete <- FALSE
+  f1$optim.method <- optim.method
+  f1$control <- control
   npar <- length(theta)
   
   #gof statistics

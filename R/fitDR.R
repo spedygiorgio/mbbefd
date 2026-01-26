@@ -27,6 +27,8 @@ fitDR <- function(x, dist, method="mle", start=NULL, optim.method="default", con
   con4constrOptim.nl[names(control)[idx]] <- control[names(control)[idx]]
   con4constrOptim.nl$trace <- max(con4constrOptim.nl$trace -1, 0)
   
+  if(is.null(control$trace))
+    control$trace <- 0
   if(control$trace > 0)
     cat("Distribution is", dist, "\n")
   
@@ -101,7 +103,8 @@ fitDR <- function(x, dist, method="mle", start=NULL, optim.method="default", con
           fHess <- NULL
       }
       f1 <- fitDR.addcomp(x=x, theta=f1$estimate, hessian=fHess, vcov=NULL,
-                          dist="mbbefd", method="mle", convergence=f1$convergence)
+                          dist="mbbefd", method="mle", convergence=f1$convergence,
+                          optim.method=optim.method, control=control)
       if(control$trace > 0)
       {
         cat("\toptimal parameter value after mledist()\n")
@@ -131,7 +134,8 @@ fitDR <- function(x, dist, method="mle", start=NULL, optim.method="default", con
           f1 <- list(estimate=alabama2$par, convergence=0)
       }
       f1 <- fitDR.addcomp(x=x, theta=f1$estimate, hessian=f1$hessian, vcov=NULL,
-                          dist="mbbefd", method="tlmme", convergence=f1$convergence)
+                          dist="mbbefd", method="tlmme", convergence=f1$convergence,
+                          optim.method=optim.method, control=control)
       if(control$trace > 0)
       {
         cat("\toptimal parameter value after optim()\n")
@@ -224,7 +228,8 @@ fitDR <- function(x, dist, method="mle", start=NULL, optim.method="default", con
           fHess <- NULL
       }
       f1 <- fitDR.addcomp(x=x, theta=f1$estimate, hessian=fHess, vcov=NULL,
-                          dist="MBBEFD", method="mle", convergence=f1$convergence)
+                          dist="MBBEFD", method="mle", convergence=f1$convergence,
+                          optim.method=optim.method, control=control)
       if(control$trace > 0)
       {
         cat("\toptimal parameter value after mledist()\n")
@@ -255,7 +260,8 @@ fitDR <- function(x, dist, method="mle", start=NULL, optim.method="default", con
           f1 <- list(estimate=alabama2$par, convergence=0)
       }
       f1 <- fitDR.addcomp(x=x, theta=f1$estimate, hessian=f1$hessian, vcov=NULL,
-                          dist="MBBEFD", method="tlmme", convergence=f1$convergence)
+                          dist="MBBEFD", method="tlmme", convergence=f1$convergence,
+                          optim.method=optim.method, control=control)
       if(control$trace > 0)
       {
         cat("\toptimal parameter value after optim()\n")
@@ -281,6 +287,8 @@ fitDR <- function(x, dist, method="mle", start=NULL, optim.method="default", con
         optim.method <- "Brent"
       f1 <- fitdist(x, distr=dist, method=method, start=start, calcvcov=TRUE, 
                     lower=0, upper=1, control=con4optim, ..., optim.method=optim.method) 
+      f1$optim.method <- optim.method
+      f1$control <- NULL
       if(control$trace > 0)
       {
         cat("\toptimal parameter value after fitdist()\n")
@@ -372,6 +380,7 @@ fitDR <- function(x, dist, method="mle", start=NULL, optim.method="default", con
           optim.method <- "BFGS"
         f1 <- fitdist(xneq1, distr=distneq1, method="mle", start=start, control=con4optim,
                       optim.method=optim.method, calcvcov=TRUE, ...)
+        
       }else
       {
         if(optim.method == "default")
@@ -382,7 +391,8 @@ fitDR <- function(x, dist, method="mle", start=NULL, optim.method="default", con
       }
       f1$estimate <- c(f1$estimate, "p1"=p1) 
       f1 <- fitDR.addcomp(x=x, theta=f1$estimate, hessian=f1$hessian, vcov=NULL,
-                          dist=dist, method="mle", convergence=f1$convergence)
+                          dist=dist, method="mle", convergence=f1$convergence,
+                          optim.method=optim.method, control=control)
       if(control$trace > 0)
       {
         cat("\toptimal parameter value after fitdist()\n")
@@ -430,7 +440,8 @@ fitDR <- function(x, dist, method="mle", start=NULL, optim.method="default", con
         f1 <- list(estimate=res$par, convergence=0, hessian=NULL)
       }
       f1 <- fitDR.addcomp(x=x, theta=f1$estimate, hessian=f1$hessian, vcov=NULL,
-                          dist=dist, method="tlmme", convergence=f1$convergence)
+                          dist=dist, method="tlmme", convergence=f1$convergence,
+                          optim.method=optim.method, control=control)
       if(control$trace > 0)
       {
         cat("\toptimal parameter value after optim()\n")
@@ -446,7 +457,8 @@ fitDR <- function(x, dist, method="mle", start=NULL, optim.method="default", con
   
   #reorder components as a fitdist object
   f1 <- f1[c("estimate", "method", "sd", "cor", "vcov", "loglik", "aic", "bic", "n", "data", 
-             "distname", "fix.arg", "fix.arg.fun", "dots", "convergence", "discrete", "weights")]
+             "distname", "fix.arg", "fix.arg.fun", "dots", "convergence", "discrete", "weights",
+             "optim.method", "control")]
   class(f1) <- c("DR", "fitdist")
   f1
 }

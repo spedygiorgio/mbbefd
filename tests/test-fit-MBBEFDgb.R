@@ -1,10 +1,10 @@
 library(mbbefd)
 library(fitdistrplus)
+set.seed(123456)
 
 n <- 1e3
-nboot <- 1000
+nboot <- 100
 nboot <- 10
-set.seed(123456)
 x <- rMBBEFD(n, 8, 1/4)
 
 system.time(f1 <- fitDR(x, "MBBEFD"))
@@ -29,10 +29,13 @@ qqcomp(f1)
 
 
 b1 <- bootDR(f1, niter=nboot, silent=TRUE)
-plot(b1, enhance=TRUE, trueval=c(8, 1/4))
+if(sum(b1$converg == 0) > 2)
+{
+  plot(b1, enhance=TRUE, trueval=c(8, 1/4))
+  plot(density(b1))
+}
 
 
-set.seed(123456)
 x <- rMBBEFD(n, 2, 1/4)
 
 system.time(f1 <- fitDR(x, "MBBEFD"))

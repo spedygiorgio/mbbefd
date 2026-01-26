@@ -1,6 +1,6 @@
 citHeader("To cite mbbefd in publications use:")
 
-year <- 2025
+year <- 2026
 note <- sprintf("R package version %s", meta$Version)
 
 bibentry(bibtype = "Manual",

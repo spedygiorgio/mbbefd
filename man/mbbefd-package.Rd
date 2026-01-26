@@ -10,7 +10,7 @@ at this time worked in the area of quantitative risk assessment.
 In 2015, M. Gesmann and C. Dutang joined the project.
 This project is hosted at \href{https://github.com/spedygiorgio/mbbefd}{github}.
 
-This package contains the core functions of the two parametrizations
+This package contains the core functions for the two parametrizations
 of the MBBEFD distribution
 (distribution function, density, quantile functions, random generation, 
 aka d, p, q, r)
@@ -20,10 +20,12 @@ This package also provides other distributions used for destruction rate
 modelling, that is the beta, the shifted truncated Pareto 
 and the generalized beta distributions.
 Due to the presence of a total loss, a one-inflated version of the
-previous distributions is also provided.
+previous distributions is provided.
 
 The vignette shows code snippets to fit the distribution to empirical data: 
 \href{../doc/Introduction.pdf}{Exposure rating, destruction rate models and the mbbefd package}.
+Main functions are \code{\link{fitDR}} for fitting destruction rate modeling, 
+\code{\link{bootDR}} for bootstrap procedures.
 
 }
 

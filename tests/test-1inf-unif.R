@@ -26,6 +26,15 @@ cbind(eecf(x)(z), ecoiunif(z, 1/2))
 cbind(eecf(y)(z), ecoiunif(z, 1/3))
 
 
+#density
+
+
+summary(log(doiunif(x, 1/6)))
+summary(doiunif(x, 1/6, log=TRUE))
+
+head(cbind(x, doiunif(x, 1/6, log=TRUE), log(doiunif(x, 1/6))))
+
+
 
 #plots
 n <- 1e2

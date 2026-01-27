@@ -18,8 +18,6 @@ if(FALSE)
   fitDR(lossrate, "mbbefd", start= list(a=1/4, b=1/4), control=list(trace=2))
 }
 
-
-
 cdfcomp(f1, do.points=FALSE)
 qqcomp(f1)
 vcov(f1)
@@ -37,20 +35,17 @@ if(sum(b1$converg == 0) > 2)
   plot(density(b1))
 }
 
-f2 <- fitDR(lossrate, "mbbefd", method="tlmme")
-summary(f2)
 
-
-
-lossrate <- rmbbefd(n, -1/2, 5)
-
-
-f1 <- fitDR(lossrate, "mbbefd")
-summary(f1)
-
-b1 <- bootDR(f1, niter=nboot, silent=TRUE)
-if(sum(b1$converg == 0) > 2)
+if(FALSE)
 {
+  lossrate <- rmbbefd(n, -1/2, 5)
+  
+  
+  f1 <- fitDR(lossrate, "mbbefd")
+  summary(f1)
+  
+  
+  b1 <- bootDR(f1, niter=nboot, silent=TRUE)
   plot(b1, enhance=TRUE, trueval=c(-1/2, 5))
   plot(density(b1))
 }

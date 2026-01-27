@@ -36,11 +36,13 @@ if(sum(b1$converg == 0) > 2)
 }
 
 
-x <- rMBBEFD(n, 2, 1/4)
-
-system.time(f1 <- fitDR(x, "MBBEFD"))
-summary(f1)
-
-b1 <- bootDR(f1, niter=nboot, silent=TRUE)
-plot(b1, enhance=TRUE, trueval=c(2, 1/4))
-
+if(FALSE)
+{
+  x <- rMBBEFD(n, 2, 1/4)
+  
+  system.time(f1 <- fitDR(x, "MBBEFD"))
+  summary(f1)
+  
+  b1 <- bootDR(f1, niter=nboot, silent=TRUE)
+  plot(b1, enhance=TRUE, trueval=c(2, 1/4))
+}

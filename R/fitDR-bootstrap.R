@@ -1,8 +1,8 @@
 bootDR <- function(f, bootmethod="param", niter=1001, silent=TRUE,
                    parallel = c("no", "snow", "multicore"), ncpus)
 {
-  if (!inherits(f, "DR"))
-    stop("Use only with 'DR' objects")
+  if (!inherits(f, "fitDR"))
+    stop("Use only with 'fitDR' objects")
   if (niter<10) 
     stop("niter must be an integer above 10")
   bootmethod <- match.arg(bootmethod, c("param", "nonparam"))

@@ -7,7 +7,7 @@ n <- 1e3
 nboot <- 1000
 nboot <- 10
 x <- roiunif(n, 1/6)
-f1 <- fitDR(x, "oiunif", method="mle", control=list(trace=0))
+f1 <- fitDR(x, "oiunif", method="mle", control=list(trace=3))
 summary(f1)
 
 if(FALSE)

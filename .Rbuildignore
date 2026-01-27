@@ -11,6 +11,7 @@ vignettes/*\.md
 vignettes/test-beta.Rmd
 tests/check-formula*
 tests/test-mbbefd-*
+tests/test-GB1.R
 tests/t-brvehinsdr.R
 R/data-documentData-old.R
 share/

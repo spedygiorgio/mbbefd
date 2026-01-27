@@ -6,15 +6,31 @@ n <- 1e4
 x <- roibeta(n, 2, 2, p1=1/2)
 y <- roibeta(n, 4/3, 2/3, p1=1/3)
 
+#test pDF
+doibeta(1/2, 2, 2, 1/1:10)
+
 #test CDF
 z <- 0:10/10
 cbind(ecdf(x)(z), poibeta(z, 2, 2, 1/2))
 
 cbind(ecdf(y)(z), poibeta(z, 4/3, 2/3, 1/3))
 
+poibeta(1/2, 2, 2, 1/1:10)
+
+#test quantile
+curve(quantile(y, prob=x), n=501, xlab="p")
+curve(qoibeta(x, 4/3, 2/3, 1/3), n = 501, add=TRUE, col="green")
+
+#test exposure curve
+plot(eecf(y), do.points = FALSE)
+curve(ecoibeta(x, 4/3, 2/3, 1/3), n = 501, add=TRUE, col="green")
+
+
 #total loss
 c(etl(x), tloibeta(2, 2, 1/2))
 c(etl(y), tloibeta(4/3, 2/3, 1/3))
+
+tloibeta(2, 2, 1/2:10)
 
 #mean
 c(mean(x), moibeta(1, 2, 2, 1/2))

@@ -4,6 +4,7 @@ data(asiacomrisk)
 x <- asiacomrisk$DR
 x <- x[!is.na(x)]
 
+
 plot(ecdf(x))
 plot(eecf(x))
 etl(x)
@@ -12,16 +13,17 @@ etl(x)
 if(FALSE)
 {
   fitDR(x, "oistpareto", control=list(trace=TRUE))  
+  fitDR(x, "oiunif", method="mle", optim.method="default", control=list(trace=1))
   
-fitDR(x, "oibeta", control=list(trace=TRUE))
-fitDR(x, "oibeta", control=list(trace=TRUE), optim.method="L-BFGS-B")
-
-fitDR(x, "oigbeta", control=list(trace=TRUE))
-fitDR(x, "oigbeta", control=list(trace=TRUE), optim.method="L-BFGS-B")
-fitDR(x, "oigbeta", control=list(trace=TRUE), optim.method="BFGS")
+  fitDR(x, "oibeta", control=list(trace=TRUE))
+  fitDR(x, "oibeta", control=list(trace=TRUE), optim.method="L-BFGS-B")
+  
+  fitDR(x, "oigbeta", control=list(trace=TRUE))
+  fitDR(x, "oigbeta", control=list(trace=TRUE), optim.method="L-BFGS-B")
+  fitDR(x, "oigbeta", control=list(trace=TRUE), optim.method="BFGS")
 }
 
-dlist <- c("oiunif", "oistpareto", "oibeta", "oigbeta")
+dlist <- c("oistpareto", "oibeta", "oigbeta")
 flist <- lapply(dlist, function(d) {
   cat("distribution:", d, "\n");
   fitDR(x, d, method="mle", optim.method=ifelse(d=="oigbeta", "BFGS", "default"))})

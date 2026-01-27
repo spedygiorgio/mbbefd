@@ -4,19 +4,21 @@
 
 ### NEW
 
-  * allow parallel computation `bootDR()` as in `bootdist()`.  
-  * add a `control` argument for `fitDR()` which allows different levels of estimation traces.
-  * add components for `fitDR()` outputs in order to make correct bootstrap estimations in `bootDR()`.
-
+  * Allow parallel computation `bootDR()` as in `bootdist()`.  
+  * Add a `control` argument for `fitDR()` which allows different levels of estimation traces.
+  * Add components for `fitDR()` outputs in order to make correct bootstrap estimations in `bootDR()`.
+  * Rewrite entirely the `d`, `p`, `q`, `r` functions for GB1 in order to allow a parameter vector.
+  * Rewrite entirely `*oifun()` functions for one-inflated distributions in order to allow a vector `p1`.
+  
 ### BUG FIX 
 
-  * bug fix issue in `fitDR()` for distribution `oibeta` with total-loss-moment-matching estimation.
+  * Fix an issue in `fitDR()` for distribution `oibeta` with total-loss-moment-matching estimation.
 
 # `mbbefd` NEWS
 
 ## CHANGES IN `mbbefd` VERSION 0.8.14
 
-  * Rewrite entirely the d, p, q, r functions for MBBEFD in order to allow a parameter vector.
+  * Rewrite entirely the `d`, `p`, `q`, `r` functions for MBBEFD in order to allow a parameter vector.
   * Convert `NEWS` file in markdown.
   * Remove the use of `dilog()` from package `gsl`.
   * Remove a NOTE in R CMD CHECK with a missing link in a man page.

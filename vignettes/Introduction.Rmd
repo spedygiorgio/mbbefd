@@ -681,16 +681,15 @@ same graph or with the same statistics. We just have to pass a list of
 
 ```{r simufit1}
 f2 <- fitDR(x, "oibeta", method="mle")
-f3 <- fitDR(x, "oiunif", method="mle")
-gofstat(list(f1, f2, f3))
+gofstat(list(f1, f2))
 ```
 
 
 
 ```{r simufit2, echo=FALSE, fig.height=4, fig.width=7, warning=FALSE, fig.align="center", fig.cap="comparison on cdf and pdf plots"}
 par(mfrow=c(1, 2), cex.main=0.8,  cex.lab=0.8, cex.axis=0.8, mar=c(2,2,2,2))
-cdfcomp(list(f1, f2, f3), leg=c("mbbefd", "oibeta", "oiunif"))
-denscomp(list(f1, f2, f3), leg=c("mbbefd", "oibeta", "oiunif"), 
+cdfcomp(list(f1, f2), leg=c("mbbefd", "oibeta"))
+denscomp(list(f1, f2), leg=c("mbbefd", "oibeta"), 
          ylim=c(0,4), xleg="topleft")
 ```
 
@@ -699,7 +698,7 @@ using the function \pkg{eccomp}. That is
 
 ```{r simufit3, echo=FALSE, fig.height=4, fig.width=4, warning=FALSE, fig.align="center", fig.cap="Comparison on exposure curves"}
 par(cex=0.8)
-eccomp(list(f1, f2, f3), leg=c("mbbefd", "oibeta", "oiunif"), do.points=FALSE)
+eccomp(list(f1, f2), leg=c("mbbefd", "oibeta"), do.points=FALSE)
 ```
 
 

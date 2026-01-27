@@ -3,16 +3,16 @@ eccomp <- function(ft, xlim, ylim, main, xlab, ylab, do.points=TRUE,
                    legendtext, xlegend = "bottomright", 
                     ylegend = NULL, ...)
 {
-  if(inherits(ft, "DR"))
+  if(inherits(ft, "fitDR"))
   {
     ft <- list(ft)
   }else if(!is.list(ft))
   {
-    stop("argument ft must be a list of 'DR' objects")
+    stop("argument ft must be a list of 'fitDR' objects")
   }else
   {
-    if(any(sapply(ft, function(x) !inherits(x, "DR"))))        
-      stop("argument ft must be a list of 'DR' objects")
+    if(any(sapply(ft, function(x) !inherits(x, "fitDR"))))        
+      stop("argument ft must be a list of 'fitDR' objects")
   }
   
   nft <- length(ft)

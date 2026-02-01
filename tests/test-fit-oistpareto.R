@@ -18,6 +18,9 @@ if(FALSE)
 
 b1 <- bootDR(f1, niter=nboot)
 summary(b1)
+vcov(b1)
+vcov(f1)
+
 
 if(sum(b1$converg == 0) > 2)
 {

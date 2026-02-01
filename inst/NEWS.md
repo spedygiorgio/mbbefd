@@ -7,6 +7,7 @@
   * Allow parallel computation `bootDR()` as in `bootdist()`.  
   * Add a `control` argument for `fitDR()` which allows different levels of estimation traces.
   * Add components for `fitDR()` outputs in order to make correct bootstrap estimations in `bootDR()`.
+  * Add a `vcov()` function for `bootDR()` outputs.
   * Rewrite entirely the `d`, `p`, `q`, `r` functions for GB1 in order to allow a parameter vector.
   * Rewrite entirely `*oifun()` functions for one-inflated distributions in order to allow a vector `p1`.
   

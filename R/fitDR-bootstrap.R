@@ -93,3 +93,11 @@ bootDR <- function(f, bootmethod="param", niter=1001, silent=TRUE,
                    class=c("bootDR", "bootdist"))
   res    
 }
+
+
+
+vcov.bootDR <- function(object, ...)
+{
+  stopifnot(inherits(object, "bootDR"))
+  return(cov(object$estim, ...))
+}

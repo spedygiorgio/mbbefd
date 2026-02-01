@@ -13,5 +13,9 @@ tests/check-formula*
 tests/test-mbbefd-*
 tests/test-GB1.R
 tests/t-brvehinsdr.R
+tests/brvehinsdr.csv
 R/data-documentData-old.R
 share/
+.github/
+.gitignore
+.Rhistory

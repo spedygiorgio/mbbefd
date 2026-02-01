@@ -30,7 +30,7 @@ importFrom("stats", dbeta, pbeta, qbeta, rbeta,
            dunif, punif, qunif, runif, 
            rbinom, pgamma, 
            optim, optimHess, constrOptim, integrate, optimize, 
-           cov2cor, median, quantile, var)
+           cov2cor, median, quantile, var, cov)
 importFrom("actuar", munif, levunif, mbeta, levbeta) #d,p,q,r functions in base R
 export(ecunif)
 export(ecbeta)
@@ -64,6 +64,8 @@ importFrom("fitdistrplus", fitdist, mledist, mmedist)
 importFrom("alabama", constrOptim.nl) #only for MBBEFD
 export(fitDR) #fitDR class inheriting from fitdist class
 export(bootDR) #bootDR class inheriting from bootdist class
+
+S3method(vcov, bootDR)
 
 #temporary 
 importFrom("MASS", kde2d)

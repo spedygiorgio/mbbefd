@@ -19,7 +19,6 @@ fitDR <- function(x, dist, method="mle", start=NULL, optim.method="default", con
   idx <- names(control) %in% names(con4optim)
   con4optim[names(control)[idx]] <- control[names(control)[idx]]
   con4optim$trace <- max(con4optim$trace -1, 0) #decrease trace level
-  print(con4optim$trace)
   
   #make control parameters as in constrOptim.nl()
   con4constrOptim.nl <- list(mu0 = 0.01, sig0 = 10, eps = 1e-07, itmax = 50, 

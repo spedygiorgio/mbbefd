@@ -15,8 +15,6 @@
 
   * Fix an issue in `fitDR()` for distribution `oibeta` with total-loss-moment-matching estimation.
 
-# `mbbefd` NEWS
-
 ## CHANGES IN `mbbefd` VERSION 0.8.14
 
   * Rewrite entirely the `d`, `p`, `q`, `r` functions for MBBEFD in order to allow a parameter vector.

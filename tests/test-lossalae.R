@@ -1,10 +1,9 @@
 library(mbbefd)
 
 data(lossalaefull)
+lossalaefull <- na.omit(lossalaefull)
+
 x <- lossalaefull$Loss/lossalaefull$Limit
-
-
-# fitDR(x, "oigbeta", method="mle", control=list(trace=1, REPORT=1))
 
 dlist <- c("oistpareto", "oibeta", "oigbeta")
 flist <- lapply(dlist, function(d) {print(d);

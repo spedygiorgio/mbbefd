@@ -71,7 +71,8 @@ prefitDR.mle <- function(x, dist, control=list(trace=0, REPORT=1, maxit=100), ..
       initpar <- c(NA, NA)  
     }
     initpar
-  }
+  }else
+    stop("wrong distribution in prefitDR.mle().")
 }
 
 #Transformed distribution (internal use)

@@ -3,6 +3,30 @@ library(mbbefd)
 #test of 1-infl beta distribution
 n <- 1e4
 
+
+#test arguments
+
+res <- doibeta(c(1:3/4, Inf, NaN, -1, NA), shape1=5, shape2=5, p1=1/3)
+all(which(is.na(res)) == c(5,7))
+which(is.nan(res)) == c(5, 7)
+
+
+res <- poibeta(c(1:3/4, Inf, NaN, -1, NA), shape1=5, shape2=5, p1=1/3)
+all(which(is.na(res)) == c(5,7))
+which(is.nan(res)) == 5
+
+
+res <- qoibeta(c(1:3/4, Inf, NaN, -1, NA), shape1=5, shape2=5, p1=1/3)
+all(which(is.na(res)) == 4:7)
+
+
+res <- ecoibeta(c(1:3/4, Inf, NaN, -1, NA), shape1=5, shape2=5, p1=1/3)
+all(which(is.na(res)) == 4:7)
+
+
+res <- moibeta(c(1:3/4, Inf, NaN, -1, NA), shape1=5, shape2=5, p1=1/3)
+all(which(is.na(res)) == c(5,7))
+
 x <- roibeta(n, 2, 2, p1=1/2)
 y <- roibeta(n, 4/3, 2/3, p1=1/3)
 

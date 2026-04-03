@@ -19,21 +19,23 @@ dgbeta <- function(x, shape0, shape1, shape2, log=FALSE)
   x <- rep_len(x, length.out=m)
   
   res <- rep(NaN, m)
-  shapepos <- shape0 > 0 & shape1 > 0 & shape2 > 0
-  id01 <- 0 <= x & x <= 1
+  shapenomiss <- !is.na(shape0) & !is.na(shape1) & !is.na(shape2)
+  shapepos <- shape0 > 0 & shape1 > 0 & shape2 > 0 & shapenomiss
+  id01 <- 0 <= x & x <= 1 & !is.na(x)
+  idno01 <- (0 > x | x > 1) & !is.nan(x)
   
   if(log)
   {
     idmain <- id01 & shapepos
-    res[idmain] <- log(shape0[idmain])+(shape0[idmain]-1)*log(x[idmain])+dbeta(x[idmain]^(shape0[idmain]), 
-                                                                               shape1[idmain], shape2[idmain], log=TRUE)
-    res[!id01 & shapepos] <- -Inf
+    res[idmain] <- log(shape0[idmain])+(shape0[idmain]-1)*log(x[idmain])
+    res[idmain] <- res[idmain] + dbeta(x[idmain]^(shape0[idmain]), shape1[idmain], shape2[idmain], log=TRUE)
+    res[idno01 & shapepos] <- -Inf
   }else
   {
     idmain <- id01 & shapepos
-    res[idmain] <- shape0[idmain]*x[id01]^(shape0[idmain]-1)*dbeta(x[idmain]^(shape0[idmain]), 
-                                                                   shape1[idmain], shape2[idmain], log=FALSE)
-    res[!id01 & shapepos] <- 0
+    res[idmain] <- shape0[idmain]*x[id01]^(shape0[idmain]-1)
+    res[idmain] <- res[idmain]*dbeta(x[idmain]^(shape0[idmain]), shape1[idmain], shape2[idmain], log=FALSE)
+    res[idno01 & shapepos] <- 0
   }
   res
 }
@@ -55,7 +57,8 @@ pgbeta <- function(q, shape0, shape1, shape2, lower.tail = TRUE, log.p = FALSE)
   q <- rep_len(q, length.out=m)
   
   res <- rep(NaN, m)
-  shapepos <- shape0 > 0 & shape1 > 0 & shape2 > 0
+  shapenomiss <- !is.na(shape0) & !is.na(shape1) & !is.na(shape2)
+  shapepos <- shape0 > 0 & shape1 > 0 & shape2 > 0 & shapenomiss & !is.nan(q)
   
   res[shapepos] <- pbeta(q[shapepos]^shape0[shapepos], shape1[shapepos], shape2[shapepos], 
                          lower.tail=TRUE, log.p=FALSE)
@@ -84,8 +87,9 @@ qgbeta <- function(p, shape0, shape1, shape2, lower.tail = TRUE, log.p = FALSE)
   p <- rep_len(p, length.out=m)
   
   res <- rep(NaN, m)
-  shapepos <- shape0 > 0 & shape1 > 0 & shape2 > 0
-  idmain <- shapepos & 0 <= p & p <= 1
+  shapenomiss <- !is.na(shape0) & !is.na(shape1) & !is.na(shape2)
+  shapepos <- shape0 > 0 & shape1 > 0 & shape2 > 0 & shapenomiss
+  idmain <- shapepos & 0 <= p & p <= 1 & !is.na(p)
   
   if(!lower.tail)
     p <- 1-p
@@ -113,7 +117,8 @@ rgbeta <- function(n, shape0, shape1, shape2)
   shape2 <- rep_len(shape2, length.out=m)
   res <- rep(NaN, m)
   
-  shapepos <- shape0 > 0 & shape1 > 0 & shape2 > 0
+  shapenomiss <- !is.na(shape0) & !is.na(shape1) & !is.na(shape2)
+  shapepos <- shape0 > 0 & shape1 > 0 & shape2 > 0 & shapenomiss
   
   res[shapepos] <- rbeta(sum(shapepos), shape1[shapepos], shape2[shapepos])^(1/shape0[shapepos])
   res
@@ -138,8 +143,9 @@ ecgbeta <- function(x, shape0, shape1, shape2)
   
   res <- rep(NaN, m)
   
-  shapepos <- shape0 > 0 & shape1 > 0 & shape2 > 0
-  idmain <- shapepos & 0 <= x & x <= 1
+  shapenomiss <- !is.na(shape0) & !is.na(shape1) & !is.na(shape2)
+  shapepos <- shape0 > 0 & shape1 > 0 & shape2 > 0 & shapenomiss
+  idmain <- shapepos & 0 <= x & x <= 1 & !is.na(x)
   
   cst2 <- beta(shape1[idmain], 1/shape0[idmain])/beta(shape1[idmain] + shape2[idmain], 1/shape0[idmain])
   res[idmain] <- pbeta(x[idmain]^shape0[idmain], shape1[idmain]+1/shape0[idmain], shape2[idmain])
@@ -165,9 +171,10 @@ mgbeta <- function(order, shape0, shape1, shape2)
   
   res <- rep(NaN, m)
   
-  shapepos <- shape0 > 0 & shape1 > 0 & shape2 > 0
+  shapenomiss <- !is.na(shape0) & !is.na(shape1) & !is.na(shape2)
+  shapepos <- shape0 > 0 & shape1 > 0 & shape2 > 0 & shapenomiss
   
-  idmain <- shapepos & 0 < shape1 + order / shape0
+  idmain <- shapepos & 0 < shape1 + order / shape0 & !is.na(order)
   res[idmain] <- beta(shape1[idmain] + order[idmain] / shape0[idmain], shape2[idmain]) / beta(shape1[idmain], shape2[idmain])
   res
 }

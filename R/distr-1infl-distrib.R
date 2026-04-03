@@ -16,21 +16,21 @@ doifun <- function(x, dfun, p1, log=FALSE, ...)
   res <- rep(NaN, m)
   
   #x == 1
-  idmain <- x == 1 & p1 >= 0 & p1 <= 1
+  idmain <- x == 1 & p1 >= 0 & p1 <= 1 & !is.na(x) & !is.na(p1)
   if(!log)
   {
     res[idmain] <- p1[idmain]  
   }else
     res[idmain] <- log(p1[idmain])
   # x not in [0,1]
-  idmain <- (x > 1 | x < 0) & p1 >= 0 & p1 <= 1
+  idmain <- (x > 1 | x < 0) & p1 >= 0 & p1 <= 1 & !is.na(x) & !is.na(p1)
   if(!log)
   {
     res[idmain] <- 0
   }else
     res[idmain] <- -Inf
   # x in [0,1)
-  idmain <- 0 <= x & x < 1 & p1 >= 0 & p1 <= 1
+  idmain <- 0 <= x & x < 1 & p1 >= 0 & p1 <= 1 & !is.na(x) & !is.na(p1)
   if(!log)
   {
     res[idmain] <- dfun(x[idmain], log=FALSE, ...) * (1 - p1[idmain])
@@ -53,7 +53,7 @@ poifun <- function(q, pfun, p1, lower.tail = TRUE, log.p = FALSE, ...)
   
   res <- rep(NaN, m)
   
-  idmain <- p1 >= 0 & p1 <= 1
+  idmain <- p1 >= 0 & p1 <= 1 & !is.nan(q) & !is.na(p1)
   res[idmain] <- pfun(q[idmain], lower.tail = TRUE, log.p = FALSE, ...)*(1 - p1[idmain]) + p1[idmain]*(q[idmain] >= 1)
   
   if(!lower.tail)
@@ -79,7 +79,7 @@ qoifun <- function(p, qfun, p1, lower.tail = TRUE, log.p = FALSE, ...)
   
   res <- rep(NaN, m)
   
-  idmain <- p1 >= 0 & p1 < 1 & p >= 0 & p < 1 - p1
+  idmain <- p1 >= 0 & p1 < 1 & p >= 0 & p < 1 - p1 & !is.na(p) & !is.na(p1)
   p[idmain] <- p[idmain]/(1-p1[idmain]) #transformed quantile
   if(!lower.tail)
     p[idmain] <- 1-p[idmain]
@@ -88,7 +88,7 @@ qoifun <- function(p, qfun, p1, lower.tail = TRUE, log.p = FALSE, ...)
   
   res[idmain] <- qfun(p[idmain], lower.tail = TRUE, log.p = FALSE, ...)
   
-  idmain <- p1 >= 0 & p1 < 1 & p <= 1 & p >= 1 - p1
+  idmain <- p1 >= 0 & p1 < 1 & p <= 1 & p >= 1 - p1 & !is.na(p) & !is.na(p1)
   res[idmain] <- 1
   res
 }  
@@ -107,7 +107,7 @@ roifun <- function(n, rfun, p1, ...)
   
   res <- rep(NaN, m)
   
-  idmain <- p1 >= 0 & p1 <= 1
+  idmain <- p1 >= 0 & p1 <= 1 & !is.na(p1)
   res[idmain] <- rbinom(sum(idmain), 1, p1[idmain])
   
   notone <- res[idmain] != 1 & idmain
@@ -131,7 +131,7 @@ ecoifun <- function(x, ecfun, mfun, p1, ...)
   
   res <- rep(NaN, m)
   
-  idmain <- x >= 0 & x <= 1  & p1 >= 0 & p1 <= 1
+  idmain <- x >= 0 & x <= 1  & p1 >= 0 & p1 <= 1 & !is.na(x) & !is.na(p1)
   
   G0 <- ecfun(x[idmain], ...) #exposure curve
   E0 <- mfun(order=1, ...) #expectation
@@ -156,8 +156,7 @@ moifun <- function(order, mfun, p1, ...)
   order <- rep_len(order, length.out=m)
   res <- rep(NaN, m)
   
-  idmain <- p1 >= 0 & p1 <= 1
-  
+  idmain <- p1 >= 0 & p1 <= 1 & !is.na(order) & !is.na(p1)
   E0 <- mfun(order=order[idmain], ...) #expectation
   res[idmain] <- p1[idmain] + (1-p1[idmain])*E0
   res
@@ -174,7 +173,7 @@ tloifun <- function(p1, ...)
   m <- length(p1)
   res <- rep(NaN, m)
   
-  idmain <- p1 >= 0 & p1 <= 1
+  idmain <- p1 >= 0 & p1 <= 1 & !is.na(p1)
   res[idmain] <- p1[idmain]
   res
 }

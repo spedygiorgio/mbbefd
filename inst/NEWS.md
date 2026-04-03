@@ -7,13 +7,16 @@
   * Allow parallel computation `bootDR()` as in `bootdist()`.  
   * Add a `control` argument for `fitDR()` which allows different levels of estimation traces.
   * Add components for `fitDR()` outputs in order to make correct bootstrap estimations in `bootDR()`.
+  * Control arguments are correctly passed to optimization functions in `fitDR()`.
   * Add a `vcov()` function for `bootDR()` outputs.
   * Rewrite entirely the `d`, `p`, `q`, `r` functions for GB1 in order to allow a parameter vector.
   * Rewrite entirely `*oifun()` functions for one-inflated distributions in order to allow a vector `p1`.
+  * Speedup `fitDR()` by removing `fitdist()` in favor of `mledist()` directly.
   
 ### BUG FIX 
 
   * Fix an issue in `fitDR()` for distribution `oibeta` with total-loss-moment-matching estimation.
+  * Fix the treatment of `NA` and `NaN` in probability distribution functions (`d`, `p`, `q`, `ec`, `m`, `tl`).
 
 ## CHANGES IN `mbbefd` VERSION 0.8.14
 

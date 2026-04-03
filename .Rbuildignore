@@ -3,12 +3,17 @@
 ^\.travis\.yml$
 ^\.travis_old\.yml$
 ^data-raw$
+.github/
+.gitignore
+.Rhistory
 AUTHORS
 LICENCE
+
 vignettes/figure/
 vignettes/*\.tex
 vignettes/*\.md
 vignettes/test-beta.Rmd
+tests/test-lossalae-oigbeta.R
 tests/check-formula*
 tests/test-mbbefd-*
 tests/test-GB1.R
@@ -16,6 +21,3 @@ tests/t-brvehinsdr.R
 tests/brvehinsdr.csv
 R/data-documentData-old.R
 share/
-.github/
-.gitignore
-.Rhistory

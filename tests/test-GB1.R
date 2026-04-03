@@ -2,6 +2,30 @@ library(mbbefd)
 
 #test of GB1 distribution
 
+#test arguments
+
+res <- dgbeta(c(1:3/4, Inf, NaN, -1, NA), shape0=5, shape1=5, shape2=5)
+all(which(is.na(res)) == c(5,7))
+which(is.nan(res)) == 5
+
+
+res <- pgbeta(c(1:3/4, Inf, NaN, -1, NA), shape0=5, shape1=5, shape2=5)
+all(which(is.na(res)) == c(5,7))
+which(is.nan(res)) == 5
+
+
+res <- qgbeta(c(1:3/4, Inf, NaN, -1, NA), shape0=5, shape1=5, shape2=5)
+all(which(is.na(res)) == 4:7)
+
+
+
+res <- ecgbeta(c(1:3/4, Inf, NaN, -1, NA), shape0=5, shape1=5, shape2=5)
+all(which(is.na(res)) == 4:7)
+
+res <- mgbeta(c(1:3/4, Inf, NaN, -1, NA), shape0=5, shape1=5, shape2=5)
+all(which(is.na(res)) == c(5,7))
+
+
 
 #integral of the density
 integrate(dgbeta, 0, 1, shape0=1, shape1=3, shape2=3/2)
@@ -140,12 +164,12 @@ integrate(f, 0, 1, d=d, shape0=s0)
 
 
 #test EC
-f <- function(x, d, shape0) dgbeta(x, shape0=shape0, shape1=3, shape2=3/2)*pmin(x, d)/mgbeta(1, shape0=shape0, shape1=3, shape2=3/2)
-F <- function(d, shape0) sapply(d, function(d) integrate(f, 0, 1, d=d, shape0=shape0)$value)
+fn <- function(x, d, shape0) dgbeta(x, shape0=shape0, shape1=3, shape2=3/2)*pmin(x, d)/mgbeta(1, shape0=shape0, shape1=3, shape2=3/2)
+Fn <- function(d, shape0) sapply(d, function(d) integrate(fn, 0, 1, d=d, shape0=shape0)$value)
 
-cbind(eecf(x)(z), ecgbeta(z, shape0=2, shape1=3, shape2=3/2), F(z, shape0=2))
+cbind(eecf(x)(z), ecgbeta(z, shape0=2, shape1=3, shape2=3/2), Fn(z, shape0=2))
 
-cbind(eecf(y)(z), ecgbeta(z, shape0=pi, shape1=3, shape2=3/2), F(z, shape0=pi))
+cbind(eecf(y)(z), ecgbeta(z, shape0=pi, shape1=3, shape2=3/2), Fn(z, shape0=pi))
 
 
 

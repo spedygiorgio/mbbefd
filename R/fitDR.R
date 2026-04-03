@@ -41,7 +41,7 @@ fitDR <- function(x, dist, method="mle", start=NULL, optim.method="default", con
       cat("\tinitial parameter value try\n")
       print(sapply(initparmbbefd, unlist))
     }
-    prefit <- prefitDR.mle(x, "mbbefd")
+    prefit <- prefitDR.mle(x, "mbbefd", control=con4optim)
     #domain : (a,b) in (-1, 0) x (1, +Inf)
     if(all(!is.na(prefit[[1]])))
     {
@@ -168,7 +168,7 @@ fitDR <- function(x, dist, method="mle", start=NULL, optim.method="default", con
       cat("\tinitial parameter value second try\n")
       print(sapply(initparMBBEFD, unlist))
     }
-    prefit <- prefitDR.mle(x, "MBBEFD")
+    prefit <- prefitDR.mle(x, "MBBEFD", control=con4optim)
     if(all(!is.na(prefit[[1]])))
     { 
       initparMBBEFD[[1]] <- prefit[[1]]
@@ -285,13 +285,13 @@ fitDR <- function(x, dist, method="mle", start=NULL, optim.method="default", con
         method <- "mle"
       if(optim.method == "default")
         optim.method <- "Brent"
-      f1 <- fitdist(x, distr=dist, method=method, start=start, calcvcov=TRUE, 
+      f1 <- mledist(x, distr=dist, method=method, start=start, calcvcov=TRUE, 
                     lower=0, upper=1, control=con4optim, ..., optim.method=optim.method) 
       f1$optim.method <- optim.method
       f1$control <- NULL
       if(control$trace > 0)
       {
-        cat("\toptimal parameter value after fitdist()\n")
+        cat("\toptimal parameter value after mledist()\n")
         print(f1$estimate)
       }
     }else
@@ -300,7 +300,7 @@ fitDR <- function(x, dist, method="mle", start=NULL, optim.method="default", con
   }else if(dist %in% c("oistpareto", "oibeta", "oigbeta")) #one-inflated distr
   {
     p1 <- etl(x, na.rm=TRUE)
-    xneq1 <- x[x != 1]
+    xneq1 <- x[x < 1]
     distneq1 <- substr(dist, 3, nchar(dist))
     
     if(is.null(start))
@@ -366,9 +366,11 @@ fitDR <- function(x, dist, method="mle", start=NULL, optim.method="default", con
       {
         if(length(xneq1) > 1)
         {
-          prefit <- prefitDR.mle(xneq1, "oigbeta")
+          prefit <- prefitDR.mle(xneq1, "oigbeta", control=con4optim)
           
-          if(all(!is.na(prefit)))
+          loglik1 <- LLfunc(xneq1, prefit, distneq1)
+          
+          if(all(!is.na(prefit)) && loglik1 > loglik0)
             start <- as.list(prefit)
           if(control$trace > 0)
           {
@@ -377,17 +379,22 @@ fitDR <- function(x, dist, method="mle", start=NULL, optim.method="default", con
           }
         }
         if(optim.method == "default")
-          optim.method <- "BFGS"
-        f1 <- fitdist(xneq1, distr=distneq1, method="mle", start=start, control=con4optim,
-                      optim.method=optim.method, calcvcov=TRUE, ...)
+          optim.method <- "L-BFGS-B"
+        f1 <- mledist(xneq1, distr=distneq1, lower=uplolist$lower, upper=uplolist$upper, 
+                      start=start, control=con4optim, optim.method=optim.method, calcvcov=TRUE, ...)
+        #f1 <- fitdist(xneq1, distr=distneq1, method="mle", lower=uplolist$lower, upper=uplolist$upper, 
+        #              start=start, control=con4optim,
+        #              optim.method=optim.method, calcvcov=TRUE, ...)
         
       }else
       {
         if(optim.method == "default")
           optim.method <- "L-BFGS-B"
-        f1 <- fitdist(xneq1, distr=distneq1, method="mle", start=start, 
-                      lower=uplolist$lower, upper=uplolist$upper, control=con4optim,
-                      optim.method=optim.method, calcvcov=TRUE, ...)
+        f1 <- mledist(xneq1, distr=distneq1, lower=uplolist$lower, upper=uplolist$upper, 
+                      start=start, control=con4optim, optim.method=optim.method, calcvcov=TRUE, ...)
+        #f1 <- fitdist(xneq1, distr=distneq1, method="mle", start=start, 
+        #              lower=uplolist$lower, upper=uplolist$upper, control=con4optim,
+        #              optim.method=optim.method, calcvcov=TRUE, ...)
       }
       f1$estimate <- c(f1$estimate, "p1"=p1) 
       f1 <- fitDR.addcomp(x=x, theta=f1$estimate, hessian=f1$hessian, vcov=NULL,
@@ -395,7 +402,7 @@ fitDR <- function(x, dist, method="mle", start=NULL, optim.method="default", con
                           optim.method=optim.method, control=control)
       if(control$trace > 0)
       {
-        cat("\toptimal parameter value after fitdist()\n")
+        cat("\toptimal parameter value after mledist()\n")
         print(f1$estimate)
       }  
       

@@ -4,13 +4,16 @@ library(fitdistrplus)
 
 #oigbeta
 n <- 1e3
+n <- 1e5
 nboot <- 1000
 nboot <- 10
 set.seed(12345)
 x <- roigbeta(n, 3, 2, 5/2, 1/6)
 
 
-f1 <- fitDR(x, "oigbeta", method="mle", control=list(trace=0, maxit=500)) 
+#fitdistrplus::fitdist(x[x<1], "gbeta", start=list(shape0=5, shape1=5, shape2=5), lower=0)
+
+f1 <- fitDR(x, "oigbeta", method="mle", control=list(trace=2, maxit=500)) 
 summary(f1)
 
 if(FALSE)

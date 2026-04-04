@@ -285,7 +285,7 @@ fitDR <- function(x, dist, method="mle", start=NULL, optim.method="default", con
         method <- "mle"
       if(optim.method == "default")
         optim.method <- "Brent"
-      f1 <- mledist(x, distr=dist, method=method, start=start, calcvcov=TRUE, 
+      f1 <- fitdist(x, distr=dist, method=method, start=start, calcvcov=TRUE, 
                     lower=0, upper=1, control=con4optim, ..., optim.method=optim.method) 
       f1$optim.method <- optim.method
       f1$control <- NULL

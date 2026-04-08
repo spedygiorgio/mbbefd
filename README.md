@@ -5,7 +5,7 @@
 [![CRAN-checks](https://badges.cranchecks.info/summary/mbbefd.svg)](https://cran.r-project.org/web/checks/check_results_mbbefd.html)
 [![License: GPL
 v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
-[![Git-Version](https://img.shields.io/badge/devel%20version-0.8.14-red.svg)](https://github.com/spedygiorgio/mbbefd)
+[![Git-Version](https://img.shields.io/badge/devel%20version-0.8.15-red.svg)](https://github.com/spedygiorgio/mbbefd)
 
 MBBEFD provides additional distributions to R, such as the MBBEFD and
 shifted truncated Pareto as well as functions to handle destruction rate
@@ -41,4 +41,8 @@ help("mbbefd-package")
 
 If you use `mbbefd`, you should cite: <br /> Christophe Dutang, Giorgio
 Spedicato (2025). *mbbefd: Maxwell Boltzmann Bose Einstein Fermi Dirac
-Distribution and Destruction Rate Modelling.* R package.
+Distribution and Destruction Rate Modelling.* R package,
+DOI [10.32614/CRAN.package.mbbefd](https://doi.org/10.32614/CRAN.package.mbbefd).
+
+
+ 	

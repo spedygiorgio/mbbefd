@@ -62,7 +62,15 @@ jobs:
       - name: Test coverage
         shell: Rscript {0}
         run: |
-          cov <- covr::package_coverage(type = "tests", quiet = FALSE)
+          # Build the package first so that .Rbuildignore is honoured, as in
+          # R CMD check: tests/ also contains old scripts that are excluded
+          # from the package (they need packages that are no longer used).
+          stopifnot(system2(file.path(R.home("bin"), "R"),
+                            c("CMD", "build", "--no-build-vignettes", "--no-manual", ".")) == 0)
+          tarball <- list.files(pattern = "^mbbefd_.*\\.tar\\.gz$")[1]
+          exdir <- tempfile("pkg")
+          untar(tarball, exdir = exdir)
+          cov <- covr::package_coverage(file.path(exdir, "mbbefd"), type = "tests", quiet = FALSE)
           print(cov)
           covr::report(cov, file = "coverage.html", browse = FALSE)
           # summary in the job page

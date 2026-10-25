@@ -8,9 +8,11 @@
 
 .onAttach <- function(libname, pkgname) {
   desc  <- packageDescription(pkgname, libname)
+  # 'Date' is an optional DESCRIPTION field: do not print an empty line when absent
+  datemsg <- if(!is.null(desc$Date)) paste0('Date:     ', desc$Date, '\n') else ''
   packageStartupMessage('Package:  ', desc$Package, '\n',
                         'Version:  ', desc$Version, '\n', 
-                        'Date:     ', desc$Date, '\n',
+                        datemsg,
                         'BugReport: ', desc$BugReports, '\n\n')
 }
 

@@ -13,7 +13,7 @@ Description: Distributions that are typically used for exposure rating in
              empirical data. See, e.g., Bernegger (1997) <doi:10.2143/AST.27.1.563208>
              freely available on-line.
 License: GPL-2
-Depends: R (>= 3.6), fitdistrplus (>= 1.1-4), alabama, Rcpp (>= 0.12.18)
+Depends: R (>= 3.6), fitdistrplus (>= 1.2-1), alabama, Rcpp (>= 0.12.18)
 ByteCompile: yes
 Suggests: testthat, pander, rmarkdown, knitr, lattice
 LinkingTo: Rcpp
@@ -21,6 +21,5 @@ Imports: utils, actuar, MASS
 URL: https://github.com/spedygiorgio/mbbefd
 BugReports: https://github.com/spedygiorgio/mbbefd/issues
 VignetteBuilder: knitr
-SystemRequirements: GNU make
 NeedsCompilation: yes
 RoxygenNote: 6.0.1

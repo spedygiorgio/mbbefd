@@ -17,6 +17,13 @@
 
   * Fix an issue in `fitDR()` for distribution `oibeta` with total-loss-moment-matching estimation.
   * Fix the treatment of `NA` and `NaN` in probability distribution functions (`d`, `p`, `q`, `ec`, `m`, `tl`).
+  * `bootDR()` now restores the user's `warn` and `show.error.messages` options even when the bootstrap loop fails or is interrupted.
+  * The start-up message no longer prints an empty `Date:` line when the `Date` field is absent from `DESCRIPTION`.
+
+### MISC
+
+  * Raise the minimal required version of `fitdistrplus` to 1.2-1: `fitDR()` and `bootDR()` rely on the `calcvcov` argument and on `density.bootdist()`, which are not available in older releases (before: `unused argument (calcvcov = TRUE)`).
+  * Remove the obsolete `src/Makevars*` files (`RCPP_USE_UNWIND_PROTECT` is the default of `Rcpp >= 0.12.18`) and the unneeded `SystemRequirements: GNU make`.
 
 ## CHANGES IN `mbbefd` VERSION 0.8.14
 

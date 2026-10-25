@@ -40,7 +40,7 @@ bootDR <- function(f, bootmethod="param", niter=1001, silent=TRUE,
                                    optim.method=f$optim.method, control=f$control)
                        ), silent=silent)
     
-    if(class(res)[1] == "try-error")
+    if(inherits(res, "try-error"))
       return(c(rep(NA, length(start)), 100))
     else
       return(c(res$estimate, res$convergence))
@@ -49,6 +49,8 @@ bootDR <- function(f, bootmethod="param", niter=1001, silent=TRUE,
   owarn <- getOption("warn")
   oerr <- getOption("show.error.messages")
   options(warn=ifelse(silent, -1, 0), show.error.messages=!silent)
+  #restore the user options even if the bootstrap loop fails (e.g. an interruption)
+  on.exit(options(warn=owarn, show.error.messages=oerr), add=TRUE)
   
   # parallel or sequential computation
   if (parallel != "no") 

@@ -37,7 +37,7 @@ dmbbefdR <- function(x, a, b, log=FALSE)
   idbonly <- a == Inf & b > 0 & b < 1 & is.finite(b) & id01
   res[idbonly] <- -log(b[idbonly]) * b[idbonly]^x[idbonly]  #-log(b)b^x, x!=1
   idbonly <- a == Inf & b > 0 & b < 1 & is.finite(b) & id1
-  res[idbonly] <- 1 - b[idbonly] #1-b, x==1
+  res[idbonly] <- b[idbonly] #P(X = 1) = b, x==1
   
   
   #main case

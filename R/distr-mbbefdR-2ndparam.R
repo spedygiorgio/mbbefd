@@ -36,7 +36,7 @@ dMBBEFDR <- function(x, g, b, log=FALSE)
   idbonly <- g > 1 & b < 1 & b > 0 & b*g == 1 & is.finite(b) & id01
   res[idbonly] <- -log(b[idbonly]) * b[idbonly]^x[idbonly]  #-log(b)b^x, x!=1
   idbonly <- g > 1 & b != 1 & b > 0 & b*g == 1 & is.finite(b) & id1
-  res[idbonly] <- 1 - b[idbonly] #1-b, x==1
+  res[idbonly] <- b[idbonly] #P(X = 1) = b, x==1
   
   #g only
   idgonly <- g > 1 & b == 1

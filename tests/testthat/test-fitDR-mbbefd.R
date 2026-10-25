@@ -113,3 +113,10 @@ test_that("standard errors of one-inflated fits match the observed information",
   expect_equal(unname(f$sd[1:2]), sqrt(diag(solve(H))), tolerance=1e-3)
   expect_equal(unname(f$sd[3]), sqrt(etl(x)*(1-etl(x))/length(x)), tolerance=1e-8)
 })
+
+test_that("point mass at 1 in the special case gb = 1 (a = Inf)", {
+  b <- 0.3
+  expect_equal(dmbbefd(1, Inf, b), tlmbbefd(Inf, b))
+  expect_equal(dMBBEFD(1, 1/b, b), tlMBBEFD(1/b, b))
+  expect_equal(dMBBEFD(1, 1/b, b), 1 - pMBBEFD(1 - 1e-12, 1/b, b), tolerance=1e-8)
+})

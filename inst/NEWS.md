@@ -41,6 +41,7 @@
   * `fitDR()` for `mbbefd` and `MBBEFD` now computes the Hessian (and standard errors) also when the 
     optimization converges in a single domain (previously `NA`).
   * Fix the starting value of `b` based on `F(1/2)` in `fitDR(x, "MBBEFD")`: the polynomial root is `sqrt(b)`, not `b`.
+  * Fix the point mass at 1 returned by `dmbbefd()` and `dMBBEFD()` in the special case `gb = 1` (`a = Inf`): it is `b`, as given by `tlmbbefd()`, `pmbbefd()` and `rmbbefd()`, not `1 - b`.
   * Fix the standard errors of the shape parameters of one-inflated fits (`oibeta`, `oistpareto`, `oigbeta`) in `fitDR()`: they are estimated on the observations below 1 only, so their covariance matrix is now divided by the number of such observations instead of the total sample size (standard errors were too small by a factor `sqrt(1 - p1)`).
 
 ### MISC

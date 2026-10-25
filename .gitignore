@@ -2,3 +2,5 @@
 .Rhistory
 .RData
 /vignettes/*.log
+tests/Rplots.pdf
+

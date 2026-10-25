@@ -12,6 +12,17 @@
   * Rewrite entirely the `d`, `p`, `q`, `r` functions for GB1 in order to allow a parameter vector.
   * Rewrite entirely `*oifun()` functions for one-inflated distributions in order to allow a vector `p1`.
   * Speedup `fitDR()` by removing `fitdist()` in favor of `mledist()` directly.
+  * `fitDR()` for `mbbefd` and `MBBEFD` now explores the whole parameter space, including the region 
+    `b < 1` and `gb > 1` (decreasing density, `a < -1` in the first parametrization), which was 
+    previously excluded: the maximum likelihood is computed on three domains and the best fit is retained.
+  * `dmbbefd()`, `pmbbefd()`, `qmbbefd()`, `rmbbefd()`, `ecmbbefd()`, `mmbbefd()` and `tlmbbefd()` now 
+    support `a < -1` with `0 < b < 1`, consistently with the `MBBEFD(g,b)` functions (previously `NaN`).
+  * `fitDR(method = "tlmme")` for `mbbefd` and `MBBEFD` now solves the total loss and mean equations exactly, 
+    as in Bernegger (1997): `g = 1/etl(x)` and `b` is the unique root of the mean equation. 
+    A warning is raised and `NA` is returned when `0 < etl(x) < mean(x) < 1` does not hold.
+  * `fitDR(method = "mle")` for `mbbefd` and `MBBEFD` raises a warning when the data contain no total loss.
+  * Add unit tests for gradients, constraint jacobians, parametrization consistency, `tlmme`, 
+    standard errors and the new parameter domain.
   
 ### BUG FIX 
 
@@ -19,6 +30,17 @@
   * Fix the treatment of `NA` and `NaN` in probability distribution functions (`d`, `p`, `q`, `ec`, `m`, `tl`).
   * `bootDR()` now restores the user's `warn` and `show.error.messages` options even when the bootstrap loop fails or is interrupted.
   * The start-up message no longer prints an empty `Date:` line when the `Date` field is absent from `DESCRIPTION`.
+  * Fix the gradient of the log-likelihood of `MBBEFD(g,b)` with respect to `b` (a factor `-2` was missing).
+    Point estimates were mostly unaffected, but the Hessian, hence standard errors, correlation and 
+    confidence intervals of `fitDR(x, "MBBEFD")`, were wrong: standard errors were too small 
+    (coverage of 95% Wald intervals between 3% and 83% in simulations, now about 95%).
+  * Fix the jacobians of the constraints `constrmbbefd1jac()` and `constrmbbefd2jac()`, and the constraint 
+    `b > 0` in `constrmbbefd2()` (previously `a > 0` was checked twice); they were used by 
+    `fitDR(x, "mbbefd", method = "tlmme")`.
+  * `fitDR(x, "MBBEFD", method = "tlmme")` did not solve the moment equations (estimates could get stuck at `b = 1`).
+  * `fitDR()` for `mbbefd` and `MBBEFD` now computes the Hessian (and standard errors) also when the 
+    optimization converges in a single domain (previously `NA`).
+  * Fix the starting value of `b` based on `F(1/2)` in `fitDR(x, "MBBEFD")`: the polynomial root is `sqrt(b)`, not `b`.
 
 ### MISC
 

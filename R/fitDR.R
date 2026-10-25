@@ -32,42 +32,49 @@ fitDR <- function(x, dist, method="mle", start=NULL, optim.method="default", con
   if(control$trace > 0)
     cat("Distribution is", dist, "\n")
   
+  if(dist %in% c("mbbefd", "MBBEFD") && method == "mle" && !any(x == 1))
+    warning("there is no total loss (x == 1) in the data: the estimated total loss probability goes to the boundary 0.")
+  
   if(dist == "mbbefd")
   {
+    #the parameter space is split in three domains
+    #D1 : (a,b) in (-1, 0) x (1, +Inf)
+    #D2 : (a,b) in (0, +Inf) x (0, 1)
+    #D3 : (a,b) in (-Inf, -1) x (0, 1), i.e. b < 1 and gb > 1 in the 2nd parametrization
     initparmbbefd <- list(list(a=Trans.m10(0), b=Trans.1Inf(0)), 
-                          list(a=Trans.0Inf(0), b=Trans.01(0)))
+                          list(a=Trans.0Inf(0), b=Trans.01(0)),
+                          list(a=Trans.mInfm1(0), b=Trans.01(0)))
     if(control$trace > 0)
     {
       cat("\tinitial parameter value try\n")
       print(sapply(initparmbbefd, unlist))
     }
-    prefit <- prefitDR.mle(x, "mbbefd", control=con4optim)
-    #domain : (a,b) in (-1, 0) x (1, +Inf)
-    if(all(!is.na(prefit[[1]])))
-    {
-      initparmbbefd[[1]] <- prefit[[1]]
-      if(initparmbbefd[[1]]["b"] == 1)
-        initparmbbefd[[1]]["b"] <- 2
-    }
-    #domain : (a,b) in (0, +Inf) x (0, 1)
-    if(all(!is.na(prefit[[2]])))
-    {
-      initparmbbefd[[2]] <- prefit[[2]]
-      if(initparmbbefd[[2]]["b"] == 1)
-        initparmbbefd[[2]]["b"] <- 1/2
-    }
-    if(!is.list(initparmbbefd[[1]]))
-      initparmbbefd[[1]] <- as.list(initparmbbefd[[1]])
-    if(!is.list(initparmbbefd[[2]]))
-      initparmbbefd[[2]] <- as.list(initparmbbefd[[2]])
-    if(control$trace > 0)
-    {
-      cat("\tinitial parameter value after prefit()\n")
-      print(sapply(initparmbbefd, unlist))
-    }
-    
     if(method == "mle")
     {
+      prefit <- prefitDR.mle(x, "mbbefd", control=con4optim)
+      #domain D1
+      if(all(!is.na(prefit[[1]])))
+      {
+        initparmbbefd[[1]] <- prefit[[1]]
+        if(initparmbbefd[[1]]["b"] == 1)
+          initparmbbefd[[1]]["b"] <- 2
+      }
+      #domain D2 and D3
+      for(i in 2:3)
+        if(all(!is.na(prefit[[i]])))
+        {
+          initparmbbefd[[i]] <- prefit[[i]]
+          if(initparmbbefd[[i]]["b"] == 1)
+            initparmbbefd[[i]]["b"] <- 1/2
+        }
+      for(i in 1:3)
+        if(!is.list(initparmbbefd[[i]]))
+          initparmbbefd[[i]] <- as.list(initparmbbefd[[i]])
+      if(control$trace > 0)
+      {
+        cat("\tinitial parameter value after prefit()\n")
+        print(sapply(initparmbbefd, unlist))
+      }
       
       #wrap -LL to match the call by fitdist
       minusLL <- function(x, fix.arg, obs, ddistnam) 
@@ -76,33 +83,21 @@ fitDR <- function(x, dist, method="mle", start=NULL, optim.method="default", con
       grLL <- function(x, fix.arg, obs, ddistnam) 
         -grLLfunc(obs=obs, theta=x, dist="mbbefd")/length(obs)
       
-      #domain : (a,b) in (-1, 0) x (1, +Inf)
-      alabama1 <- mledist(x, distr="mbbefd", start=initparmbbefd[[1]], custom.optim= constrOptim.nl, 
-                          hin=constrmbbefd1, control.outer=con4constrOptim.nl, gradient=grLL, 
-                          calcvcov=FALSE, silent = con4constrOptim.nl$trace == 0, ...)
-      #domain : (a,b) in (0, +Inf) x (0, 1)
-      alabama2 <- mledist(x, distr="mbbefd", start=initparmbbefd[[2]], custom.optim= constrOptim.nl, 
-                          hin=constrmbbefd2, control.outer=con4constrOptim.nl, gradient=grLL, 
-                          calcvcov=FALSE, silent = con4constrOptim.nl$trace == 0, ...)
-      fHess <- NULL
-      if(alabama1$convergence == 100 && alabama2$convergence == 100)
-        f1 <- alabama1
-      else if(alabama1$convergence == 100 && alabama2$convergence != 100) 
-        f1 <- alabama2
-      else if(alabama1$convergence != 100 && alabama2$convergence == 100) 
-        f1 <- alabama1
-      else
-      {
-        if(alabama1$loglik > alabama2$loglik)
-          f1 <- alabama1
-        else
-          f1 <- alabama2 
-        
-        fHess <- try(optimHess(par=f1$estimate, fn=minusLL, obs=x, gr=grLL), silent=TRUE)
-        if(inherits(fHess, "try-error"))
-          fHess <- NULL
-      }
-      f1 <- fitDR.addcomp(x=x, theta=f1$estimate, hessian=fHess, vcov=NULL,
+      #a failure in one domain is expected: do not print the error unless tracing
+      oerr <- options(show.error.messages = con4constrOptim.nl$trace > 0)
+      on.exit(options(oerr), add=TRUE)
+      hinlist <- list(constrmbbefd1, constrmbbefd2, constrmbbefd3)
+      hinjaclist <- list(constrmbbefd1jac, constrmbbefd2jac, constrmbbefd3jac)
+      fitlist <- lapply(1:3, function(i)
+        mledist(x, distr="mbbefd", start=initparmbbefd[[i]], custom.optim= constrOptim.nl, 
+                hin=hinlist[[i]], hin.jac=hinjaclist[[i]], control.outer=con4constrOptim.nl, 
+                gradient=grLL, calcvcov=FALSE, silent = con4constrOptim.nl$trace == 0, ...))
+      options(oerr)
+      #analytical Hessian of -LL/n
+      heLL <- function(par) -heLLfunc(obs=x, theta=par, dist="mbbefd")/length(x)
+      best <- fitDR.selectbest(fitlist, x=x, minusLL=minusLL, grLL=grLL, hessian.fun=heLL)
+      f1 <- best$fit
+      f1 <- fitDR.addcomp(x=x, theta=f1$estimate, hessian=best$hessian, vcov=NULL,
                           dist="mbbefd", method="mle", convergence=f1$convergence,
                           optim.method=optim.method, control=control)
       if(control$trace > 0)
@@ -112,86 +107,81 @@ fitDR <- function(x, dist, method="mle", start=NULL, optim.method="default", con
       }
     }else if(method == "tlmme")
     {
-      DIFF2 <- function(par, obs) 
-      {
-        (mmbbefd(1, par[1], par[2]) - mean(obs))^2 + (tlmbbefd(par[1], par[2]) - etl(obs))^2
-      }
-      alabama1 <- constrOptim.nl(unlist(initparmbbefd[[1]]), fn=DIFF2, hin=constrmbbefd1, 
-                                 hin.jac=constrmbbefd1jac, obs=x, control.outer=con4constrOptim.nl)
-      alabama2 <- constrOptim.nl(unlist(initparmbbefd[[2]]), fn=DIFF2, hin=constrmbbefd2, 
-                                 hin.jac=constrmbbefd2jac, obs=x, control.outer=con4constrOptim.nl)
-      if(alabama1$convergence > 0 && alabama2$convergence > 0)
-        f1 <- list(estimate=NA, convergence=100)
-      else if(alabama1$convergence > 0 && alabama2$convergence == 0) 
-        f1 <- list(estimate=alabama2$par, convergence=0)
-      else if(alabama1$convergence == 0 && alabama2$convergence > 0) 
-        f1 <- list(estimate=alabama1$par, convergence=0)
+      #exact solution of E[X] = mean(x) and P(X=1) = etl(x), see Bernegger (1997)
+      f1 <- tlmme.MBBEFD(x)
+      gb <- f1$estimate
+      if(f1$convergence == 0)
+        f1$estimate <- c(a=unname((gb["g"]-1)*gb["b"]/(1-gb["g"]*gb["b"])), b=unname(gb["b"]))
       else
-      {
-        if(alabama1$value < alabama2$value)
-          f1 <- list(estimate=alabama1$par, convergence=0)
-        else
-          f1 <- list(estimate=alabama2$par, convergence=0)
-      }
-      f1 <- fitDR.addcomp(x=x, theta=f1$estimate, hessian=f1$hessian, vcov=NULL,
+        f1$estimate <- c(a=NA, b=NA)
+      f1 <- fitDR.addcomp(x=x, theta=f1$estimate, hessian=NULL, vcov=NULL,
                           dist="mbbefd", method="tlmme", convergence=f1$convergence,
                           optim.method=optim.method, control=control)
       if(control$trace > 0)
       {
-        cat("\toptimal parameter value after optim()\n")
+        cat("\toptimal parameter value after tlmme\n")
         print(f1$estimate)
       }
     }else
       stop("not yet implemented")
   }else if(dist == "MBBEFD")
   {
-    #starting values
-    g <- 1/etl(x, na.rm=TRUE)
-    if(is.infinite(g))
-      g <- 2
-    initparMBBEFD <- list(list(g=g, b=Trans.1Inf(0)), 
-                          list(g=g, b=1/(2*g)))
-    if(control$trace > 0)
-    {
-      cat("\tinitial parameter value first try\n")
-      print(sapply(initparMBBEFD, unlist))
-    }
-    #try to improve initial value for b
-    phalf <- mean(x <= 1/2)
-    b <- Re(polyroot(c(phalf, (1-g)*(1-phalf), - 1 +g*(1-phalf))))
-    if(any(b > 0 | b < 1))
-      initparMBBEFD[[2]]["b"] <- max(b[b > 0 | b < 1])
-    else if(any(b > 1))
-      initparMBBEFD[[2]]["b"] <- max(b[b > 1])
-    if(control$trace > 0)
-    {
-      cat("\tinitial parameter value second try\n")
-      print(sapply(initparMBBEFD, unlist))
-    }
-    prefit <- prefitDR.mle(x, "MBBEFD", control=con4optim)
-    if(all(!is.na(prefit[[1]])))
-    { 
-      initparMBBEFD[[1]] <- prefit[[1]]
-      if(initparMBBEFD[[1]]["b"] == 1)
-        initparMBBEFD[[1]]["b"] <- 2
-    }
-    if(all(!is.na(prefit[[2]])))
-    {  
-      initparMBBEFD[[2]] <- prefit[[2]]
-      if(initparMBBEFD[[2]]["b"] == 1)
-        initparMBBEFD[[2]]["b"] <- 1/2
-    }
-    if(!is.list(initparMBBEFD[[1]]))
-      initparMBBEFD[[1]] <- as.list(initparMBBEFD[[1]])
-    if(!is.list(initparMBBEFD[[2]]))
-      initparMBBEFD[[2]] <- as.list(initparMBBEFD[[2]])
-    if(control$trace > 0)
-    {
-      cat("\tinitial parameter value after prefit()\n")
-      print(sapply(initparMBBEFD, unlist))
-    }
+    #the parameter space is split in three domains
+    #D1 : (g,b) in (1, +Inf) x (1, +Inf)
+    #D2 : (g,b) in (1, +Inf) x (0, 1) with gb < 1
+    #D3 : (g,b) in (1, +Inf) x (0, 1) with gb > 1
     if(method == "mle")
     {
+      #starting values
+      g <- 1/etl(x, na.rm=TRUE)
+      if(is.infinite(g))
+        g <- 2
+      initparMBBEFD <- list(list(g=g, b=Trans.1Inf(0)), 
+                            list(g=g, b=1/(2*g)),
+                            list(g=g, b=(1+1/g)/2))
+      if(control$trace > 0)
+      {
+        cat("\tinitial parameter value first try\n")
+        print(sapply(initparMBBEFD, unlist))
+      }
+      #try to improve initial value for b using F(1/2) = P(X <= 1/2), 
+      #which is a polynomial equation of degree 2 in y = sqrt(b)
+      phalf <- mean(x <= 1/2)
+      y <- polyroot(c(phalf, (1-g)*(1-phalf), - 1 +g*(1-phalf)))
+      y <- Re(y[abs(Im(y)) < 1e-8])
+      b <- y[y > 0]^2
+      if(any(b < 1/g))
+        initparMBBEFD[[2]]["b"] <- max(b[b < 1/g])
+      else if(any(b > 1))
+        initparMBBEFD[[1]]["b"] <- max(b[b > 1])
+      if(control$trace > 0)
+      {
+        cat("\tinitial parameter value second try\n")
+        print(sapply(initparMBBEFD, unlist))
+      }
+      prefit <- prefitDR.mle(x, "MBBEFD", control=con4optim)
+      if(all(!is.na(prefit[[1]])))
+      { 
+        initparMBBEFD[[1]] <- prefit[[1]]
+        if(initparMBBEFD[[1]]["b"] == 1)
+          initparMBBEFD[[1]]["b"] <- 2
+      }
+      for(i in 2:3)
+        if(all(!is.na(prefit[[i]])))
+        {  
+          initparMBBEFD[[i]] <- prefit[[i]]
+          if(initparMBBEFD[[i]]["b"] == 1)
+            initparMBBEFD[[i]]["b"] <- 1/2
+        }
+      for(i in 1:3)
+        if(!is.list(initparMBBEFD[[i]]))
+          initparMBBEFD[[i]] <- as.list(initparMBBEFD[[i]])
+      if(control$trace > 0)
+      {
+        cat("\tinitial parameter value after prefit()\n")
+        print(sapply(initparMBBEFD, unlist))
+      }
+      
       #wrap -LL to match the call by fitdist
       minusLL <- function(x, fix.arg, obs, ddistnam) 
         -LLfunc(obs=obs, theta=x, dist="MBBEFD")/length(obs)
@@ -199,35 +189,20 @@ fitDR <- function(x, dist, method="mle", start=NULL, optim.method="default", con
       grLL <- function(x, fix.arg, obs, ddistnam) 
         -grLLfunc(obs=obs, theta=x, dist="MBBEFD")/length(obs)
       
-      #domain : (g,b) in (1, +Inf) x (1, +Inf) with gb > 1
-      alabama1 <- mledist(x, distr="MBBEFD", start=initparMBBEFD[[1]], 
-                          custom.optim= constrOptim.nl, hin=constrMBBEFD1, 
-                          control.outer=con4constrOptim.nl, hin.jac=constrMBBEFD1jac, 
-                          silent = con4constrOptim.nl$trace == 0, calcvcov=FALSE, gradient=grLL)
-      #domain : (g,b) in (1, +Inf) x (0, 1) with gb < 1
-      alabama2 <- mledist(x, distr="MBBEFD", start=initparMBBEFD[[2]], 
-                          custom.optim= constrOptim.nl, hin=constrMBBEFD2, 
-                          control.outer=con4constrOptim.nl, hin.jac=constrMBBEFD2jac, 
-                          silent = con4constrOptim.nl$trace == 0, calcvcov=FALSE, gradient=grLL)
-      
-      fHess <- NULL
-      if(alabama1$convergence == 100 && alabama2$convergence == 100)
-        f1 <- alabama1
-      else if(alabama1$convergence == 100 && alabama2$convergence != 100) 
-        f1 <- alabama2
-      else if(alabama1$convergence != 100 && alabama2$convergence == 100) 
-        f1 <- alabama1
-      else
-      {
-        if(alabama1$loglik > alabama2$loglik)
-          f1 <- alabama1
-        else
-          f1 <- alabama2 
-        fHess <- try(optimHess(par=f1$estimate, fn=minusLL, obs=x, gr=grLL), silent=FALSE)
-        if(inherits(fHess, "try-error"))
-          fHess <- NULL
-      }
-      f1 <- fitDR.addcomp(x=x, theta=f1$estimate, hessian=fHess, vcov=NULL,
+      #a failure in one domain is expected: do not print the error unless tracing
+      oerr <- options(show.error.messages = con4constrOptim.nl$trace > 0)
+      on.exit(options(oerr), add=TRUE)
+      hinlist <- list(constrMBBEFD1, constrMBBEFD2, constrMBBEFD3)
+      hinjaclist <- list(constrMBBEFD1jac, constrMBBEFD2jac, constrMBBEFD3jac)
+      fitlist <- lapply(1:3, function(i)
+        mledist(x, distr="MBBEFD", start=initparMBBEFD[[i]], 
+                custom.optim= constrOptim.nl, hin=hinlist[[i]], hin.jac=hinjaclist[[i]],
+                control.outer=con4constrOptim.nl, gradient=grLL,
+                silent = con4constrOptim.nl$trace == 0, calcvcov=FALSE, ...))
+      options(oerr)
+      best <- fitDR.selectbest(fitlist, x=x, minusLL=minusLL, grLL=grLL)
+      f1 <- best$fit
+      f1 <- fitDR.addcomp(x=x, theta=f1$estimate, hessian=best$hessian, vcov=NULL,
                           dist="MBBEFD", method="mle", convergence=f1$convergence,
                           optim.method=optim.method, control=control)
       if(control$trace > 0)
@@ -237,38 +212,18 @@ fitDR <- function(x, dist, method="mle", start=NULL, optim.method="default", con
       }
     }else if(method == "tlmme")
     {
-      DIFF2 <- function(par, obs) 
-      {
-        (mMBBEFD(1, par[1], par[2]) - mean(obs))^2 + (tlMBBEFD(par[1], par[2]) - etl(obs))^2
-      }
-      alabama1 <- constrOptim.nl(unlist(initparMBBEFD[[1]]), fn=DIFF2, hin=constrMBBEFD1, 
-                                 obs=x, control.outer=con4constrOptim.nl)
-      alabama2 <- constrOptim.nl(unlist(initparMBBEFD[[2]]), fn=DIFF2, hin=constrMBBEFD2, 
-                                 obs=x, control.outer=con4constrOptim.nl)
-      
-      if(alabama1$convergence > 0 && alabama2$convergence > 0)
-        f1 <- list(estimate=NA, convergence=100)
-      else if(alabama1$convergence > 0 && alabama2$convergence == 0) 
-        f1 <- list(estimate=alabama2$par, convergence=0)
-      else if(alabama1$convergence == 0 && alabama2$convergence > 0) 
-        f1 <- list(estimate=alabama1$par, convergence=0)
-      else
-      {
-        if(alabama1$value < alabama2$value)
-          f1 <- list(estimate=alabama1$par, convergence=0)
-        else
-          f1 <- list(estimate=alabama2$par, convergence=0)
-      }
-      f1 <- fitDR.addcomp(x=x, theta=f1$estimate, hessian=f1$hessian, vcov=NULL,
+      #exact solution of E[X] = mean(x) and P(X=1) = etl(x), see Bernegger (1997)
+      f1 <- tlmme.MBBEFD(x)
+      f1 <- fitDR.addcomp(x=x, theta=f1$estimate, hessian=NULL, vcov=NULL,
                           dist="MBBEFD", method="tlmme", convergence=f1$convergence,
                           optim.method=optim.method, control=control)
       if(control$trace > 0)
       {
-        cat("\toptimal parameter value after optim()\n")
+        cat("\toptimal parameter value after tlmme\n")
         print(f1$estimate)
       }
     }else
-      stop("not yet implemented")  
+      stop("not yet implemented")
     
   }else if(dist == "oiunif")
   {

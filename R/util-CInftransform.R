@@ -29,3 +29,10 @@ Trans.1Inf <- function(x)
 InvT.1Inf <- function(x)
   log(x-1)
 
+#Transformation from (-Inf, +Inf) to (-Inf, -1)
+Trans.mInfm1 <- function(x)
+  -1-exp(x)
+#Inverse
+InvT.mInfm1 <- function(x)
+  log(-1-x)
+

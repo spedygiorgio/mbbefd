@@ -49,7 +49,8 @@ grLLfunc <- function(obs, theta, dist)
       {
         denom1 <- (g-1)*b^(1-x)+1-g*b
         num1 <- 1/(b-1)+1/(b*log(b))+(1-x)/b
-        num2 <- ((g-1)*(1-x)*b^(-x) - g)/denom1
+        #derivative of -2*log(denom1) w.r.t. b
+        num2 <- -2*((g-1)*(1-x)*b^(-x) - g)/denom1
         res <- num1+num2
       }else
       {

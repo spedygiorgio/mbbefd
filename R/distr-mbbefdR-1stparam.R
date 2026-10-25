@@ -18,7 +18,7 @@ dmbbefdR <- function(x, a, b, log=FALSE)
   x <- rep_len(x, length.out=m)
   
   #default to NaN: b=+infty; a=+infy && b > 0 && b < 1;
-  #a != -1 && a +1 >0 && b > 0 && a*(1-b) >= 0
+  #main domain: -1 < a < 0 & b > 1, or a > 0 & 0 < b < 1, or a < -1 & 0 < b < 1 (i.e. b < 1 and gb > 1)
   res <- rep(NaN, m)
   id1 <- x == 1
   id01 <- 0 < x & x < 1
@@ -28,7 +28,7 @@ dmbbefdR <- function(x, a, b, log=FALSE)
   res[idDirac] <- 1 * id1[idDirac] #x == 1
   
   #identity function
-  ididentity <- (b == 1 & a > -1) | (b == Inf & a >-1 & a < 0) | (a == 0 & b > 0)
+  ididentity <- (b == 1 & a > -1) | (b == 1 & a < -1) | (b == Inf & a >-1 & a < 0) | (a == 0 & b > 0)
   res[ididentity] <- 1 * id1[ididentity] #x == 1
   
   #b only
@@ -41,12 +41,12 @@ dmbbefdR <- function(x, a, b, log=FALSE)
   
   
   #main case
-  idmain <- ((-1 < a & a < 0 & b > 1) | (0 < a & 0 < b & b < 1)) & is.finite(a) & is.finite(b)
+  idmain <- ((-1 < a & a < 0 & b > 1) | (0 < a & 0 < b & b < 1) | (a < -1 & 0 < b & b < 1)) & is.finite(a) & is.finite(b)
   res[idmain] <- 0
   idmain <- idmain & id01
   #-  \ln(b) \frac{a(a+1) b^x }{(a+b^x)^2}
   res[idmain] <- -a[idmain] * (a[idmain]+1) * b[idmain]^x[idmain] * log(b[idmain]) / (a[idmain] + b[idmain]^x[idmain])^2 
-  idmain <- ((-1 < a & a < 0 & b > 1) | (0 < a & 0 < b & b < 1)) & is.finite(a) & is.finite(b)
+  idmain <- ((-1 < a & a < 0 & b > 1) | (0 < a & 0 < b & b < 1) | (a < -1 & 0 < b & b < 1)) & is.finite(a) & is.finite(b)
   idmain <- idmain & id1
   #\frac{(a+1)b}{a+b}
   res[idmain] <- (a[idmain]+1) * b[idmain] / (a[idmain]+b[idmain])
@@ -72,7 +72,7 @@ pmbbefdR <- function(q, a, b, lower.tail = TRUE, log.p = FALSE)
   q <- rep_len(q, length.out=m)
   
   #default to NaN: b=+infty; a=+infy && b > 0 && b < 1;
-  #a != -1 && a +1 >0 && b > 0 && a*(1-b) >= 0
+  #main domain: -1 < a < 0 & b > 1, or a > 0 & 0 < b < 1, or a < -1 & 0 < b < 1 (i.e. b < 1 and gb > 1)
   res <- rep(NaN, m)
   id0 <- 0 < q 
   id1 <- q < 1
@@ -82,7 +82,7 @@ pmbbefdR <- function(q, a, b, lower.tail = TRUE, log.p = FALSE)
   res[idDirac] <- 1*(q[idDirac] >= 1)
   
   #identity function
-  ididentity <- (b == 1 & a > -1) | (b == Inf & a >-1 & a < 0) | (a == 0 & b > 0)
+  ididentity <- (b == 1 & a > -1) | (b == 1 & a < -1) | (b == Inf & a >-1 & a < 0) | (a == 0 & b > 0)
   res[ididentity] <- 1 * (q[ididentity] >= 1)
   
   #b only
@@ -92,7 +92,7 @@ pmbbefdR <- function(q, a, b, lower.tail = TRUE, log.p = FALSE)
   res[idbonly] <- 1-b[idbonly]^q[idbonly]
   
   #main case
-  idmain <- ((-1 < a & a < 0 & b > 1) | (0 < a & 0 < b & b < 1)) & is.finite(a) & is.finite(b)
+  idmain <- ((-1 < a & a < 0 & b > 1) | (0 < a & 0 < b & b < 1) | (a < -1 & 0 < b & b < 1)) & is.finite(a) & is.finite(b)
   res[idmain] <- 1*(q[idmain] >= 1) # 1_(x >= 1)
   idmain <- idmain & id0 & id1
   res[idmain] <- 1 - (a[idmain]+1)*b[idmain]^q[idmain]/(a[idmain]+b[idmain]^q[idmain])
@@ -126,7 +126,7 @@ qmbbefdR <- function(p, a, b, lower.tail = TRUE, log.p = FALSE)
     p <- exp(p) 
   
   #default to NaN: b=+infty; a=+infy && b > 0 && b < 1;
-  #a != -1 && a +1 >0 && b > 0 && a*(1-b) >= 0
+  #main domain: -1 < a < 0 & b > 1, or a > 0 & 0 < b < 1, or a < -1 & 0 < b < 1 (i.e. b < 1 and gb > 1)
   res <- rep(NaN, m)
   
   #unit indicator - 
@@ -135,7 +135,7 @@ qmbbefdR <- function(p, a, b, lower.tail = TRUE, log.p = FALSE)
   res[idDirac] <- 1
   
   #identity function
-  ididentity <- (b == 1 & a > -1) | (b == Inf & a >-1 & a < 0) | (a == 0 & b > 0)
+  ididentity <- (b == 1 & a > -1) | (b == 1 & a < -1) | (b == Inf & a >-1 & a < 0) | (a == 0 & b > 0)
   ididentity <- ididentity & 0 <= p & p <= 1
   res[ididentity] <- 1
   
@@ -146,14 +146,14 @@ qmbbefdR <- function(p, a, b, lower.tail = TRUE, log.p = FALSE)
   res[idbonly] <- 1 #1
   
   #main case
-  idmain <- ((-1 < a & a < 0 & b > 1) | (0 < a & 0 < b & b < 1)) & is.finite(a) & is.finite(b)
+  idmain <- ((-1 < a & a < 0 & b > 1) | (0 < a & 0 < b & b < 1) | (a < -1 & 0 < b & b < 1)) & is.finite(a) & is.finite(b)
   idmain <- idmain & 0 == p
   res[idmain] <- 0 #0
-  idmain <- ((-1 < a & a < 0 & b > 1) | (0 < a & 0 < b & b < 1)) & is.finite(a) & is.finite(b)
+  idmain <- ((-1 < a & a < 0 & b > 1) | (0 < a & 0 < b & b < 1) | (a < -1 & 0 < b & b < 1)) & is.finite(a) & is.finite(b)
   idmain <- idmain & 0 < p & p < 1 - (a+1)*b/(a+b)
   #\frac{\ln\left(\frac{(1-p)a}{a+p}\right)}{\ln(b)}
   res[idmain] <- log( (1 - p[idmain]) * a[idmain] / (a[idmain] + p[idmain]) ) / log( b[idmain] )
-  idmain <- ((-1 < a & a < 0 & b > 1) | (0 < a & 0 < b & b < 1)) & is.finite(a) & is.finite(b)
+  idmain <- ((-1 < a & a < 0 & b > 1) | (0 < a & 0 < b & b < 1) | (a < -1 & 0 < b & b < 1)) & is.finite(a) & is.finite(b)
   idmain <- idmain & p >= 1 - (a+1)*b/(a+b) & p <= 1
   res[idmain] <- 1 #1
   
@@ -177,7 +177,7 @@ rmbbefdR <- function(n, a, b)
   b <- rep_len(b, length.out=m)
   
   #default to NaN: b=+infty; a=+infy && b > 0 && b < 1;
-  #a != -1 && a +1 >0 && b > 0 && a*(1-b) >= 0
+  #main domain: -1 < a < 0 & b > 1, or a > 0 & 0 < b < 1, or a < -1 & 0 < b < 1 (i.e. b < 1 and gb > 1)
   res <- rep(NaN, m)
   
   #unit indicator - 
@@ -185,7 +185,7 @@ rmbbefdR <- function(n, a, b)
   res[idDirac] <- 1
   
   #identity function
-  ididentity <- (b == 1 & a > -1) | (b == Inf & a >-1 & a < 0) | (a == 0 & b > 0)
+  ididentity <- (b == 1 & a > -1) | (b == 1 & a < -1) | (b == Inf & a >-1 & a < 0) | (a == 0 & b > 0)
   res[ididentity] <- 1
   
   #b only
@@ -194,7 +194,7 @@ rmbbefdR <- function(n, a, b)
     res[idbonly] <- qmbbefdR(runif(sum(idbonly)), a[idbonly], b[idbonly])
   
   #main case
-  idmain <- ((-1 < a & a < 0 & b > 1) | (0 < a & 0 < b & b < 1)) & is.finite(b)
+  idmain <- ((-1 < a & a < 0 & b > 1) | (0 < a & 0 < b & b < 1) | (a < -1 & 0 < b & b < 1)) & is.finite(b)
   if(sum(idmain) > 0)
     res[idmain] <- qmbbefdR(runif(sum(idmain)), a[idmain], b[idmain])
   
@@ -217,7 +217,7 @@ ecmbbefdR <- function(x, a, b)
   x <- rep_len(x, length.out=m)
   
   #default to NaN: b=+infty; a=+infy && b > 0 && b < 1;
-  #a != -1 && a +1 >0 && b > 0 && a*(1-b) >= 0
+  #main domain: -1 < a < 0 & b > 1, or a > 0 & 0 < b < 1, or a < -1 & 0 < b < 1 (i.e. b < 1 and gb > 1)
   res <- rep(NaN, m)
   id0 <- 0 <= x 
   id1 <- x <= 1
@@ -228,7 +228,7 @@ ecmbbefdR <- function(x, a, b)
   res[idDirac] <- 1*(x[idDirac] == 1)
   
   #identity function
-  ididentity <- (b == 1 & a > -1) | (b == Inf & a >-1 & a < 0) | (a == 0 & b > 0)
+  ididentity <- (b == 1 & a > -1) | (b == 1 & a < -1) | (b == Inf & a >-1 & a < 0) | (a == 0 & b > 0)
   ididentity <- ididentity & x > 0 & id1
   res[ididentity] <- x[ididentity]
   
@@ -237,7 +237,7 @@ ecmbbefdR <- function(x, a, b)
   res[idbonly] <- (1-b[idbonly]^x[idbonly])/(1-b[idbonly])
   
   #main case
-  idmain <- ((-1 < a & a < 0 & b > 1) | (0 < a & 0 < b & b < 1)) & is.finite(a) & is.finite(b)
+  idmain <- ((-1 < a & a < 0 & b > 1) | (0 < a & 0 < b & b < 1) | (a < -1 & 0 < b & b < 1)) & is.finite(a) & is.finite(b)
   idmain <- idmain & id0 & id1
   res[idmain] <- log((a[idmain]+b[idmain]^x[idmain])/(a[idmain]+1)) / log((a[idmain]+b[idmain])/(a[idmain]+1))  
   
@@ -266,7 +266,7 @@ mmbbefdR <- function(order, a, b)
   res[idDirac] <- 1^order[idDirac]
   
   #identity function
-  ididentity <- (b == 1 & a > -1) | (b == Inf & a >-1 & a < 0) | (a == 0 & b > 0)
+  ididentity <- (b == 1 & a > -1) | (b == 1 & a < -1) | (b == Inf & a >-1 & a < 0) | (a == 0 & b > 0)
   res[ididentity] <- 1^order[ididentity]
   
   #b only
@@ -288,10 +288,10 @@ mmbbefdR <- function(order, a, b)
       mom1(k=order[idbonly][i], b=b[idbonly][i]))
   }
   #main case
-  idmain <- (-1 < a & a < 0 & b > 1) | (0 < a & 0 < b & b < 1)
+  idmain <- (-1 < a & a < 0 & b > 1) | (0 < a & 0 < b & b < 1) | (a < -1 & 0 < b & b < 1)
   idmain <- idmain & is.finite(a) & is.finite(b) & order == 1
   res[idmain] <- log( (a[idmain]+b[idmain]) / (a[idmain]+1) ) / log(b[idmain]) * (a[idmain]+1)
-  idmain <- (-1 < a & a < 0 & b > 1) | (0 < a & 0 < b & b < 1)
+  idmain <- (-1 < a & a < 0 & b > 1) | (0 < a & 0 < b & b < 1) | (a < -1 & 0 < b & b < 1)
   idmain <- idmain & is.finite(a) & is.finite(b) & order != 1
   if(sum(idmain) > 0)
   {
@@ -325,7 +325,7 @@ tlmbbefdR <- function(a, b)
   b <- rep_len(b, length.out=m)
   
   #default to NaN: b=+infty; a=+infy && b > 0 && b < 1;
-  #a != -1 && a +1 >0 && b > 0 && a*(1-b) >= 0
+  #main domain: -1 < a < 0 & b > 1, or a > 0 & 0 < b < 1, or a < -1 & 0 < b < 1 (i.e. b < 1 and gb > 1)
   res <- rep(NaN, m)
   
   #unit indicator - 
@@ -333,7 +333,7 @@ tlmbbefdR <- function(a, b)
   res[idDirac] <- 1
   
   #identity function
-  ididentity <- (b == 1 & a > -1) | (b == Inf & a >-1 & a < 0) | (a == 0 & b > 0)
+  ididentity <- (b == 1 & a > -1) | (b == 1 & a < -1) | (b == Inf & a >-1 & a < 0) | (a == 0 & b > 0)
   res[ididentity] <- 1
   
   #b only
@@ -341,7 +341,7 @@ tlmbbefdR <- function(a, b)
   res[idbonly] <- b[idbonly]
   
   #main case
-  idmain <- ((-1 < a & a < 0 & b > 1) | (0 < a & 0 < b & b < 1)) & is.finite(a) & is.finite(b)
+  idmain <- ((-1 < a & a < 0 & b > 1) | (0 < a & 0 < b & b < 1) | (a < -1 & 0 < b & b < 1)) & is.finite(a) & is.finite(b)
   res[idmain] <- (a[idmain] + 1) * b[idmain] / (a[idmain] + b[idmain])
   
   res

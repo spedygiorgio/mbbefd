@@ -64,7 +64,7 @@ NumericVector rmbbefdC(int n, double a, double b) {
       else
         out[i] = log(1-u)/log(b);
     }
-  }else if(a +1 >0 && b > 0 && a*(1-b) > 0)
+  }else if( (a +1 >0 && b > 0 && a*(1-b) > 0) || (a < -1 && b > 0 && b < 1) ) //main domain incl. b < 1 and gb > 1
   {
     pab = (a+1)*b/(a+b);
     for(int i=0; i<n; i++)

@@ -44,10 +44,9 @@ fitDR.addcomp <- function(x, theta, hessian=NULL, dist, method, convergence=0, v
         f1$vcov <- f1$sd <- f1$cor <- NA
       }else if(all(!is.na(hessian)) && qr(hessian)$rank == NCOL(hessian))
       {
-        subvcov <- solve(hessian)
+        subvcov <- solve(hessian) / sum(x < 1)
         f1$vcov <- rbind(cbind(as.matrix(subvcov), rep(0, npar-1)),
-                         c(rep(0, npar-1), p1*(1-p1)))
-        f1$vcov <- f1$vcov/f1$n
+                         c(rep(0, npar-1), p1*(1-p1)/f1$n))
         dimnames(f1$vcov) <- list(names(f1$estimate), names(f1$estimate))
         f1$sd <- sqrt(diag(f1$vcov))
         f1$cor <- cov2cor(f1$vcov)

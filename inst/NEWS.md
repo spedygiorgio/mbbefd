@@ -41,10 +41,11 @@
   * `fitDR()` for `mbbefd` and `MBBEFD` now computes the Hessian (and standard errors) also when the 
     optimization converges in a single domain (previously `NA`).
   * Fix the starting value of `b` based on `F(1/2)` in `fitDR(x, "MBBEFD")`: the polynomial root is `sqrt(b)`, not `b`.
+  * Fix the standard errors of the shape parameters of one-inflated fits (`oibeta`, `oistpareto`, `oigbeta`) in `fitDR()`: they are estimated on the observations below 1 only, so their covariance matrix is now divided by the number of such observations instead of the total sample size (standard errors were too small by a factor `sqrt(1 - p1)`).
 
 ### MISC
 
-  * Raise the minimal required version of `fitdistrplus` to 1.2-1: `fitDR()` and `bootDR()` rely on the `calcvcov` argument and on `density.bootdist()`, which are not available in older releases (before: `unused argument (calcvcov = TRUE)`).
+  * Raise the minimal required version of `fitdistrplus` to 1.2-2: `fitDR()` and `bootDR()` rely on the `calcvcov` argument and on `density.bootdist()` (introduced in 1.2-1; before: `unused argument (calcvcov = TRUE)`), and the standard errors of one-inflated fits assume that `mledist()` minimizes the average negative log-likelihood (since 1.2-2).
   * Remove the obsolete `src/Makevars*` files (`RCPP_USE_UNWIND_PROTECT` is the default of `Rcpp >= 0.12.18`) and the unneeded `SystemRequirements: GNU make`.
 
 ## CHANGES IN `mbbefd` VERSION 0.8.14

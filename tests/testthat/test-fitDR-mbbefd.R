@@ -103,3 +103,13 @@ test_that("a warning is raised without total losses", {
   x <- rMBBEFD(200, 5, .1)
   expect_warning(fitDR(x[x < 1], "MBBEFD"), "no total loss")
 })
+
+test_that("standard errors of one-inflated fits match the observed information", {
+  set.seed(7)
+  x <- roibeta(1000, 2, 5, 1/10)
+  f <- fitDR(x, "oibeta")
+  y <- x[x < 1]
+  H <- -numhess(function(t) sum(dbeta(y, t[1], t[2], log=TRUE)), unname(f$estimate[1:2]))
+  expect_equal(unname(f$sd[1:2]), sqrt(diag(solve(H))), tolerance=1e-3)
+  expect_equal(unname(f$sd[3]), sqrt(etl(x)*(1-etl(x))/length(x)), tolerance=1e-8)
+})

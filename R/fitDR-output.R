@@ -1,3 +1,11 @@
+# File overview: builds the object returned by fitDR(). The object mimics the
+# output of fitdistrplus::fitdist() (same component names and order), so that
+# the fitdist methods (summary, plot, cdfcomp, gofstat, bootdist, ...) can be
+# used on fitDR objects.
+# Arguments: x the data, theta the estimated parameters, hessian the Hessian of
+# the average negative log-likelihood -LL/n at theta (NULL if not available),
+# dist the distribution name, method "mle" or "tlmme", convergence the code of
+# the optimizer.
 fitDR.addcomp <- function(x, theta, hessian=NULL, dist, method, convergence=0, vcov=NULL, 
                           optim.method="default", control=list())
 {
@@ -18,6 +26,7 @@ fitDR.addcomp <- function(x, theta, hessian=NULL, dist, method, convergence=0, v
   f1$control <- control
   npar <- length(theta)
   
+  # log-likelihood and information criteria AIC = -2 LL + 2 k, BIC = -2 LL + log(n) k
   #gof statistics
   if(any(is.na(theta)))
   {
@@ -29,6 +38,7 @@ fitDR.addcomp <- function(x, theta, hessian=NULL, dist, method, convergence=0, v
     f1$bic <- -2*f1$loglik+log(f1$n)*npar
   }
   
+  # covariance matrix of the estimates (only for maximum likelihood)
   #one-inflated uniform distribution
   if(dist %in% "oiunif")
   {
@@ -38,6 +48,12 @@ fitDR.addcomp <- function(x, theta, hessian=NULL, dist, method, convergence=0, v
     #one-inflated distribution with at least two parameters
     if(method == "mle")
     {
+      # For one-inflated distributions, p1 is estimated by the proportion of total
+      # losses, independently of the shape parameters, which are estimated on the
+      # observations below 1 only. Hence the covariance matrix is block diagonal:
+      # - shape parameters: inverse Hessian of -LL/n divided by the number of
+      #   observations below 1;
+      # - p1: binomial variance p1 (1 - p1) / n.
       p1 <- f1$estimate["p1"]
       if(is.null(hessian))
       {
@@ -60,6 +76,8 @@ fitDR.addcomp <- function(x, theta, hessian=NULL, dist, method, convergence=0, v
     }
   }else
   {
+    # MBBEFD: the asymptotic covariance matrix is the inverse of the observed
+    # information, i.e. solve(Hessian of -LL/n) / n.
     #non one-inflated distributions: mbbefd / MBBEFD
     if(method == "mle")
     {

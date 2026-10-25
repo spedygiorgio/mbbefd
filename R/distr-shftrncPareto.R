@@ -1,6 +1,12 @@
+# File overview: the shifted truncated Pareto distribution on [0,1], with
+# shape a > 0. It is the Pareto distribution of X + 1 (support [1, +Inf))
+# truncated to [1, 2] and shifted back to [0, 1]:
+#   F(x) = (1 - (x+1)^(-a)) / (1 - 2^(-a)),  0 <= x <= 1.
+# It is used as the continuous part of the one-inflated distribution oistpareto.
 #d, p, q, r function for shifted truncated Pareto distribution
 
 #should it be dstpareto01?
+# density f(x) = a (x+1)^(-a-1) / (1 - 2^(-a)) on [0,1], zero elsewhere
 dstpareto <- function(x, a, log=FALSE)
 {
   if(!(a > 0))
@@ -15,6 +21,7 @@ dstpareto <- function(x, a, log=FALSE)
   res
 }
 
+# distribution function (see the file overview)
 pstpareto <- function(q, a, lower.tail = TRUE, log.p = FALSE)
 {
   if(!(a > 0))
@@ -33,6 +40,7 @@ pstpareto <- function(q, a, lower.tail = TRUE, log.p = FALSE)
 }
 
 
+# quantile function: inverse of pstpareto
 qstpareto <- function(p, a, lower.tail = TRUE, log.p = FALSE)
 {
   if(!(a > 0))
@@ -49,6 +57,7 @@ qstpareto <- function(p, a, lower.tail = TRUE, log.p = FALSE)
   res
 }  
 
+# random generation by inversion: Q(U) with U uniform on (0,1)
 rstpareto <- function(n, a)
 {
   n <- ifelse(length(n)>1, length(n), n)
@@ -58,6 +67,7 @@ rstpareto <- function(n, a)
 }
 
 
+# exposure curve G(x) = E[min(X,x)] / E[X], in closed form (special case a = 1)
 ecstpareto <- function(x, a)
 {
   if(!(a > 0))
@@ -76,6 +86,7 @@ ecstpareto <- function(x, a)
   res
 }
 
+# raw moment: only the mean (order 1) is implemented, in closed form
 mstpareto <- function(order, a)
 {
   if(order == 1)

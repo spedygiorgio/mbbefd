@@ -1,7 +1,16 @@
+# File overview: generalized beta distribution of the first kind (GB1) on [0,1],
+# without location and scale. If Y ~ Beta(shape1, shape2) then
+# X = Y^(1/shape0) ~ GB1(shape0, shape1, shape2), hence
+#   F(x) = pbeta(x^shape0, shape1, shape2),
+#   f(x) = shape0 x^(shape0 - 1) dbeta(x^shape0, shape1, shape2).
+# All functions are vectorized in the data and in the parameters (recycled to a
+# common length) and return NaN when a shape parameter is not positive or missing.
+# It is the continuous part of the one-inflated distribution oigbeta.
 #d, p, q, r function for generalized beta distribution of the first kind
 #(no location and scale paramater)
 
 
+# density (see the file overview); 0 outside [0,1]
 dgbeta <- function(x, shape0, shape1, shape2, log=FALSE)
 {
   #sanity check
@@ -40,6 +49,7 @@ dgbeta <- function(x, shape0, shape1, shape2, log=FALSE)
   res
 }
 
+# distribution function
 pgbeta <- function(q, shape0, shape1, shape2, lower.tail = TRUE, log.p = FALSE)
 {
   #sanity check
@@ -70,6 +80,7 @@ pgbeta <- function(q, shape0, shape1, shape2, lower.tail = TRUE, log.p = FALSE)
 }
 
 
+# quantile function: Q(p) = qbeta(p, shape1, shape2)^(1/shape0)
 qgbeta <- function(p, shape0, shape1, shape2, lower.tail = TRUE, log.p = FALSE)
 {
   #sanity check
@@ -99,6 +110,7 @@ qgbeta <- function(p, shape0, shape1, shape2, lower.tail = TRUE, log.p = FALSE)
   res
 }  
 
+# random generation: Beta variates raised to the power 1/shape0
 rgbeta <- function(n, shape0, shape1, shape2)
 {
   #sanity check
@@ -125,6 +137,8 @@ rgbeta <- function(n, shape0, shape1, shape2)
 }
 
 
+# exposure curve G(x) = E[min(X,x)] / E[X], in closed form with incomplete beta
+# functions (pbeta)
 ecgbeta <- function(x, shape0, shape1, shape2)
 {
   #sanity check
@@ -153,6 +167,7 @@ ecgbeta <- function(x, shape0, shape1, shape2)
   res
 }
 
+# raw moment E[X^k] = B(shape1 + k/shape0, shape2) / B(shape1, shape2)
 mgbeta <- function(order, shape0, shape1, shape2)
 {
   #sanity check
@@ -184,16 +199,21 @@ mgbeta <- function(order, shape0, shape1, shape2)
 #internal functions
 
 #incomplete beta function
+# non-normalized incomplete beta function
 betainc <- function(x, a, b) pbeta(x, a, b) * beta(a, b)
 
 
 #Theil index, see package ineq for other income index (e.g. Gini coefficient)
+# Theoretical Theil index of GB1, used to find a starting value of shape0
 Theil.theo  <- function(shape0, shape1, shape2)
 {
   EX <- beta(shape1+shape2, 1/shape0) / beta(shape1, 1/shape0)
   1/shape0*(digamma(shape1+1/shape0) - digamma(shape1+shape2+ 1/shape0)) - log(EX)
 }
 
+# Theil index as a function of shape0 only: shape1 and shape2 are replaced by
+# their moment estimates on the transformed sample obs^shape0. fitDR() picks the
+# shape0 for which it matches the empirical Theil index (Theil.emp).
 Theil.theo.shape0  <- function(shape0, obs)
 {
   #compute shape1/shape2 on a rescaled sample and moment estimator

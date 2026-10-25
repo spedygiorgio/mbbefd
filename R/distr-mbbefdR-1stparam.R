@@ -1,8 +1,28 @@
+# File overview: d, p, q, r, ec (exposure curve), m (raw moments) and tl (total
+# loss) functions of the MBBEFD distribution in its first parametrization (a,b)
+# (Bernegger, 1997). For a destruction rate X in [0,1]:
+#   exposure curve  G(x) = log((a + b^x) / (a + 1)) / log((a + b) / (a + 1)),
+#   survival        1 - F(x) = (a + 1) b^x / (a + b^x)  for 0 <= x < 1,
+#   total loss      P(X = 1) = (a + 1) b / (a + b) = 1/g.
+# The link with the second parametrization is g = (a + b) / ((a + 1) b) and
+# a = (g - 1) b / (1 - g b) (see g2a()).
+#
+# All functions follow the same structure:
+# 1. check the arguments and recycle x, a, b to a common length m;
+# 2. start from NaN (invalid parameters), then fill the result case by case:
+#    - 'unit indicator' / 'identity function': degenerate parameters, where all
+#      the mass is at 1 (total loss only, g = 1);
+#    - 'b only': a = +Inf, i.e. gb = 1 in the second parametrization;
+#    - 'main case': the regular domain -1 < a < 0 with b > 1, a > 0 with
+#      0 < b < 1, or a < -1 with 0 < b < 1 (i.e. b < 1 and gb > 1).
+# The user-level names (dmbbefd, ...) are defined at the end of the file.
 
 
 ### R version of d,p,q,r functions MBBEFD(a,b)
 #see r functions in distr-mbbefdCpp.R
 
+# Density f(x) = -a (a+1) log(b) b^x / (a + b^x)^2 for 0 <= x < 1, and the
+# point mass P(X = 1) = (a+1) b / (a+b) at x = 1 (needed by the likelihood).
 dmbbefdR <- function(x, a, b, log=FALSE)
 {
   #sanity check
@@ -23,14 +43,17 @@ dmbbefdR <- function(x, a, b, log=FALSE)
   id1 <- x == 1
   id01 <- 0 < x & x < 1
   
+  # degenerate case: total loss only
   #unit indicator - 
   idDirac <- (b == 0 & a > 0) | (a == -1 & b > 1)
   res[idDirac] <- 1 * id1[idDirac] #x == 1
   
+  # degenerate case: total loss only (b = 1 or a = 0 gives g = 1)
   #identity function
   ididentity <- (b == 1 & a > -1) | (b == 1 & a < -1) | (b == Inf & a >-1 & a < 0) | (a == 0 & b > 0)
   res[ididentity] <- 1 * id1[ididentity] #x == 1
   
+  # a = +Inf (gb = 1): F(x) = 1 - b^x, P(X = 1) = b
   #b only
   idbonly <- a == Inf & b > 0 & b < 1 
   res[idbonly] <- 0 #0
@@ -40,6 +63,7 @@ dmbbefdR <- function(x, a, b, log=FALSE)
   res[idbonly] <- b[idbonly] #P(X = 1) = b, x==1
   
   
+  # regular domain
   #main case
   idmain <- ((-1 < a & a < 0 & b > 1) | (0 < a & 0 < b & b < 1) | (a < -1 & 0 < b & b < 1)) & is.finite(a) & is.finite(b)
   res[idmain] <- 0
@@ -57,6 +81,8 @@ dmbbefdR <- function(x, a, b, log=FALSE)
   res
 }  
 
+# Distribution function F(q) = 1 - (a+1) b^q / (a + b^q) for 0 < q < 1,
+# F(q) = 1 for q >= 1.
 pmbbefdR <- function(q, a, b, lower.tail = TRUE, log.p = FALSE)
 {
   #sanity check
@@ -77,20 +103,24 @@ pmbbefdR <- function(q, a, b, lower.tail = TRUE, log.p = FALSE)
   id0 <- 0 < q 
   id1 <- q < 1
   
+  # degenerate case: total loss only
   #unit indicator - 
   idDirac <- (b == 0 & a > 0) | (a == -1 & b > 1)
   res[idDirac] <- 1*(q[idDirac] >= 1)
   
+  # degenerate case: total loss only (b = 1 or a = 0 gives g = 1)
   #identity function
   ididentity <- (b == 1 & a > -1) | (b == 1 & a < -1) | (b == Inf & a >-1 & a < 0) | (a == 0 & b > 0)
   res[ididentity] <- 1 * (q[ididentity] >= 1)
   
+  # a = +Inf (gb = 1): F(x) = 1 - b^x, P(X = 1) = b
   #b only
   idbonly <- a == Inf & b > 0 & b < 1 & is.finite(b)
   res[idbonly] <- 1*(q[idbonly] >= 1) # 1_(x >= 1)
   idbonly <- a == Inf & b > 0 & b < 1 & is.finite(b) & id0 & id1
   res[idbonly] <- 1-b[idbonly]^q[idbonly]
   
+  # regular domain
   #main case
   idmain <- ((-1 < a & a < 0 & b > 1) | (0 < a & 0 < b & b < 1) | (a < -1 & 0 < b & b < 1)) & is.finite(a) & is.finite(b)
   res[idmain] <- 1*(q[idmain] >= 1) # 1_(x >= 1)
@@ -106,6 +136,8 @@ pmbbefdR <- function(q, a, b, lower.tail = TRUE, log.p = FALSE)
 }  
 
 
+# Quantile function: for p < 1 - P(X = 1), Q(p) = log((1-p) a / (a + p)) / log(b);
+# for larger p the quantile is 1 (total loss).
 qmbbefdR <- function(p, a, b, lower.tail = TRUE, log.p = FALSE)
 {
   #sanity check
@@ -129,22 +161,26 @@ qmbbefdR <- function(p, a, b, lower.tail = TRUE, log.p = FALSE)
   #main domain: -1 < a < 0 & b > 1, or a > 0 & 0 < b < 1, or a < -1 & 0 < b < 1 (i.e. b < 1 and gb > 1)
   res <- rep(NaN, m)
   
+  # degenerate case: total loss only
   #unit indicator - 
   idDirac <- (b == 0 & a > 0) | (a == -1 & b > 1)
   idDirac <- idDirac & 0 <= p & p <= 1
   res[idDirac] <- 1
   
+  # degenerate case: total loss only (b = 1 or a = 0 gives g = 1)
   #identity function
   ididentity <- (b == 1 & a > -1) | (b == 1 & a < -1) | (b == Inf & a >-1 & a < 0) | (a == 0 & b > 0)
   ididentity <- ididentity & 0 <= p & p <= 1
   res[ididentity] <- 1
   
+  # a = +Inf (gb = 1): F(x) = 1 - b^x, P(X = 1) = b
   #b only
   idbonly <- a == Inf & b > 0 & b < 1 & is.finite(b) & 0 <= p & p < 1-b
   res[idbonly] <- log(1 - p[idbonly]) / log(b[idbonly]) #log(1-p)/log(b)
   idbonly <- a == Inf & b > 0 & b < 1 & is.finite(b) & p >= 1-b & p <= 1
   res[idbonly] <- 1 #1
   
+  # regular domain
   #main case
   idmain <- ((-1 < a & a < 0 & b > 1) | (0 < a & 0 < b & b < 1) | (a < -1 & 0 < b & b < 1)) & is.finite(a) & is.finite(b)
   idmain <- idmain & 0 == p
@@ -161,6 +197,9 @@ qmbbefdR <- function(p, a, b, lower.tail = TRUE, log.p = FALSE)
 }  
 
 
+# Vectorized random generation by inversion: Q(U) with U uniform on (0,1).
+# Used when the parameters are vectors; the C++ generator is used otherwise
+# (see rmbbefd() in distr-mbbefdCpp.R).
 rmbbefdR <- function(n, a, b)
 {
   #sanity check
@@ -180,19 +219,23 @@ rmbbefdR <- function(n, a, b)
   #main domain: -1 < a < 0 & b > 1, or a > 0 & 0 < b < 1, or a < -1 & 0 < b < 1 (i.e. b < 1 and gb > 1)
   res <- rep(NaN, m)
   
+  # degenerate case: total loss only
   #unit indicator - 
   idDirac <- (b == 0 & a > 0) | (a == -1 & b > 1)
   res[idDirac] <- 1
   
+  # degenerate case: total loss only (b = 1 or a = 0 gives g = 1)
   #identity function
   ididentity <- (b == 1 & a > -1) | (b == 1 & a < -1) | (b == Inf & a >-1 & a < 0) | (a == 0 & b > 0)
   res[ididentity] <- 1
   
+  # a = +Inf (gb = 1): F(x) = 1 - b^x, P(X = 1) = b
   #b only
   idbonly <- a == Inf & b > 0 & b < 1 & is.finite(b)
   if(sum(idbonly) > 0)
     res[idbonly] <- qmbbefdR(runif(sum(idbonly)), a[idbonly], b[idbonly])
   
+  # regular domain
   #main case
   idmain <- ((-1 < a & a < 0 & b > 1) | (0 < a & 0 < b & b < 1) | (a < -1 & 0 < b & b < 1)) & is.finite(b)
   if(sum(idmain) > 0)
@@ -202,6 +245,7 @@ rmbbefdR <- function(n, a, b)
 }
 
 
+# Exposure curve G(x) = E[min(X,x)] / E[X] (see the file overview).
 ecmbbefdR <- function(x, a, b)
 {
   #sanity check
@@ -222,20 +266,24 @@ ecmbbefdR <- function(x, a, b)
   id0 <- 0 <= x 
   id1 <- x <= 1
   
+  # degenerate case: total loss only
   #unit indicator - 
   idDirac <- (b == 0 & a > 0) | (a == -1 & b > 1)
   idDirac <- idDirac & id0 & id1
   res[idDirac] <- 1*(x[idDirac] == 1)
   
+  # degenerate case: total loss only (b = 1 or a = 0 gives g = 1)
   #identity function
   ididentity <- (b == 1 & a > -1) | (b == 1 & a < -1) | (b == Inf & a >-1 & a < 0) | (a == 0 & b > 0)
   ididentity <- ididentity & x > 0 & id1
   res[ididentity] <- x[ididentity]
   
+  # a = +Inf (gb = 1): F(x) = 1 - b^x, P(X = 1) = b
   #b only
   idbonly <- a == Inf & b > 0 & b < 1 & is.finite(b) & id0 & id1
   res[idbonly] <- (1-b[idbonly]^x[idbonly])/(1-b[idbonly])
   
+  # regular domain
   #main case
   idmain <- ((-1 < a & a < 0 & b > 1) | (0 < a & 0 < b & b < 1) | (a < -1 & 0 < b & b < 1)) & is.finite(a) & is.finite(b)
   idmain <- idmain & id0 & id1
@@ -245,6 +293,9 @@ ecmbbefdR <- function(x, a, b)
 }
 
 #moment
+# Raw moments E[X^k]. The mean has a closed form; other orders use
+# E[X^k] = integral on [0,1] of P(X^k > t) dt = integral of S(t^(1/k)) dt,
+# with S the survival function, computed by numerical integration.
 mmbbefdR <- function(order, a, b)
 {
   #sanity check
@@ -261,14 +312,17 @@ mmbbefdR <- function(order, a, b)
   
   res <- rep(NaN, m)
   
+  # degenerate case: X = 1, so E[X^k] = 1
   #unit indicator - 
   idDirac <- (b == 0 & a > 0) | (a == -1 & b > 1)
   res[idDirac] <- 1^order[idDirac]
   
+  # degenerate case: X = 1
   #identity function
   ididentity <- (b == 1 & a > -1) | (b == 1 & a < -1) | (b == Inf & a >-1 & a < 0) | (a == 0 & b > 0)
   res[ididentity] <- 1^order[ididentity]
   
+  # a = +Inf: mean (b - 1)/log(b); other orders by integration of S(x) = b^x
   #b only
   idbonly <- a == Inf & b > 0 & b < 1 & is.finite(b) & order == 1
   res[idbonly] <- (b[idbonly] - 1) / log(b[idbonly])
@@ -287,6 +341,7 @@ mmbbefdR <- function(order, a, b)
     res[idbonly] <- sapply(1:sum(idbonly), function(i) 
       mom1(k=order[idbonly][i], b=b[idbonly][i]))
   }
+  # regular domain: mean (a+1) log((a+b)/(a+1)) / log(b); other orders by integration
   #main case
   idmain <- (-1 < a & a < 0 & b > 1) | (0 < a & 0 < b & b < 1) | (a < -1 & 0 < b & b < 1)
   idmain <- idmain & is.finite(a) & is.finite(b) & order == 1
@@ -312,6 +367,7 @@ mmbbefdR <- function(order, a, b)
 }
 
 #total loss
+# Total loss probability P(X = 1) = (a+1) b / (a+b).
 tlmbbefdR <- function(a, b)
 {
   #sanity check
@@ -328,18 +384,22 @@ tlmbbefdR <- function(a, b)
   #main domain: -1 < a < 0 & b > 1, or a > 0 & 0 < b < 1, or a < -1 & 0 < b < 1 (i.e. b < 1 and gb > 1)
   res <- rep(NaN, m)
   
+  # degenerate case: total loss only
   #unit indicator - 
   idDirac <- (b == 0 & a > 0) | (a == -1 & b > 1)
   res[idDirac] <- 1
   
+  # degenerate case: total loss only (b = 1 or a = 0 gives g = 1)
   #identity function
   ididentity <- (b == 1 & a > -1) | (b == 1 & a < -1) | (b == Inf & a >-1 & a < 0) | (a == 0 & b > 0)
   res[ididentity] <- 1
   
+  # a = +Inf (gb = 1): F(x) = 1 - b^x, P(X = 1) = b
   #b only
   idbonly <- a == Inf & b > 0 & b < 1 & is.finite(b)
   res[idbonly] <- b[idbonly]
   
+  # regular domain
   #main case
   idmain <- ((-1 < a & a < 0 & b > 1) | (0 < a & 0 < b & b < 1) | (a < -1 & 0 < b & b < 1)) & is.finite(a) & is.finite(b)
   res[idmain] <- (a[idmain] + 1) * b[idmain] / (a[idmain] + b[idmain])
@@ -351,6 +411,7 @@ tlmbbefdR <- function(a, b)
 
 ### d,p,q,ec,m,tl functions MBBEFD(a,b)
 
+# User-level functions (exported): aliases of the R implementations above.
 dmbbefd <- dmbbefdR
 
 pmbbefd <- pmbbefdR

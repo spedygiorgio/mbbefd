@@ -1,7 +1,35 @@
+# File overview: fitDR(), the main fitting function of the package.
+# It fits a destruction rate model (a distribution on [0,1] with a point mass
+# at 1 for total losses) to a sample x of destruction rates (loss / sum insured).
+#
+# Supported distributions (argument dist):
+#   "mbbefd" / "MBBEFD"  MBBEFD distribution in its (a,b) / (g,b) parametrization
+#   "oiunif", "oistpareto", "oibeta", "oigbeta"  one-inflated distributions
+# Supported methods:
+#   "mle"    maximum likelihood estimation;
+#   "tlmme"  total-loss-moment matching: match the empirical total loss
+#            probability etl(x) and the empirical moments.
+#
+# How the MBBEFD fit works (method "mle"):
+# 1. the parameter space is split in three domains D1 (b > 1), D2 (b < 1, gb < 1)
+#    and D3 (b < 1, gb > 1), because the parameter constraints differ;
+# 2. starting values in each domain come from an unconstrained pre-fit on
+#    transformed parameters (prefitDR.mle() in fitDR-prefit.R);
+# 3. in each domain, -LL is minimized under inequality constraints with
+#    alabama::constrOptim.nl(), called through fitdistrplus::mledist() and using
+#    the analytical gradient (util-loglikfunc.R) and constraints
+#    (util-constr-mbbefd.R);
+# 4. the fit with the highest log-likelihood is retained and its Hessian gives
+#    the standard errors (fitDR.selectbest() in fitDR-prefit.R).
+# For the one-inflated distributions, p1 is the proportion of total losses and
+# the other parameters are fitted on the observations below 1.
+# The result is built by fitDR.addcomp() (fitDR-output.R) as a "fitDR" object,
+# which inherits from fitdistrplus "fitdist" objects.
 
 fitDR <- function(x, dist, method="mle", start=NULL, optim.method="default", control=list(trace=0), ...)
 {
   
+  # Check the data: remove missing values, require at least one value in [0,1].
   if(any(is.na(x)))
     x <- x[!is.na(x)]
   if(length(x) <= 0)
@@ -11,6 +39,10 @@ fitDR <- function(x, dist, method="mle", start=NULL, optim.method="default", con
   method <- match.arg(method, c("mle", "tlmme"))
   dist <- match.arg(dist, c("oiunif", "oistpareto", "oibeta", "oigbeta", "mbbefd", "MBBEFD"))
   
+  # The user control list is split into the options understood by optim() (used
+  # by the pre-fits and the one-inflated fits) and those understood by
+  # constrOptim.nl() (used by the MBBEFD fits). The trace level is decreased by
+  # one for the optimizers, so that trace = 1 only prints fitDR's own messages.
   #make control parameters as in optim()
   con4optim <- list(trace = 0, fnscale = 1, maxit = 100L, abstol = -Inf, 
                     reltol = sqrt(.Machine$double.eps), alpha = 1, beta = 0.5, 
@@ -32,15 +64,21 @@ fitDR <- function(x, dist, method="mle", start=NULL, optim.method="default", con
   if(control$trace > 0)
     cat("Distribution is", dist, "\n")
   
+  # Without total losses, the MLE of P(X = 1) is 0, i.e. on the boundary of the
+  # parameter space (g -> +Inf): the fit is still computed but the user is warned.
   if(dist %in% c("mbbefd", "MBBEFD") && method == "mle" && !any(x == 1))
     warning("there is no total loss (x == 1) in the data: the estimated total loss probability goes to the boundary 0.")
   
+  # ---------------------------------------------------------------------------
+  # MBBEFD(a,b)
+  # ---------------------------------------------------------------------------
   if(dist == "mbbefd")
   {
     #the parameter space is split in three domains
     #D1 : (a,b) in (-1, 0) x (1, +Inf)
     #D2 : (a,b) in (0, +Inf) x (0, 1)
     #D3 : (a,b) in (-Inf, -1) x (0, 1), i.e. b < 1 and gb > 1 in the 2nd parametrization
+    # default starting values, one per domain (overwritten by the pre-fit below)
     initparmbbefd <- list(list(a=Trans.m10(0), b=Trans.1Inf(0)), 
                           list(a=Trans.0Inf(0), b=Trans.01(0)),
                           list(a=Trans.mInfm1(0), b=Trans.01(0)))
@@ -51,6 +89,7 @@ fitDR <- function(x, dist, method="mle", start=NULL, optim.method="default", con
     }
     if(method == "mle")
     {
+      # pre-fit on transformed parameters to get better starting values
       prefit <- prefitDR.mle(x, "mbbefd", control=con4optim)
       #domain D1
       if(all(!is.na(prefit[[1]])))
@@ -67,6 +106,7 @@ fitDR <- function(x, dist, method="mle", start=NULL, optim.method="default", con
           if(initparmbbefd[[i]]["b"] == 1)
             initparmbbefd[[i]]["b"] <- 1/2
         }
+      # mledist() requires the starting values as a named list
       for(i in 1:3)
         if(!is.list(initparmbbefd[[i]]))
           initparmbbefd[[i]] <- as.list(initparmbbefd[[i]])
@@ -76,6 +116,7 @@ fitDR <- function(x, dist, method="mle", start=NULL, optim.method="default", con
         print(sapply(initparmbbefd, unlist))
       }
       
+      # -LL/n and its gradient, with the argument names expected by mledist()
       #wrap -LL to match the call by fitdist
       minusLL <- function(x, fix.arg, obs, ddistnam) 
         -LLfunc(obs=obs, theta=x, dist="mbbefd")/length(obs)
@@ -86,6 +127,7 @@ fitDR <- function(x, dist, method="mle", start=NULL, optim.method="default", con
       #a failure in one domain is expected: do not print the error unless tracing
       oerr <- options(show.error.messages = con4constrOptim.nl$trace > 0)
       on.exit(options(oerr), add=TRUE)
+      # one constrained fit per domain
       hinlist <- list(constrmbbefd1, constrmbbefd2, constrmbbefd3)
       hinjaclist <- list(constrmbbefd1jac, constrmbbefd2jac, constrmbbefd3jac)
       fitlist <- lapply(1:3, function(i)
@@ -93,6 +135,7 @@ fitDR <- function(x, dist, method="mle", start=NULL, optim.method="default", con
                 hin=hinlist[[i]], hin.jac=hinjaclist[[i]], control.outer=con4constrOptim.nl, 
                 gradient=grLL, calcvcov=FALSE, silent = con4constrOptim.nl$trace == 0, ...))
       options(oerr)
+      # keep the best of the three fits and compute its Hessian, then build the output
       #analytical Hessian of -LL/n
       heLL <- function(par) -heLLfunc(obs=x, theta=par, dist="mbbefd")/length(x)
       best <- fitDR.selectbest(fitlist, x=x, minusLL=minusLL, grLL=grLL, hessian.fun=heLL)
@@ -108,6 +151,7 @@ fitDR <- function(x, dist, method="mle", start=NULL, optim.method="default", con
     }else if(method == "tlmme")
     {
       #exact solution of E[X] = mean(x) and P(X=1) = etl(x), see Bernegger (1997)
+      # the exact solution is computed in (g,b) and converted to a = (g-1) b / (1 - gb)
       f1 <- tlmme.MBBEFD(x)
       gb <- f1$estimate
       if(f1$convergence == 0)
@@ -124,6 +168,9 @@ fitDR <- function(x, dist, method="mle", start=NULL, optim.method="default", con
       }
     }else
       stop("not yet implemented")
+  # ---------------------------------------------------------------------------
+  # MBBEFD(g,b): same procedure as for MBBEFD(a,b)
+  # ---------------------------------------------------------------------------
   }else if(dist == "MBBEFD")
   {
     #the parameter space is split in three domains
@@ -133,9 +180,11 @@ fitDR <- function(x, dist, method="mle", start=NULL, optim.method="default", con
     if(method == "mle")
     {
       #starting values
+      # g = 1 / P(X = 1) is estimated by the inverse of the empirical total loss
       g <- 1/etl(x, na.rm=TRUE)
       if(is.infinite(g))
         g <- 2
+      # default starting values, one per domain (overwritten by the pre-fit below)
       initparMBBEFD <- list(list(g=g, b=Trans.1Inf(0)), 
                             list(g=g, b=1/(2*g)),
                             list(g=g, b=(1+1/g)/2))
@@ -159,6 +208,7 @@ fitDR <- function(x, dist, method="mle", start=NULL, optim.method="default", con
         cat("\tinitial parameter value second try\n")
         print(sapply(initparMBBEFD, unlist))
       }
+      # pre-fit on transformed parameters to get better starting values
       prefit <- prefitDR.mle(x, "MBBEFD", control=con4optim)
       if(all(!is.na(prefit[[1]])))
       { 
@@ -173,6 +223,7 @@ fitDR <- function(x, dist, method="mle", start=NULL, optim.method="default", con
           if(initparMBBEFD[[i]]["b"] == 1)
             initparMBBEFD[[i]]["b"] <- 1/2
         }
+      # mledist() requires the starting values as a named list
       for(i in 1:3)
         if(!is.list(initparMBBEFD[[i]]))
           initparMBBEFD[[i]] <- as.list(initparMBBEFD[[i]])
@@ -182,6 +233,7 @@ fitDR <- function(x, dist, method="mle", start=NULL, optim.method="default", con
         print(sapply(initparMBBEFD, unlist))
       }
       
+      # -LL/n and its gradient, with the argument names expected by mledist()
       #wrap -LL to match the call by fitdist
       minusLL <- function(x, fix.arg, obs, ddistnam) 
         -LLfunc(obs=obs, theta=x, dist="MBBEFD")/length(obs)
@@ -192,6 +244,7 @@ fitDR <- function(x, dist, method="mle", start=NULL, optim.method="default", con
       #a failure in one domain is expected: do not print the error unless tracing
       oerr <- options(show.error.messages = con4constrOptim.nl$trace > 0)
       on.exit(options(oerr), add=TRUE)
+      # one constrained fit per domain
       hinlist <- list(constrMBBEFD1, constrMBBEFD2, constrMBBEFD3)
       hinjaclist <- list(constrMBBEFD1jac, constrMBBEFD2jac, constrMBBEFD3jac)
       fitlist <- lapply(1:3, function(i)
@@ -200,6 +253,8 @@ fitDR <- function(x, dist, method="mle", start=NULL, optim.method="default", con
                 control.outer=con4constrOptim.nl, gradient=grLL,
                 silent = con4constrOptim.nl$trace == 0, calcvcov=FALSE, ...))
       options(oerr)
+      # keep the best of the three fits, compute its Hessian (finite differences of
+      # the analytical gradient), then build the output
       best <- fitDR.selectbest(fitlist, x=x, minusLL=minusLL, grLL=grLL)
       f1 <- best$fit
       f1 <- fitDR.addcomp(x=x, theta=f1$estimate, hessian=best$hessian, vcov=NULL,
@@ -225,6 +280,10 @@ fitDR <- function(x, dist, method="mle", start=NULL, optim.method="default", con
     }else
       stop("not yet implemented")
     
+  # ---------------------------------------------------------------------------
+  # One-inflated uniform: the only parameter is p1; for both methods, the MLE
+  # is the proportion of total losses, computed by fitdist() with Brent's method.
+  # ---------------------------------------------------------------------------
   }else if(dist == "oiunif")
   {
     if(is.null(start))
@@ -252,17 +311,24 @@ fitDR <- function(x, dist, method="mle", start=NULL, optim.method="default", con
     }else
       stop("not yet implemented")  
     
+  # ---------------------------------------------------------------------------
+  # Other one-inflated distributions: p1 is estimated by etl(x), the parameters
+  # of the continuous part (distneq1 = "stpareto", "beta" or "gbeta") are fitted
+  # on the observations strictly below 1 (xneq1).
+  # ---------------------------------------------------------------------------
   }else if(dist %in% c("oistpareto", "oibeta", "oigbeta")) #one-inflated distr
   {
     p1 <- etl(x, na.rm=TRUE)
     xneq1 <- x[x < 1]
     distneq1 <- substr(dist, 3, nchar(dist))
     
+    # default starting values of the continuous part: a = 1 for stpareto, moment
+    # estimates for beta, Theil index + moment estimates for GB1
     if(is.null(start))
     {
       if(distneq1 == "stpareto")
       {
-        start <- list(a=1)               
+        start <- list(a=1)
       }else if(distneq1 == "beta")
       {
         n <- length(xneq1)
@@ -288,11 +354,12 @@ fitDR <- function(x, dist, method="mle", start=NULL, optim.method="default", con
           start <- list(shape0=1, shape1=1, shape2=1) #i.e. uniform distribution
       }else
         stop("wrong non-inflated distribution.")
+    # user starting values: keep only the parameters of the continuous part
     }else
     {
       if(distneq1 == "stpareto")
       {
-        start <- start["a"]               
+        start <- start["a"]            
       }else if(distneq1 == "beta")
       {
         start <- start[c("shape1", "shape2")]
@@ -307,6 +374,7 @@ fitDR <- function(x, dist, method="mle", start=NULL, optim.method="default", con
       cat("\tinitial parameter value try\n")
       print(unlist(start))
     }  
+    # maximum likelihood on xneq1 with box constraints (parameters > 0)
     if(method == "mle")
     {
       uplolist <- list(upper=Inf, lower=0)
@@ -361,6 +429,9 @@ fitDR <- function(x, dist, method="mle", start=NULL, optim.method="default", con
         print(f1$estimate)
       }  
       
+    # match the total loss probability and the first raw moments (as many
+    # equations as parameters) by least squares with optim(); fails (NA) when the
+    # equations cannot be solved
     }else if(method == "tlmme")
     {
       start <- c(start, list(p1=p1))

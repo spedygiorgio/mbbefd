@@ -1,6 +1,16 @@
+# File overview: generic functions for one-inflated distributions on [0,1].
+# A one-inflated distribution mixes a total loss with probability p1 (X = 1)
+# and a continuous distribution on [0,1) with probability 1 - p1:
+#   F(x) = (1 - p1) F0(x) + p1 * 1(x >= 1).
+# Each function takes the corresponding function of the continuous part
+# (dfun, pfun, qfun, rfun, ecfun, mfun) and passes its parameters through "...".
+# All functions are vectorized in x and p1 (recycled to a common length), and
+# return NaN for invalid p1 (outside [0,1]) or missing values.
 #d, p, q, r function for one-inflated distribution
 
 
+# "Density": (1 - p1) f0(x) for 0 <= x < 1, p1 at x = 1 (the point mass,
+# as needed by the likelihood), 0 outside [0,1].
 doifun <- function(x, dfun, p1, log=FALSE, ...)
 {
   #sanity check
@@ -39,6 +49,7 @@ doifun <- function(x, dfun, p1, log=FALSE, ...)
   res
 }
 
+# Distribution function (1 - p1) F0(q) + p1 1(q >= 1).
 poifun <- function(q, pfun, p1, lower.tail = TRUE, log.p = FALSE, ...)
 {
   #sanity check
@@ -65,6 +76,8 @@ poifun <- function(q, pfun, p1, lower.tail = TRUE, log.p = FALSE, ...)
 }
 
 
+# Quantile function: for p < 1 - p1 it is the quantile of the continuous part at
+# level p / (1 - p1); for p >= 1 - p1 it is 1 (total loss).
 qoifun <- function(p, qfun, p1, lower.tail = TRUE, log.p = FALSE, ...)
 {
   #sanity check
@@ -93,6 +106,8 @@ qoifun <- function(p, qfun, p1, lower.tail = TRUE, log.p = FALSE, ...)
   res
 }  
 
+# Random generation: draw a Bernoulli(p1) total loss indicator, then draw
+# from the continuous part for the observations that are not total losses.
 roifun <- function(n, rfun, p1, ...)
 {
   #sanity check
@@ -117,6 +132,9 @@ roifun <- function(n, rfun, p1, ...)
 }
 
 #exposure curve and moment functions
+# Exposure curve of the mixture. With G0 and E0 the exposure curve and mean of
+# the continuous part, E[min(X,x)] = (1-p1) E0 G0(x) + p1 x and E[X] = (1-p1) E0 + p1,
+# so G(x) = ((1-p1) G0(x) + p1 x / E0) / (1 - p1 + p1 / E0).
 ecoifun <- function(x, ecfun, mfun, p1, ...)
 {
   #sanity check
@@ -142,6 +160,7 @@ ecoifun <- function(x, ecfun, mfun, p1, ...)
 
 
 # moment function
+# Raw moment E[X^k] = p1 * 1^k + (1 - p1) E0[X^k].
 moifun <- function(order, mfun, p1, ...)
 {
   #sanity check
@@ -163,6 +182,7 @@ moifun <- function(order, mfun, p1, ...)
 }
 
 #total loss function
+# Total loss probability P(X = 1) = p1.
 tloifun <- function(p1, ...)
 {
   #sanity check

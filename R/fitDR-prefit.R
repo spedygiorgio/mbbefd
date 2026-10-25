@@ -1,12 +1,26 @@
+# File overview: helpers of fitDR() (see fitDR.R):
+# - prefitDR.mle(): starting values for the MBBEFD and GB1 fits;
+# - d<dist>1/2/3(): densities on transformed (unconstrained) parameters, used
+#   by the pre-fit; they must be exported because fitdistrplus::mledist()
+#   looks up the density "d" + distr by name;
+# - fitDR.selectbest(): choice of the best fit among the domains and Hessian;
+# - tlmme.MBBEFD(): exact total-loss-moment-matching estimator of MBBEFD.
 
 #search good starting values
 #for MBBEFD, the parameter space is split in three domains (see fitDR()):
 # D1: b > 1; D2: b < 1, gb < 1; D3: b < 1, gb > 1
+# Pre-fit: maximize the likelihood without constraints, on transformed
+# parameters u such that the original parameters are Trans.*(u) and always lie in
+# the right domain (see util-CInftransform.R). The optimum, mapped back to the
+# original parameters, is used as starting value of the constrained fit.
+# The result is a list of starting values (one per domain), with NA when a
+# pre-fit fails; fitDR() then keeps its default starting values.
 prefitDR.mle <- function(x, dist, control=list(trace=0, REPORT=1, maxit=100), ...)
 {
   if(dist == "mbbefd")
   {
 
+    # MBBEFD(a,b): one pre-fit per domain, all starting from u = (0, 0)
     prefit1 <- mledist(x, distr="mbbefd1", optim.method="BFGS", start=list(a=0, b=0),
                        silent=TRUE, control=control, ...)
     prefit2 <- mledist(x, distr="mbbefd2", optim.method="BFGS", start=list(a=0, b=0),
@@ -14,6 +28,7 @@ prefitDR.mle <- function(x, dist, control=list(trace=0, REPORT=1, maxit=100), ..
     prefit3 <- mledist(x, distr="mbbefd3", optim.method="BFGS", start=list(a=0, b=0),
                        silent=TRUE, control=control, ...)
 
+    # map the optimum back to the original parameters
     if(prefit1$convergence %in% 0:1) #either successful or reached the iter limit
     {
       initpar1 <- c(Trans.m10(prefit1$estimate["a"]), Trans.1Inf(prefit1$estimate["b"]))
@@ -43,9 +58,13 @@ prefitDR.mle <- function(x, dist, control=list(trace=0, REPORT=1, maxit=100), ..
   }else if(dist == "MBBEFD")
   {
     #no constraint for the new param
+    # MBBEFD(g,b), domain D1: g = 1 + exp(u1), b = 1 + exp(u2), no constraint needed
     prefit1 <- mledist(x, distr="MBBEFD1", optim.method="BFGS", start=list(g=0, b=0),
                        silent=TRUE, control=control, ...)
 
+    # In D2 and D3, g = 1 + exp(u1) and b = logistic(u2) is not enough: gb < 1 (D2)
+    # or gb > 1 (D3) is a linear constraint on (u1, u2), handled by stats::constrOptim().
+    # constrOptim2 adapts constrOptim() to the custom.optim interface of mledist().
     constrOptim2 <- function(par, fn, gr=NULL, ui, ci, ...)
       constrOptim(theta=unlist(par), f=fn, grad=gr, ui=ui, ci=ci, ...)
     #constraint is  g+b < 0 <=> -g-b > 0 (new param)
@@ -56,6 +75,7 @@ prefitDR.mle <- function(x, dist, control=list(trace=0, REPORT=1, maxit=100), ..
     prefit3 <- mledist(x, distr="MBBEFD3", optim.method="BFGS", custom.optim=constrOptim2,
                        start=list(g=1, b=0), ui = cbind(1, 1), ci = 0,
                        silent=TRUE, control=control, ...)
+    # map the optimum back to the original parameters
     if(prefit1$convergence %in% 0:1) #either successful or reached the iter limit
     {
       initpar1 <- c(Trans.1Inf(prefit1$estimate["g"]), Trans.1Inf(prefit1$estimate["b"]))
@@ -82,6 +102,8 @@ prefitDR.mle <- function(x, dist, control=list(trace=0, REPORT=1, maxit=100), ..
 
     list(initpar1, initpar2, initpar3)
 
+  # GB1 (continuous part of oigbeta): the three shape parameters are positive,
+  # shape = exp(u); total losses are removed first
   }else if(dist == "oigbeta")
   {
     x <- x[x != 1]
@@ -99,6 +121,8 @@ prefitDR.mle <- function(x, dist, control=list(trace=0, REPORT=1, maxit=100), ..
     stop("wrong distribution in prefitDR.mle().")
 }
 
+# Densities on transformed parameters (u1, u2): each one maps (u1, u2) to the
+# parameters of the corresponding domain and calls the original density.
 #Transformed distribution (internal use)
 
 #MBBEFD(a,b)
@@ -132,6 +156,9 @@ dgbeta1 <- function(x, shape0, shape1, shape2, log=FALSE)
   dgbeta(x, Trans.0Inf(shape0), Trans.0Inf(shape1), Trans.0Inf(shape2), log=log)
 
 
+# Keep the converged fit with the highest log-likelihood and compute the Hessian
+# of -LL/n at the optimum (used by fitDR.addcomp() for the standard errors).
+# When every domain fails, the first fit (with NA estimates) is returned.
 #select the best MLE among several parameter domains and compute the Hessian of -LL/n
 #fitlist: list of mledist() outputs (convergence == 100 means failure)
 #hessian.fun: optional function returning the analytical Hessian of -LL/n at par
@@ -166,6 +193,8 @@ fitDR.selectbest <- function(fitlist, x, minusLL, grLL, hessian.fun=NULL)
 #b solves E[X] = mean(x), as E[X] is decreasing in b from 1 (b -> 0) to 1/g (b -> +Inf).
 tlmme.MBBEFD <- function(x)
 {
+  # the system has a solution if and only if 0 < p < mean < 1 (the mean of an
+  # MBBEFD distribution with P(X = 1) = p lies in (p, 1))
   p <- etl(x, na.rm=TRUE)
   m <- mean(x, na.rm=TRUE)
   if(!(p > 0 && p < 1 && m > p && m < 1))
@@ -174,6 +203,8 @@ tlmme.MBBEFD <- function(x)
     return(list(estimate=c(g=NA, b=NA), convergence=100))
   }
   g <- 1/p
+  # Solve on log(b) so that the search covers b in (0, +Inf); extendInt widens
+  # the initial interval as needed, using the fact that the function decreases.
   meandiff <- function(logb) mMBBEFD(1, g, exp(logb)) - m
   res <- try(uniroot(meandiff, interval=c(-5, 5), extendInt="downX",
                      tol=sqrt(.Machine$double.eps)*1e-4, maxiter=1000), silent=TRUE)

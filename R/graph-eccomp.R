@@ -1,8 +1,12 @@
+# File overview: eccomp() plots the empirical exposure curve of the data
+# together with the fitted exposure curves of one or several fitDR objects
+# (same spirit as fitdistrplus::cdfcomp, which compares distribution functions).
 eccomp <- function(ft, xlim, ylim, main, xlab, ylab, do.points=TRUE,
                     datapch, datacol, fitlty, fitcol, addlegend = TRUE, 
                    legendtext, xlegend = "bottomright", 
                     ylegend = NULL, ...)
 {
+  # accept a single fit or a list of fits, all of class "fitDR"
   if(inherits(ft, "fitDR"))
   {
     ft <- list(ft)
@@ -15,6 +19,7 @@ eccomp <- function(ft, xlim, ylim, main, xlab, ylab, do.points=TRUE,
       stop("argument ft must be a list of 'fitDR' objects")
   }
   
+  # default graphical parameters (one color and line type per fit)
   nft <- length(ft)
   if (missing(datapch)) datapch <- 16
   if (missing(datacol)) datacol <- "black"
@@ -56,6 +61,7 @@ eccomp <- function(ft, xlim, ylim, main, xlab, ylab, do.points=TRUE,
     xmax <- xlim[2]
   }
   
+  # all fits must have been obtained on the same data
   verif.ftidata <- function(fti)
   {
     if (any(fti$data != mydata))
@@ -64,6 +70,8 @@ eccomp <- function(ft, xlim, ylim, main, xlab, ylab, do.points=TRUE,
   }
   lapply(ft, verif.ftidata)
   
+  # evaluate the theoretical exposure curve ec<dist>() of each fit on a grid of
+  # 101 points, with the estimated parameters
   # computation of each fitted exposure curve
   sfin <- seq(xmin, xmax, length.out=101)
   comput.fti <- function(i)
@@ -77,6 +85,8 @@ eccomp <- function(ft, xlim, ylim, main, xlab, ylab, do.points=TRUE,
   }
   fittedec <- sapply(1:nft, comput.fti)
   
+  # empirical exposure curve (see eecf() in util-empiricalfunctions.R), then
+  # one line per fitted curve
   #main plotting
   resec <- plot(eecf(x = mydata), main=main, xlab=xlab, ylab=ylab, xlim=xlim, 
                 ylim=ylim, col=datacol, do.points=do.points)

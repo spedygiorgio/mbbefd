@@ -1,3 +1,8 @@
+# File overview: deprecated functions of the very first versions of the package
+# (when MBBEFD was computed with C++ code). They only raise an error and are kept
+# so that old internal references fail with a clear message; none is exported.
+# Note: dmbbefd2() below is overwritten by the function of the same name in
+# fitDR-prefit.R, which is sourced later (files are collated alphabetically).
 
 
 #exposure curve

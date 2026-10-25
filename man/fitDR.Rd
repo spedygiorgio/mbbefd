@@ -58,8 +58,10 @@ fitDR(x, dist, method="mle", start=NULL, optim.method="default",
     by a closed-form formula and other parameters use a two-optimization procedures.
     For the MBBEFD distribution, the log-likelihood is maximized separately 
     on the three domains of the parameter space (\eqn{b>1}; \eqn{b<1, gb<1}; 
-    \eqn{b<1, gb>1}) via \code{\link[alabama]{constrOptim.nl}} 
-    and the best fit is retained.
+    \eqn{b<1, gb>1}) via \code{\link[alabama]{constrOptim.nl}};
+    each fit is then refined by an unconstrained maximization in
+    \eqn{(\log(g-1), \log(b))}, where the log-likelihood is continuous across
+    the boundaries \eqn{b=1} and \eqn{gb=1}, and the best fit is retained.
     }
     \item{When \code{method="tlmme"}}{
     Total loss and moment matching estimation consists in equalizing theoretical and empirical 

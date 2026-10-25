@@ -19,7 +19,10 @@
 #    alabama::constrOptim.nl(), called through fitdistrplus::mledist() and using
 #    the analytical gradient (util-loglikfunc.R) and constraints
 #    (util-constr-mbbefd.R);
-# 4. the fit with the highest log-likelihood is retained and its Hessian gives
+# 4. each domain fit is refined by an unconstrained maximization in
+#    (log(g-1), log(b)), where the log-likelihood is continuous across the domain
+#    boundaries (the barrier of constrOptim.nl() stops short of them);
+# 5. the fit with the highest log-likelihood is retained and its Hessian gives
 #    the standard errors (fitDR.selectbest() in fitDR-prefit.R).
 # For the one-inflated distributions, p1 is the proportion of total losses and
 # the other parameters are fitted on the observations below 1.
@@ -138,7 +141,9 @@ fitDR <- function(x, dist, method="mle", start=NULL, optim.method="default", con
       # keep the best of the three fits and compute its Hessian, then build the output
       #analytical Hessian of -LL/n
       heLL <- function(par) -heLLfunc(obs=x, theta=par, dist="mbbefd")/length(x)
-      best <- fitDR.selectbest(fitlist, x=x, minusLL=minusLL, grLL=grLL, hessian.fun=heLL)
+      # each domain fit is refined without constraints in (g,b), see fitDR.polish.mbbefd()
+      best <- fitDR.selectbest(fitlist, x=x, minusLL=minusLL, grLL=grLL, hessian.fun=heLL,
+                               polish=function(par) fitDR.polish.mbbefd(x, par))
       f1 <- best$fit
       f1 <- fitDR.addcomp(x=x, theta=f1$estimate, hessian=best$hessian, vcov=NULL,
                           dist="mbbefd", method="mle", convergence=f1$convergence,
@@ -255,7 +260,9 @@ fitDR <- function(x, dist, method="mle", start=NULL, optim.method="default", con
       options(oerr)
       # keep the best of the three fits, compute its Hessian (finite differences of
       # the analytical gradient), then build the output
-      best <- fitDR.selectbest(fitlist, x=x, minusLL=minusLL, grLL=grLL)
+      # each domain fit is refined without constraints, see fitDR.polish.MBBEFD()
+      best <- fitDR.selectbest(fitlist, x=x, minusLL=minusLL, grLL=grLL,
+                               polish=function(par) fitDR.polish.MBBEFD(x, par))
       f1 <- best$fit
       f1 <- fitDR.addcomp(x=x, theta=f1$estimate, hessian=best$hessian, vcov=NULL,
                           dist="MBBEFD", method="mle", convergence=f1$convergence,

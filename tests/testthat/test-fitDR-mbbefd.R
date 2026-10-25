@@ -120,3 +120,50 @@ test_that("point mass at 1 in the special case gb = 1 (a = Inf)", {
   expect_equal(dMBBEFD(1, 1/b, b), tlMBBEFD(1/b, b))
   expect_equal(dMBBEFD(1, 1/b, b), 1 - pMBBEFD(1 - 1e-12, 1/b, b), tolerance=1e-8)
 })
+
+test_that("MLE close to the domain boundary b = 1 (Swiss Re curve c = 4)", {
+  #reference MLE: unconstrained BFGS on (log(g-1), log(b)) from several starting points
+  LL <- function(x, g, b) sum(dMBBEFD(x, g, b, log=TRUE))
+  refLL <- function(x)
+  {
+    nll <- function(u) { v <- -LL(x, 1+exp(u[1]), exp(u[2])); if(is.finite(v)) v else 1e10 }
+    max(sapply(list(c(0,0), c(2,1), c(5,0), c(5,-1), c(4,1)), function(s)
+      -optim(s, nll, method="BFGS", control=list(maxit=1000, reltol=1e-13))$value))
+  }
+  th <- swissRe(4)
+  set.seed(42)
+  for(r in 1:5)
+  {
+    x <- rMBBEFD(1000, th["g"], th["b"])
+    ref <- refLL(x)
+    f <- suppressWarnings(fitDR(x, "MBBEFD"))
+    fa <- suppressWarnings(fitDR(x, "mbbefd"))
+    expect_lt(ref - f$loglik, 1e-6)
+    expect_lt(ref - fa$loglik, 1e-6)
+    expect_true(all(is.finite(f$sd)))
+    #both parametrizations give the same distribution
+    ga <- unname((fa$estimate["a"]+fa$estimate["b"])/((fa$estimate["a"]+1)*fa$estimate["b"]))
+    expect_equal(ga, unname(f$estimate["g"]), tolerance=1e-4)
+    expect_equal(unname(fa$estimate["b"]), unname(f$estimate["b"]), tolerance=1e-4)
+  }
+})
+
+test_that("dgbeta(log = FALSE) is exp(dgbeta(log = TRUE)) with vectorized parameters", {
+  x <- c(0.2, 0.5, 0.7, 1.5, -0.1)
+  shape0 <- c(2, -1, 3, 2, 2)
+  d1 <- suppressWarnings(dgbeta(x, shape0, 2, 3))
+  d2 <- suppressWarnings(exp(dgbeta(x, shape0, 2, 3, log=TRUE)))
+  expect_equal(d1, d2)
+  expect_equal(d1[3], 3*0.7^2*dbeta(0.7^3, 2, 3))
+})
+
+test_that("swissRe() for a scalar and a vector c", {
+  p <- swissRe(3)
+  expect_named(p, c("b", "g"))
+  #Bernegger (1997), Section 4.3: b(3) = 3.669, g(3) = 30.569
+  expect_equal(unname(round(p, 3)), c(3.669, 30.569))
+  m <- swissRe(c(1.5, 2, 3, 4, 5))
+  expect_equal(dim(m), c(5L, 2L))
+  expect_equal(colnames(m), c("b", "g"))
+  expect_equal(m[3, ], p)
+})

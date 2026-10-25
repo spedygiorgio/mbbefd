@@ -162,13 +162,28 @@ dgbeta1 <- function(x, shape0, shape1, shape2, log=FALSE)
 #select the best MLE among several parameter domains and compute the Hessian of -LL/n
 #fitlist: list of mledist() outputs (convergence == 100 means failure)
 #hessian.fun: optional function returning the analytical Hessian of -LL/n at par
-fitDR.selectbest <- function(fitlist, x, minusLL, grLL, hessian.fun=NULL)
+#polish: optional function(estimate) returning list(estimate, loglik) or NULL, used to
+#refine the estimate of each converged fit (see fitDR.polish.MBBEFD() below)
+fitDR.selectbest <- function(fitlist, x, minusLL, grLL, hessian.fun=NULL, polish=NULL)
 {
   ok <- vapply(fitlist, function(f)
     !is.null(f$convergence) && f$convergence != 100 && isTRUE(is.finite(f$loglik)),
     logical(1))
   if(!any(ok))
     return(list(fit=fitlist[[1]], hessian=NULL))
+  #refine each converged fit; the refined estimate replaces the original one only
+  #if it increases the log-likelihood
+  if(!is.null(polish))
+    for(i in which(ok))
+    {
+      p <- try(polish(fitlist[[i]]$estimate), silent=TRUE)
+      if(!inherits(p, "try-error") && !is.null(p) && all(is.finite(p$estimate)) &&
+         isTRUE(p$loglik > fitlist[[i]]$loglik))
+      {
+        fitlist[[i]]$estimate <- p$estimate
+        fitlist[[i]]$loglik <- p$loglik
+      }
+    }
   ll <- vapply(fitlist, function(f) if(isTRUE(is.finite(f$loglik))) f$loglik else -Inf, numeric(1))
   ll[!ok] <- -Inf
   f1 <- fitlist[[which.max(ll)]]
@@ -186,6 +201,70 @@ fitDR.selectbest <- function(fitlist, x, minusLL, grLL, hessian.fun=NULL)
   if(inherits(fHess, "try-error") || any(!is.finite(fHess)))
     fHess <- NULL
   list(fit=f1, hessian=fHess)
+}
+
+# Final refinement of the MLE of MBBEFD(g,b), started from the estimate of one
+# domain. The constrained fits of fitDR() use an adaptive barrier, which keeps the
+# iterates away from the domain boundaries b = 1 and gb = 1: when the MLE is close
+# to (or on the other side of) a boundary, the constrained fit stops short of it.
+# In (g,b) the log-likelihood is continuous across these boundaries (b = 1 and
+# gb = 1 are the special cases "g only" and "b only"), so it is maximized here
+# without constraints on u = (log(g - 1), log(b)), which covers the whole
+# parameter space g > 1, b > 0 (Gatti and Wuthrich, 2024, Section 3.1).
+#x: data; gb: starting value c(g, b)
+#returns list(estimate = c(g = ..., b = ...), loglik = ...) or NULL on failure
+fitDR.polish.MBBEFD <- function(x, gb)
+{
+  gb <- unname(gb)
+  if(!all(is.finite(gb)) || gb[1] <= 1 || gb[2] <= 0)
+    return(NULL)
+  n <- length(x)
+  #-LL/n and its gradient in u (chain rule: dg/du1 = g - 1, db/du2 = b)
+  fn <- function(u)
+  {
+    v <- -LLfunc(obs=x, theta=c(1+exp(u[1]), exp(u[2])), dist="MBBEFD")/n
+    if(is.finite(v)) v else 1e10
+  }
+  gr <- function(u)
+  {
+    th <- c(1+exp(u[1]), exp(u[2]))
+    gg <- -grLLfunc(obs=x, theta=th, dist="MBBEFD")/n * c(th[1]-1, th[2])
+    if(all(is.finite(gg))) gg else c(0, 0)
+  }
+  u0 <- c(log(gb[1]-1), log(gb[2]))
+  #a starting point exactly on b = 1 has a singular analytical gradient: move it slightly
+  if(abs(u0[2]) < 1e-6)
+    u0[2] <- 1e-4
+  res <- optim(u0, fn, gr, method="BFGS", control=list(maxit=1000, reltol=1e-14))
+  #BFGS sometimes stops early with the analytical gradient near b = 1 (where it is
+  #computed with cancellation): restart once with the numerical gradient
+  res2 <- optim(res$par, fn, method="BFGS", control=list(maxit=1000, reltol=1e-14))
+  if(res2$value < res$value)
+    res <- res2
+  if(res$convergence != 0 || res$value >= 1e10)
+    return(NULL)
+  est <- c(g=1+exp(res$par[1]), b=exp(res$par[2]))
+  list(estimate=est, loglik=LLfunc(obs=x, theta=unname(est), dist="MBBEFD"))
+}
+
+#same refinement for MBBEFD(a,b): the estimate is converted to (g,b), refined, and
+#converted back with a = (g-1) b / (1 - gb). Near b = 1 the parameter a is close
+#to -1 and the log-likelihood is very flat in (a,b), which is why the refinement
+#is done in (g,b).
+fitDR.polish.mbbefd <- function(x, ab)
+{
+  a <- unname(ab[1]); b <- unname(ab[2])
+  g <- (a+b)/((a+1)*b)
+  p <- fitDR.polish.MBBEFD(x, c(g, b))
+  if(is.null(p))
+    return(NULL)
+  g <- unname(p$estimate["g"]); b <- unname(p$estimate["b"])
+  a <- (g-1)*b/(1-g*b)
+  #not representable in (a,b): b = 1 (a = -1) or gb = 1 (a = Inf)
+  if(!is.finite(a) || abs(a+1) < 1e-12)
+    return(NULL)
+  est <- c(a=a, b=b)
+  list(estimate=est, loglik=LLfunc(obs=x, theta=unname(est), dist="mbbefd"))
 }
 
 #exact total-loss-moment-matching estimator for MBBEFD(g,b), see Bernegger (1997), Section 4.1:

@@ -4,7 +4,7 @@
 [![CRAN-Downloads](https://cranlogs.r-pkg.org/badges/last-month/mbbefd)](https://cran.r-project.org/package=mbbefd)
 [![CRAN-checks](https://badges.cranchecks.info/summary/mbbefd.svg)](https://cran.r-project.org/web/checks/check_results_mbbefd.html)
 [![License: GPL
-v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+v2](https://img.shields.io/badge/License-GPL%20v2-blue.svg)](https://www.gnu.org/licenses/old-licenses/gpl-2.0.html)
 [![Git-Version](https://img.shields.io/badge/devel%20version-0.8.15-red.svg)](https://github.com/spedygiorgio/mbbefd)
 
 MBBEFD provides additional distributions to R, such as the MBBEFD and

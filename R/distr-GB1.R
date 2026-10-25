@@ -42,7 +42,7 @@ dgbeta <- function(x, shape0, shape1, shape2, log=FALSE)
   }else
   {
     idmain <- id01 & shapepos
-    res[idmain] <- shape0[idmain]*x[id01]^(shape0[idmain]-1)
+    res[idmain] <- shape0[idmain]*x[idmain]^(shape0[idmain]-1)
     res[idmain] <- res[idmain]*dbeta(x[idmain]^(shape0[idmain]), shape1[idmain], shape2[idmain], log=FALSE)
     res[idno01 & shapepos] <- 0
   }

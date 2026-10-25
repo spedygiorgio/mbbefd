@@ -21,6 +21,14 @@
     as in Bernegger (1997): `g = 1/etl(x)` and `b` is the unique root of the mean equation. 
     A warning is raised and `NA` is returned when `0 < etl(x) < mean(x) < 1` does not hold.
   * `fitDR(method = "mle")` for `mbbefd` and `MBBEFD` raises a warning when the data contain no total loss.
+  * `fitDR(method = "mle")` for `mbbefd` and `MBBEFD` refines each constrained fit with an unconstrained 
+    maximization in `(log(g-1), log(b))`, where the log-likelihood is continuous across the domain boundaries 
+    `b = 1` and `gb = 1`. When the MLE is close to `b = 1` (e.g. Swiss Re curve `c = 4`), the constrained 
+    fits stopped short of the boundary (log-likelihood gaps up to 0.16 and `NaN` standard errors); 
+    the maximum is now reached in both parametrizations.
+  * `swissRe()` accepts a vector `c` and then returns a matrix with columns `b` and `g` (previously 
+    a meaningless vector); the documentation now warns that `b` comes before `g` and that 
+    parameters should be selected by name.
   * Add unit tests for gradients, constraint jacobians, parametrization consistency, `tlmme`, 
     standard errors and the new parameter domain.
   
@@ -43,11 +51,15 @@
   * Fix the starting value of `b` based on `F(1/2)` in `fitDR(x, "MBBEFD")`: the polynomial root is `sqrt(b)`, not `b`.
   * Fix the point mass at 1 returned by `dmbbefd()` and `dMBBEFD()` in the special case `gb = 1` (`a = Inf`): it is `b`, as given by `tlmbbefd()`, `pmbbefd()` and `rmbbefd()`, not `1 - b`.
   * Fix the standard errors of the shape parameters of one-inflated fits (`oibeta`, `oistpareto`, `oigbeta`) in `fitDR()`: they are estimated on the observations below 1 only, so their covariance matrix is now divided by the number of such observations instead of the total sample size (standard errors were too small by a factor `sqrt(1 - p1)`).
+  * Fix `dgbeta(log = FALSE)` (hence `doigbeta()`) with vectorized parameters when some shape 
+    parameters are invalid or some observations are outside `[0, 1]`: the data were indexed 
+    with the wrong subset, giving wrong densities and recycling warnings.
 
 ### MISC
 
   * Raise the minimal required version of `fitdistrplus` to 1.2-2: `fitDR()` and `bootDR()` rely on the `calcvcov` argument and on `density.bootdist()` (introduced in 1.2-1; before: `unused argument (calcvcov = TRUE)`), and the standard errors of one-inflated fits assume that `mledist()` minimizes the average negative log-likelihood (since 1.2-2).
   * Remove the obsolete `src/Makevars*` files (`RCPP_USE_UNWIND_PROTECT` is the default of `Rcpp >= 0.12.18`) and the unneeded `SystemRequirements: GNU make`.
+  * The `LICENCE` file and the README badge now state GPL-2, as `DESCRIPTION` (they said GPL-3).
 
 ## CHANGES IN `mbbefd` VERSION 0.8.14
 

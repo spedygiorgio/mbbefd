@@ -12,13 +12,13 @@
 # The signature (x, fix.arg, obs, ddistnam) matches the way fitdistrplus::mledist()
 # calls the constraint functions: only x (the parameter vector) is used.
 
-#to meet the standard 'fn' argument and specific name arguments, 
+#to meet the standard 'fn' argument and specific name arguments,
 
 #constraint function for MBBEFD(a,b)
 # whole (a,b) domain (not used by fitDR)
 constrmbbefd <- function(x, fix.arg, obs, ddistnam)
 {
-  res <- x[1]*(1-x[2]) #a*(1-b) >= 0
+  res <- x[1] * (1 - x[2]) #a*(1-b) >= 0
   names(res) <- NULL
   res
 }
@@ -26,7 +26,7 @@ constrmbbefd <- function(x, fix.arg, obs, ddistnam)
 # domain D1 in (a,b)
 constrmbbefd1 <- function(x, fix.arg, obs, ddistnam)
 {
-  res <- c(x[1]+1, -x[1], x[2]-1, x[1]*(1-x[2])) #-1 < a < 0, b > 1, a*(1-b) >= 0
+  res <- c(x[1] + 1, -x[1], x[2] - 1, x[1] * (1 - x[2])) #-1 < a < 0, b > 1, a*(1-b) >= 0
   names(res) <- NULL
   res
 }
@@ -34,10 +34,10 @@ constrmbbefd1 <- function(x, fix.arg, obs, ddistnam)
 constrmbbefd1jac <- function(x, fix.arg, obs, ddistnam)
 {
   j <- matrix(0, 4, 2)
-  j[1,] <- c(1, 0)      #d(a+1)
-  j[2,] <- c(-1, 0)     #d(-a)
-  j[3,] <- c(0, 1)      #d(b-1)
-  j[4,] <- c(1-x[2], -x[1]) #d(a*(1-b))
+  j[1, ] <- c(1, 0)      #d(a+1)
+  j[2, ] <- c(-1, 0)     #d(-a)
+  j[3, ] <- c(0, 1)      #d(b-1)
+  j[4, ] <- c(1 - x[2], -x[1]) #d(a*(1-b))
   dimnames(j) <- NULL
   j
 }
@@ -46,7 +46,7 @@ constrmbbefd1jac <- function(x, fix.arg, obs, ddistnam)
 # domain D2 in (a,b)
 constrmbbefd2 <- function(x, fix.arg, obs, ddistnam)
 {
-  res <- c(x[1], x[2], 1-x[2], x[1]*(1-x[2])) #0 < a , 0 < b < 1, a*(1-b) >= 0
+  res <- c(x[1], x[2], 1 - x[2], x[1] * (1 - x[2])) #0 < a , 0 < b < 1, a*(1-b) >= 0
   names(res) <- NULL
   res
 }
@@ -54,10 +54,10 @@ constrmbbefd2 <- function(x, fix.arg, obs, ddistnam)
 constrmbbefd2jac <- function(x, fix.arg, obs, ddistnam)
 {
   j <- matrix(0, 4, 2)
-  j[1,] <- c(1, 0)      #d(a)
-  j[2,] <- c(0, 1)      #d(b)
-  j[3,] <- c(0, -1)     #d(1-b)
-  j[4,] <- c(1-x[2], -x[1]) #d(a*(1-b))
+  j[1, ] <- c(1, 0)      #d(a)
+  j[2, ] <- c(0, 1)      #d(b)
+  j[3, ] <- c(0, -1)     #d(1-b)
+  j[4, ] <- c(1 - x[2], -x[1]) #d(a*(1-b))
   dimnames(j) <- NULL
   j
 }
@@ -66,7 +66,7 @@ constrmbbefd2jac <- function(x, fix.arg, obs, ddistnam)
 # domain D3 in (a,b)
 constrmbbefd3 <- function(x, fix.arg, obs, ddistnam)
 {
-  res <- c(-1-x[1], x[2], 1-x[2]) #a < -1, 0 < b < 1
+  res <- c(-1 - x[1], x[2], 1 - x[2]) #a < -1, 0 < b < 1
   names(res) <- NULL
   res
 }
@@ -74,9 +74,9 @@ constrmbbefd3 <- function(x, fix.arg, obs, ddistnam)
 constrmbbefd3jac <- function(x, fix.arg, obs, ddistnam)
 {
   j <- matrix(0, 3, 2)
-  j[1,] <- c(-1, 0)
-  j[2,] <- c(0, 1)
-  j[3,] <- c(0, -1)
+  j[1, ] <- c(-1, 0)
+  j[2, ] <- c(0, 1)
+  j[3, ] <- c(0, -1)
   dimnames(j) <- NULL
   j
 }
@@ -86,7 +86,7 @@ constrmbbefd3jac <- function(x, fix.arg, obs, ddistnam)
 # whole (g,b) domain (not used by fitDR)
 constrMBBEFD <- function(x, fix.arg, obs, ddistnam)
 {
-  res <- c(x[1]-1, x[2]) #g >= 1, b > 0
+  res <- c(x[1] - 1, x[2]) #g >= 1, b > 0
   names(res) <- NULL
   res
 }
@@ -94,7 +94,7 @@ constrMBBEFD <- function(x, fix.arg, obs, ddistnam)
 # domain D1 in (g,b)
 constrMBBEFD1 <- function(x, fix.arg, obs, ddistnam)
 {
-  res <- c(x[1]-1, x[2]-1, x[1]*x[2]-1) #g > 1, b > 1, gb > 1
+  res <- c(x[1] - 1, x[2] - 1, x[1] * x[2] - 1) #g > 1, b > 1, gb > 1
   names(res) <- NULL
   res
 }
@@ -102,9 +102,9 @@ constrMBBEFD1 <- function(x, fix.arg, obs, ddistnam)
 constrMBBEFD1jac <- function(x, fix.arg, obs, ddistnam)
 {
   j <- matrix(0, 3, 2)
-  j[1,] <- c(1, 0)
-  j[2,] <- c(0, 1)
-  j[3,] <- c(x[2], x[1])
+  j[1, ] <- c(1, 0)
+  j[2, ] <- c(0, 1)
+  j[3, ] <- c(x[2], x[1])
   dimnames(j) <- NULL
   j
 }
@@ -113,7 +113,7 @@ constrMBBEFD1jac <- function(x, fix.arg, obs, ddistnam)
 # domain D2 in (g,b)
 constrMBBEFD2 <- function(x, fix.arg, obs, ddistnam)
 {
-  res <- c(x[1]-1, 1-x[2], x[2], 1-x[1]*x[2]) #g > 1, 1 > b > 0, gb < 1
+  res <- c(x[1] - 1, 1 - x[2], x[2], 1 - x[1] * x[2]) #g > 1, 1 > b > 0, gb < 1
   names(res) <- NULL
   res
 }
@@ -121,10 +121,10 @@ constrMBBEFD2 <- function(x, fix.arg, obs, ddistnam)
 constrMBBEFD2jac <- function(x, fix.arg, obs, ddistnam)
 {
   j <- matrix(0, 4, 2)
-  j[1,] <- c(1, 0)
-  j[2,] <- c(0, -1)
-  j[3,] <- c(0, 1)
-  j[4,] <- c(-x[2], -x[1])
+  j[1, ] <- c(1, 0)
+  j[2, ] <- c(0, -1)
+  j[3, ] <- c(0, 1)
+  j[4, ] <- c(-x[2], -x[1])
   dimnames(j) <- NULL
   j
 }
@@ -133,7 +133,7 @@ constrMBBEFD2jac <- function(x, fix.arg, obs, ddistnam)
 # domain D3 in (g,b)
 constrMBBEFD3 <- function(x, fix.arg, obs, ddistnam)
 {
-  res <- c(x[1]-1, 1-x[2], x[1]*x[2]-1) #g > 1, b < 1, gb > 1 (implies b > 0)
+  res <- c(x[1] - 1, 1 - x[2], x[1] * x[2] - 1) #g > 1, b < 1, gb > 1 (implies b > 0)
   names(res) <- NULL
   res
 }
@@ -141,10 +141,9 @@ constrMBBEFD3 <- function(x, fix.arg, obs, ddistnam)
 constrMBBEFD3jac <- function(x, fix.arg, obs, ddistnam)
 {
   j <- matrix(0, 3, 2)
-  j[1,] <- c(1, 0)
-  j[2,] <- c(0, -1)
-  j[3,] <- c(x[2], x[1])
+  j[1, ] <- c(1, 0)
+  j[2, ] <- c(0, -1)
+  j[3, ] <- c(x[2], x[1])
   dimnames(j) <- NULL
   j
 }
-

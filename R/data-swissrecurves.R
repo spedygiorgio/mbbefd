@@ -15,12 +15,12 @@
 # For a scalar c the result is a named vector c(b, g); for a vector c it is a
 # matrix with one row per value of c and columns "b" and "g" (before, a vector c
 # returned a meaningless vector c(b1, b2, ..., g1, g2, ...) with wrong names).
-swissRe<-function(c)
+swissRe <- function(c)
 {
   stopifnot(is.numeric(c))
-  b <- exp(3.1 - 0.15*c*(1+c))
-  g <- exp(c*(0.78 + 0.12*c))
-  if(length(c) == 1)
+  b <- exp(3.1 - 0.15 * c * (1 + c))
+  g <- exp(c * (0.78 + 0.12 * c))
+  if (length(c) == 1)
     return(c(b = b, g = g))
   cbind(b = b, g = g)
 }

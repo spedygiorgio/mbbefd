@@ -69,6 +69,12 @@
   * Raise the minimal required version of `fitdistrplus` to 1.2-2: `fitDR()` and `bootDR()` rely on the `calcvcov` argument and on `density.bootdist()` (introduced in 1.2-1; before: `unused argument (calcvcov = TRUE)`), and the standard errors of one-inflated fits assume that `mledist()` minimizes the average negative log-likelihood (since 1.2-2).
   * Remove the obsolete `src/Makevars*` files (`RCPP_USE_UNWIND_PROTECT` is the default of `Rcpp >= 0.12.18`) and the unneeded `SystemRequirements: GNU make`.
   * The `LICENCE` file and the README badge now state GPL-2, as `DESCRIPTION` (they said GPL-3).
+  * Code style checked with `lintr` (configuration in `.lintr`, new GitHub Actions workflow `lint`): 
+    spaces around operators and after commas, `if (`, double quotes, `<-` for assignment, no semicolons, 
+    lines of at most 120 characters, no trailing whitespace. These changes are whitespace and quoting 
+    only: the parsed code is identical. The brace style of the package (opening brace on its own line) 
+    and its object names (exported API) are kept, so `brace_linter`, `indentation_linter` and 
+    `object_name_linter` are disabled, as well as `cyclocomp_linter` and `commented_code_linter`.
   * Revision of the vignette: corrected formulas (exposure curve of the beta and one-inflated beta 
     distributions, parameter domain of `MBBEFD(a,b)`, which includes `a < -1`), new sections on the 
     parameter domains, the Swiss Re curves, the likelihood with a point mass, the fitting algorithm 

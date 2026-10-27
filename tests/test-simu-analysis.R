@@ -8,13 +8,13 @@ nsimu <- 5
 
 #### oigbeta ####
 
-trueval <- list(shape0=3, shape1=4, shape2=3, p1=0.25)
+trueval <- list(shape0 = 3, shape1 = 4, shape2 = 3, p1 = 0.25)
 
 myMLE <- function(n, trueval)
 {
-  x <- do.call("roigbeta", c(n=n, trueval))
+  x <- do.call("roigbeta", c(n = n, trueval))
   f1 <- try(fitDR(x, "oigbeta"))
-  if(inherits(f1, "fitDR"))
+  if (inherits(f1, "fitDR"))
     coef(f1)
   else
     rep(NA, length(trueval))
@@ -29,16 +29,16 @@ summary(essai200)
 
 myMLE2 <- function(n, trueval)
 {
-  x <- do.call("rmbbefd", c(n=n, trueval))
+  x <- do.call("rmbbefd", c(n = n, trueval))
   f1 <- try(fitDR(x, "mbbefd"))
-  if(inherits(f1, "fitDR"))
+  if (inherits(f1, "fitDR"))
     coef(f1)
   else
     rep(NA, length(trueval))
 }
 
 
-truevalmbbefd <- list(a=3, b=1/2)
+truevalmbbefd <- list(a = 3, b = 1 / 2)
 
 
 

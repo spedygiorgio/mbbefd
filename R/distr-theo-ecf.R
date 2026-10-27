@@ -6,7 +6,7 @@
 #limited expected value is implemented in actuar
 
 # Exposure curve of the uniform distribution on [min, max].
-ecunif <- function(x, min = 0, max =1)
+ecunif <- function(x, min = 0, max = 1)
 {
   levunif(x, min = min, max = max) / munif(1, min = min, max = max)
 }

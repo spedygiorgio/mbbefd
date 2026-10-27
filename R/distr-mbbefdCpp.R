@@ -13,14 +13,14 @@
 # internal wrappers around the C++ functions registered by Rcpp (see RcppExports.R)
 rmbbefdCpp <- function(n, a, b)
 {
-  .rmbbefdC(n,  a,  b) 
+  .rmbbefdC(n,  a,  b)
 }
 
 rMBBEFDCpp <- function(n, g, b)
 {
-  .rMBBEFDC(n, g, b) 
+  .rMBBEFDC(n, g, b)
 }
-  
+
 
 ### r function MBBEFD(a,b) for users
 # User-level generator for MBBEFD(a,b): n variates on [0,1].
@@ -30,13 +30,13 @@ rmbbefd <- function(n, a, b)
   stopifnot(is.numeric(n))
   stopifnot(is.numeric(a))
   stopifnot(is.numeric(b))
-  
+
   # an empty argument gives an empty result
-  if(min(length(a), length(b), length(n)) <= 0)
+  if (min(length(a), length(b), length(n)) <= 0)
     return(numeric(0))
   m <- max(length(a), length(b), length(n))
   # scalar parameters: C++ generator; otherwise: vectorized R generator
-  if(m == 1)
+  if (m == 1)
     res <- rmbbefdCpp(n, a, b)
   else
     res <- rmbbefdR(n, a, b)
@@ -51,16 +51,15 @@ rMBBEFD <- function(n, g, b)
   stopifnot(is.numeric(n))
   stopifnot(is.numeric(g))
   stopifnot(is.numeric(b))
-  
-  if(min(length(g), length(b), length(n)) <= 0)
+
+  if (min(length(g), length(b), length(n)) <= 0)
     return(numeric(0))
   m <- max(length(g), length(b), length(n))
-  
+
   # scalar parameters: C++ generator; otherwise: vectorized R generator
-  if(m == 1)
+  if (m == 1)
     res <- rMBBEFDCpp(n, g, b)
   else
     res <- rMBBEFDR(n, g, b)
   res
 }
-

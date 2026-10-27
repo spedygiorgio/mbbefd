@@ -468,9 +468,9 @@ fitDR <- function(x, dist, method = "mle", start = NULL, optim.method = "default
           EX3 <- do.call(paste0("m", dist), as.list(c(order = 3, par)))
 
         if (npar == 3)
-          return((EX - mean(obs))^2 + (EX2 - mean(obs^2))^2 + (PX1 - etl(obs))^2)
+          (EX - mean(obs))^2 + (EX2 - mean(obs^2))^2 + (PX1 - etl(obs))^2
         else if (npar == 4)
-          return((EX - mean(obs))^2 + (EX2 - mean(obs^2))^2 + (EX3 - mean(obs^3))^2 + (PX1 - etl(obs))^2)
+          (EX - mean(obs))^2 + (EX2 - mean(obs^2))^2 + (EX3 - mean(obs^3))^2 + (PX1 - etl(obs))^2
         else
           stop("not implemented")
       }

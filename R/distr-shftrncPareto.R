@@ -90,7 +90,7 @@ ecstpareto <- function(x, a)
 mstpareto <- function(order, a)
 {
   if (order == 1)
-    return(ifelse(a == 1, 2 * log(2) - 1, (2^(-a + 1) - 2^(-a) * (-a + 1) - 1) / (-a + 1) / (1 - 2^(-a))))
+    ifelse(a == 1, 2 * log(2) - 1, (2^(-a + 1) - 2^(-a) * (-a + 1) - 1) / (-a + 1) / (1 - 2^(-a)))
   else
     stop("not yet implemented")
 }

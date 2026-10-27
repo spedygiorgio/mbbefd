@@ -1,15 +1,13 @@
 #function that uses the fist itetation of method of moments method of moments to get the inits
 
 giveFunction2Minimize <- function(mu, g) {
-  out <- function(b) (mu - (log(g * b) * (1 - b)) / (log(b) * (1 - g * b)))^2
-  return(out)
+  function(b) (mu - (log(g * b) * (1 - b)) / (log(b) * (1 - g * b)))^2
 }
 
 #this function returns the suqared
 
 giveFunction2Integrate <- function(b, g) {
-  out <- function(x) x^2 * dMBBEFD(x, g = g, b = b)
-  return(out)
+  function(x) x^2 * dMBBEFD(x, g = g, b = b)
 }
 
 giveInits <- function(x) {
@@ -27,6 +25,5 @@ giveInits <- function(x) {
 
   #return a
   a <- (g - 1) * b / (1 - g * b)
-  out <- list(a = a, b = b)
-  return(out)
+  list(a = a, b = b)
 }

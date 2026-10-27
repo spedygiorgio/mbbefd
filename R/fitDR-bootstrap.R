@@ -53,9 +53,9 @@ bootDR <- function(f, bootmethod = "param", niter = 1001, silent = TRUE,
                        ), silent = silent)
 
     if (inherits(res, "try-error"))
-      return(c(rep(NA, length(start)), 100))
+      c(rep(NA, length(start)), 100)
     else
-      return(c(res$estimate, res$convergence))
+      c(res$estimate, res$convergence)
   }
 
   # temporarily silence warnings and error messages of the individual fits
@@ -119,5 +119,5 @@ bootDR <- function(f, bootmethod = "param", niter = 1001, silent = TRUE,
 vcov.bootDR <- function(object, ...)
 {
   stopifnot(inherits(object, "bootDR"))
-  return(cov(object$estim, ...))
+  cov(object$estim, ...)
 }

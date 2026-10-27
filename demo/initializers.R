@@ -8,7 +8,7 @@ giveFunction2Minimize<-function(mu,g) {
 #this function returns the suqared
 
 giveFunction2Integrate<-function(b,g) {
-  out = function(x) x^2*dmbbefd(x,b=b,g=g)
+  out = function(x) x^2*dMBBEFD(x,g=g,b=b)
   return(out)
 }
 

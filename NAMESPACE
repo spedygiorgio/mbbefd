@@ -29,7 +29,7 @@ export(swissRe)
 importFrom("stats", dbeta, pbeta, qbeta, rbeta, 
            dunif, punif, qunif, runif, 
            rbinom, pgamma, 
-           optim, optimHess, constrOptim, integrate, optimize, 
+           optim, optimHess, constrOptim, integrate, optimize, uniroot, 
            cov2cor, median, quantile, var, cov)
 importFrom("actuar", munif, levunif, mbeta, levbeta) #d,p,q,r functions in base R
 export(ecunif)

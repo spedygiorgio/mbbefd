@@ -16,12 +16,12 @@ bootDR <- function(f, bootmethod="param", niter=1001, silent=TRUE,
   bootmethod <- match.arg(bootmethod, c("param", "nonparam"))
   
   parallel <- match.arg(parallel, c("no", "snow", "multicore"))
-  if (parallel == "multicore" & .Platform$OS.type == "windows")
+  if (parallel == "multicore" && .Platform$OS.type == "windows")
   {
     parallel <- "snow"
     warning("As the multicore option is not supported on Windows it was replaced by snow")
   }
-  if ((parallel == "snow" | parallel == "multicore") & missing(ncpus)) 
+  if ((parallel == "snow" || parallel == "multicore") && missing(ncpus)) 
     stop("You have to specify the number of available processors to parallelize 
              the bootstrap")
   

@@ -40,7 +40,7 @@ dMBBEFDR <- function(x, g, b, log=FALSE)
   #default to NaN
   res <- rep(NaN, m)
   id1 <- x == 1
-  id01 <- 0 < x & x < 1
+  id01 <- 0 <= x & x < 1 #continuous part on [0,1): f(0) > 0
   
   # degenerate case: total loss only (g = 1)
   #unit indicator - 

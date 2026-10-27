@@ -67,10 +67,13 @@ fitDR <- function(x, dist, method="mle", start=NULL, optim.method="default", con
   if(control$trace > 0)
     cat("Distribution is", dist, "\n")
   
-  # Without total losses, the MLE of P(X = 1) is 0, i.e. on the boundary of the
-  # parameter space (g -> +Inf): the fit is still computed but the user is warned.
+  # The MBBEFD distribution has a probability mass 1/g at 1. Without total losses
+  # the MLE still exists (g also drives the shape of the density below 1), but
+  # P(X = 1) is then identified only through that shape: the fit is computed and
+  # the user is warned (total losses may have been removed or capped below 1).
   if(dist %in% c("mbbefd", "MBBEFD") && method == "mle" && !any(x == 1))
-    warning("there is no total loss (x == 1) in the data: the estimated total loss probability goes to the boundary 0.")
+    warning("there is no total loss (x == 1) in the data: the total loss probability is estimated ",
+            "only from the shape of the distribution below 1.")
   
   # ---------------------------------------------------------------------------
   # MBBEFD(a,b)

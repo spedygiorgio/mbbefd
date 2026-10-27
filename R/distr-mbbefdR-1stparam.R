@@ -41,7 +41,7 @@ dmbbefdR <- function(x, a, b, log=FALSE)
   #main domain: -1 < a < 0 & b > 1, or a > 0 & 0 < b < 1, or a < -1 & 0 < b < 1 (i.e. b < 1 and gb > 1)
   res <- rep(NaN, m)
   id1 <- x == 1
-  id01 <- 0 < x & x < 1
+  id01 <- 0 <= x & x < 1 #continuous part on [0,1): f(0) > 0
   
   # degenerate case: total loss only
   #unit indicator - 

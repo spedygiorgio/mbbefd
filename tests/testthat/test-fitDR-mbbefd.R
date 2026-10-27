@@ -167,3 +167,21 @@ test_that("swissRe() for a scalar and a vector c", {
   expect_equal(colnames(m), c("b", "g"))
   expect_equal(m[3, ], p)
 })
+
+test_that("exposure curves of one-inflated distributions with x outside [0, 1]", {
+  x <- c(-0.1, 0, 0.5, 1, 1.1, NA)
+  inside <- c(0, 0.5, 1)
+  expect_equal(ecoibeta(x, 2, 3, 0.1)[2:4], ecoibeta(inside, 2, 3, 0.1))
+  expect_equal(ecoiunif(x, 0.2)[2:4], ecoiunif(inside, 0.2))
+  expect_equal(ecoistpareto(x, 2, 0.1)[2:4], ecoistpareto(inside, 2, 0.1))
+  expect_equal(ecoigbeta(x, 2, 2, 3, 0.1)[2:4], ecoigbeta(inside, 2, 2, 3, 0.1))
+  expect_equal(ecoibeta(0, 2, 3, 0.1), 0)
+})
+
+test_that("MBBEFD density at x = 0", {
+  #f(0) = -a log(b) / (a + 1) in the first parametrization
+  expect_equal(dmbbefd(0, 0.5, 0.1), -0.5 * log(0.1) / 1.5)
+  expect_equal(dMBBEFD(0, 5, 0.1), dmbbefd(0, (5 - 1) * 0.1 / (1 - 5 * 0.1), 0.1))
+  expect_equal(dMBBEFD(0, 5, 0.1), dMBBEFD(1e-10, 5, 0.1), tolerance = 1e-8)
+  expect_true(is.finite(sum(dMBBEFD(c(0, 0.5, 1), 5, 0.1, log = TRUE))))
+})

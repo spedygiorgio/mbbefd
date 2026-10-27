@@ -44,10 +44,6 @@ eccomp <- function(ft, xlim, ylim, main, xlab, ylab, do.points=TRUE,
   }
   
   mydata <- ft[[1]]$data
-  distname <- ft[[1]]$distname
-  n <- length(mydata)
-  s <- sort(mydata)
-  largedata <- (n > 1e4)
   
   if(missing(xlim))
   {
@@ -88,8 +84,8 @@ eccomp <- function(ft, xlim, ylim, main, xlab, ylab, do.points=TRUE,
   # empirical exposure curve (see eecf() in util-empiricalfunctions.R), then
   # one line per fitted curve
   #main plotting
-  resec <- plot(eecf(x = mydata), main=main, xlab=xlab, ylab=ylab, xlim=xlim, 
-                ylim=ylim, col=datacol, do.points=do.points)
+  plot(eecf(x = mydata), main=main, xlab=xlab, ylab=ylab, xlim=xlim, 
+       ylim=ylim, col=datacol, do.points=do.points)
   #plot fitted densities
   for(i in 1:nft)
     lines(sfin, fittedec[,i], lty=fitlty[i], col=fitcol[i], ...)

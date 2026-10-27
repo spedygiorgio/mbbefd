@@ -20,7 +20,8 @@
   * `fitDR(method = "tlmme")` for `mbbefd` and `MBBEFD` now solves the total loss and mean equations exactly, 
     as in Bernegger (1997): `g = 1/etl(x)` and `b` is the unique root of the mean equation. 
     A warning is raised and `NA` is returned when `0 < etl(x) < mean(x) < 1` does not hold.
-  * `fitDR(method = "mle")` for `mbbefd` and `MBBEFD` raises a warning when the data contain no total loss.
+  * `fitDR(method = "mle")` for `mbbefd` and `MBBEFD` raises a warning when the data contain no total loss:
+    the total loss probability is then estimated only from the shape of the distribution below 1.
   * `fitDR(method = "mle")` for `mbbefd` and `MBBEFD` refines each constrained fit with an unconstrained 
     maximization in `(log(g-1), log(b))`, where the log-likelihood is continuous across the domain boundaries 
     `b = 1` and `gb = 1`. When the MLE is close to `b = 1` (e.g. Swiss Re curve `c = 4`), the constrained 
@@ -54,12 +55,27 @@
   * Fix `dgbeta(log = FALSE)` (hence `doigbeta()`) with vectorized parameters when some shape 
     parameters are invalid or some observations are outside `[0, 1]`: the data were indexed 
     with the wrong subset, giving wrong densities and recycling warnings.
+  * Fix the exposure curves of one-inflated distributions (`ecoiunif()`, `ecoibeta()`, `ecoistpareto()`, 
+    `ecoigbeta()`) when `x` contains values outside `[0, 1]` or missing values: the exposure curve of the 
+    continuous part was indexed twice, so that the results were shifted (e.g. `ecoibeta(c(-0.1, 0), 2, 3, 0.1)` 
+    returned 0.697 at 0 instead of 0).
+  * `dmbbefd()` and `dMBBEFD()` now return the density at `x = 0` (it was 0, so that the log-likelihood of 
+    data containing a zero destruction rate was `-Inf`).
+  * `bootDR()` uses scalar logical operators (`&&`, `||`) in its argument checks.
+  * Import `uniroot()` from `stats` (used by the exact `tlmme` estimator; `R CMD check` NOTE).
 
 ### MISC
 
   * Raise the minimal required version of `fitdistrplus` to 1.2-2: `fitDR()` and `bootDR()` rely on the `calcvcov` argument and on `density.bootdist()` (introduced in 1.2-1; before: `unused argument (calcvcov = TRUE)`), and the standard errors of one-inflated fits assume that `mledist()` minimizes the average negative log-likelihood (since 1.2-2).
   * Remove the obsolete `src/Makevars*` files (`RCPP_USE_UNWIND_PROTECT` is the default of `Rcpp >= 0.12.18`) and the unneeded `SystemRequirements: GNU make`.
   * The `LICENCE` file and the README badge now state GPL-2, as `DESCRIPTION` (they said GPL-3).
+  * Revision of the vignette: corrected formulas (exposure curve of the beta and one-inflated beta 
+    distributions, parameter domain of `MBBEFD(a,b)`, which includes `a < -1`), new sections on the 
+    parameter domains, the Swiss Re curves, the likelihood with a point mass, the fitting algorithm 
+    and the exact total-loss-moment matching. The premium rating example now follows Swiss Re (2004): 
+    the risks above the retention of the surplus treaty are apportioned with the mean MPL (not the 
+    maximum MPL), and the premium rate (1.65%, against 1.636% in the publication) is computed in the 
+    vignette instead of being typed (the code returned `NaN`).
 
 ## CHANGES IN `mbbefd` VERSION 0.8.14
 

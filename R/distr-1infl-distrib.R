@@ -151,10 +151,10 @@ ecoifun <- function(x, ecfun, mfun, p1, ...)
   
   idmain <- x >= 0 & x <= 1  & p1 >= 0 & p1 <= 1 & !is.na(x) & !is.na(p1)
   
-  G0 <- ecfun(x[idmain], ...) #exposure curve
+  G0 <- ecfun(x[idmain], ...) #exposure curve, already restricted to idmain
   E0 <- mfun(order=1, ...) #expectation
   
-  res[idmain] <- ((1-p1[idmain])*G0[idmain] + p1[idmain]*x[idmain]/E0)/(1-p1[idmain]+p1[idmain]/E0)
+  res[idmain] <- ((1-p1[idmain])*G0 + p1[idmain]*x[idmain]/E0)/(1-p1[idmain]+p1[idmain]/E0)
   res
 }
 

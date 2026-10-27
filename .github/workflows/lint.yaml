@@ -1,0 +1,63 @@
+# Code style: lintr with the configuration of the package (.lintr). The job
+# fails if lintr reports any lint. It is not part of the "CI gate" of
+# R-CMD-check.yaml, so a style issue does not block a merge unless this job is
+# also made a required status check.
+name: lint
+
+on:
+  push:
+    branches: [main, master]
+    paths:
+      - 'R/**'
+      - 'tests/**'
+      - 'demo/**'
+      - 'vignettes/**'
+      - '.lintr'
+      - '.github/workflows/lint.yaml'
+  pull_request:
+    branches: [main, master]
+    paths:
+      - 'R/**'
+      - 'tests/**'
+      - 'demo/**'
+      - 'vignettes/**'
+      - '.lintr'
+      - '.github/workflows/lint.yaml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: lint-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          use-public-rspm: true
+
+      # the package itself is installed so that lintr knows its functions
+      # (object_usage_linter)
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          extra-packages: any::lintr, local::.
+          needs: lint
+          cache: true
+
+      - name: Lint
+        shell: Rscript {0}
+        run: |
+          lints <- lintr::lint_package()
+          print(lints)
+          if (length(lints) > 0)
+            stop(length(lints), " lint(s) found: see above, or run lintr::lint_package() locally")

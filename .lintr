@@ -1,0 +1,26 @@
+linters: linters_with_defaults(
+    line_length_linter = line_length_linter(120L),
+    object_name_linter = NULL,
+    brace_linter = NULL,
+    indentation_linter = NULL,
+    cyclocomp_linter = NULL,
+    commented_code_linter = NULL
+  )
+exclusions: list(
+    "R/RcppExports.R",
+    "R/data-documentData-old.R",
+    "tests/check-formula-integral.R",
+    "tests/check-formula-variance.R",
+    "tests/t-brvehinsdr.R",
+    "tests/test-GB1.R",
+    "tests/test-lossalae-oigbeta.R",
+    "tests/test-mbbefd-1stparam-def-prog.R",
+    "tests/test-mbbefd-1stparam-moment-D0D1.R",
+    "tests/test-mbbefd-1stparam-moment.R",
+    "tests/test-mbbefd-1stparam.R",
+    "tests/test-mbbefd-2ndparam-def-prog.R",
+    "tests/test-mbbefd-2ndparam-grLL.R",
+    "tests/test-mbbefd-2ndparam-moment.R",
+    "tests/test-mbbefd-2ndparam.R",
+    "vignettes/test-beta.Rmd"
+  )

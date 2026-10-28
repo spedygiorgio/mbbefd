@@ -9,7 +9,7 @@ export(dmbbefd, pmbbefd, qmbbefd, rmbbefd, ecmbbefd, mmbbefd, tlmbbefd)
 export(dMBBEFD, pMBBEFD, qMBBEFD, rMBBEFD, ecMBBEFD, mMBBEFD, tlMBBEFD)
 
 #for internal use (fitting process)
-export(dmbbefd1, dmbbefd2, dMBBEFD1, dMBBEFD2, dgbeta1)
+export(dmbbefd1, dmbbefd2, dmbbefd3, dMBBEFD1, dMBBEFD2, dMBBEFD3, dgbeta1)
 
 export(g2a) #backward compatibility
 
@@ -29,7 +29,7 @@ export(swissRe)
 importFrom("stats", dbeta, pbeta, qbeta, rbeta, 
            dunif, punif, qunif, runif, 
            rbinom, pgamma, 
-           optim, optimHess, constrOptim, integrate, optimize, 
+           optim, optimHess, constrOptim, integrate, optimize, uniroot, 
            cov2cor, median, quantile, var, cov)
 importFrom("actuar", munif, levunif, mbeta, levbeta) #d,p,q,r functions in base R
 export(ecunif)

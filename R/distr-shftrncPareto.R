@@ -1,86 +1,96 @@
+# File overview: the shifted truncated Pareto distribution on [0,1], with
+# shape a > 0. It is the Pareto distribution of X + 1 (support [1, +Inf))
+# truncated to [1, 2] and shifted back to [0, 1]:
+#   F(x) = (1 - (x+1)^(-a)) / (1 - 2^(-a)),  0 <= x <= 1.
+# It is used as the continuous part of the one-inflated distribution oistpareto.
 #d, p, q, r function for shifted truncated Pareto distribution
 
 #should it be dstpareto01?
-dstpareto <- function(x, a, log=FALSE)
+# density f(x) = a (x+1)^(-a-1) / (1 - 2^(-a)) on [0,1], zero elsewhere
+dstpareto <- function(x, a, log = FALSE)
 {
-  if(!(a > 0))
+  if (!(a > 0))
     return(rep(NaN, length(x)))
-  
-  res <- a * (x+1)^(-a-1)/(1 - 2^(-a))
+
+  res <- a * (x + 1)^(-a - 1) / (1 - 2^(-a))
   res[x > 1] <- 0
   res[x < 0] <- 0
-  
-  if(log)
-    res <- log(res) 
+
+  if (log)
+    res <- log(res)
   res
 }
 
+# distribution function (see the file overview)
 pstpareto <- function(q, a, lower.tail = TRUE, log.p = FALSE)
 {
-  if(!(a > 0))
+  if (!(a > 0))
     return(rep(NaN, length(q)))
-  
-  res <- (1 - (q+1)^(-a))/(1-2^(-a))
+
+  res <- (1 - (q + 1)^(-a)) / (1 - 2^(-a))
   res[q >= 1] <- 1
   res[q <= 0] <- 0
-  
-  if(!lower.tail)
-    res <- 1-res
-  if(log.p)
+
+  if (!lower.tail)
+    res <- 1 - res
+  if (log.p)
     res <- log(res)
-  
+
   res
 }
 
 
+# quantile function: inverse of pstpareto
 qstpareto <- function(p, a, lower.tail = TRUE, log.p = FALSE)
 {
-  if(!(a > 0))
+  if (!(a > 0))
     return(rep(NaN, length(p)))
-  
-  if(!lower.tail)
-    p <- 1-p
-  if(log.p) 
-    p <- exp(p) 
-  
-  res <- (1-p*(1-2^(-a)))^(-1/a) - 1
-  res[p < 0 | p > 1] <- NaN
-  
-  res
-}  
 
+  if (!lower.tail)
+    p <- 1 - p
+  if (log.p)
+    p <- exp(p)
+
+  res <- (1 - p * (1 - 2^(-a)))^(-1 / a) - 1
+  res[p < 0 | p > 1] <- NaN
+
+  res
+}
+
+# random generation by inversion: Q(U) with U uniform on (0,1)
 rstpareto <- function(n, a)
 {
-  n <- ifelse(length(n)>1, length(n), n)
-  if(!(a > 0))
+  n <- ifelse(length(n) > 1, length(n), n)
+  if (!(a > 0))
     return(rep(NaN, n))
   qstpareto(runif(n, 0, 1), a)
 }
 
 
+# exposure curve G(x) = E[min(X,x)] / E[X], in closed form (special case a = 1)
 ecstpareto <- function(x, a)
 {
-  if(!(a > 0))
+  if (!(a > 0))
     return(rep(NaN, length(x)))
-  
-  if(a == 1)
+
+  if (a == 1)
   {
-    res <- (2*log(x+1) - x)/(2*log(2) - 1)
-  }else
+    res <- (2 * log(x + 1) - x) / (2 * log(2) - 1)
+  } else
   {
-    res <- ((x+1)^(-a+1) - 2^(-a)*x*(-a+1) - 1)/(2^(-a+1)-2^(-a)*(-a+1) - 1)
+    res <- ((x + 1)^(-a + 1) - 2^(-a) * x * (-a + 1) - 1) / (2^(-a + 1) - 2^(-a) * (-a + 1) - 1)
   }
   res[x < 0] <- 0
   res[x > 1] <- 1
-  
+
   res
 }
 
+# raw moment: only the mean (order 1) is implemented, in closed form
 mstpareto <- function(order, a)
 {
-  if(order == 1)
-    return(ifelse(a == 1, 2*log(2)-1, (2^(-a+1) - 2^(-a)*(-a+1)-1)/(-a+1)/(1-2^(-a)) ))
+  if (order == 1)
+    ifelse(a == 1, 2 * log(2) - 1, (2^(-a + 1) - 2^(-a) * (-a + 1) - 1) / (-a + 1) / (1 - 2^(-a)))
   else
     stop("not yet implemented")
 }
-  

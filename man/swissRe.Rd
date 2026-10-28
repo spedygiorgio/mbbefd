@@ -12,13 +12,20 @@ swissRe(c)
 }
 
 \arguments{
-  \item{c}{A numeric value}
+  \item{c}{A numeric value or vector.}
 }
 \details{
 The four Swiss Re Y1-Y4 are defined for c=1.5, 2, 3, 4. In addition c=5 coincides with a curve used by Lloyds for industrial risks exposure rating. 
 }
 \value{
-A named two dimensional vector
+For a scalar \code{c}, a named vector \code{c(b = ..., g = ...)}.
+For a vector \code{c}, a matrix with one row per value of \code{c} and
+columns \code{"b"} and \code{"g"}.
+
+Note that \code{b} comes first, while the functions of the \code{MBBEFD(g, b)}
+parametrization (e.g. \code{\link{dMBBEFD}}, \code{\link{ecMBBEFD}}) take
+\code{g} before \code{b}: select the parameters by name, as in the examples,
+not by position.
 }
 \references{
 BERNEGGER, STEFAN (1997). 
@@ -34,6 +41,9 @@ Giorgio Spedicato
 }
 \examples{
 pars <- swissRe(4)
-losses <- rMBBEFD(n=1000,b=pars[1],g=pars[2])
+losses <- rMBBEFD(n=1000, g=pars["g"], b=pars["b"])
 mean(losses)
+
+#the four Swiss Re curves Y1-Y4 and the Lloyd's curve
+swissRe(c(1.5, 2, 3, 4, 5))
 }

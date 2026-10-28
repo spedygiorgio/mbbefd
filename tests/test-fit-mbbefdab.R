@@ -5,20 +5,20 @@ set.seed(123456)
 n <- 1e3
 nboot <- 1000
 nboot <- 10
-lossrate <- rmbbefd(n, 1/2, 1/10)
+lossrate <- rmbbefd(n, 1 / 2, 1 / 10)
 
 
 f1 <- fitDR(lossrate, "mbbefd")
 summary(f1)
 
 #should be similar
-if(FALSE)
+if (FALSE)
 {
-  f0 <- fitDR(lossrate, "mbbefd", start= list(a=1/4, b=1/4), control=list(trace=1))
-  fitDR(lossrate, "mbbefd", start= list(a=1/4, b=1/4), control=list(trace=2))
+  f0 <- fitDR(lossrate, "mbbefd", start = list(a = 1 / 4, b = 1 / 4), control = list(trace = 1))
+  fitDR(lossrate, "mbbefd", start = list(a = 1 / 4, b = 1 / 4), control = list(trace = 2))
 }
 
-cdfcomp(f1, do.points=FALSE)
+cdfcomp(f1, do.points = FALSE)
 qqcomp(f1)
 vcov(f1)
 
@@ -27,26 +27,25 @@ vcov(f1)
 # points(f1$estimate["a"], f1$estimate["b"], pch="+", col="red")
 # points(1/2, 1/10, pch="x", col="black")
 
-b1 <- bootDR(f1, niter=nboot, silent=TRUE)
+b1 <- bootDR(f1, niter = nboot, silent = TRUE)
 
-if(sum(b1$converg == 0) > 2)
+if (sum(b1$converg == 0) > 2)
 {
-  plot(b1, enhance=TRUE, trueval=c(1/2, 1/10))
+  plot(b1, enhance = TRUE, trueval = c(1 / 2, 1 / 10))
   plot(density(b1))
 }
 
 
-if(FALSE)
+if (FALSE)
 {
-  lossrate <- rmbbefd(n, -1/2, 5)
-  
-  
+  lossrate <- rmbbefd(n, -1 / 2, 5)
+
+
   f1 <- fitDR(lossrate, "mbbefd")
   summary(f1)
-  
-  
-  b1 <- bootDR(f1, niter=nboot, silent=TRUE)
-  plot(b1, enhance=TRUE, trueval=c(-1/2, 5))
+
+
+  b1 <- bootDR(f1, niter = nboot, silent = TRUE)
+  plot(b1, enhance = TRUE, trueval = c(-1 / 2, 5))
   plot(density(b1))
 }
-

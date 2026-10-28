@@ -1,70 +1,160 @@
 # Workflow derived from https://github.com/r-lib/actions/tree/v2/examples
 # Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
-
+#
+# Design (same approach as the markovchain and lifecontingencies packages):
+# * Every pull request gets a fast 3-config matrix; every push to master (i.e.
+#   every merge) and manual runs get the full matrix. Changes that cannot affect
+#   R CMD check are filtered with paths-ignore.
+# * R-devel is checked on Linux (every run) and Windows (full matrix). It is not
+#   checked on macOS: CRAN publishes no macOS binaries for R-devel, so every
+#   dependency is compiled from source there, and some of them need system
+#   libraries that the runners do not provide (e.g. expint needs gettext's
+#   libintl.h). macOS is checked with R release.
+# * LaTeX (TinyTeX) and pandoc are only needed to build the PDF vignette, so
+#   they are installed only on the configs flagged `vignettes: true`. The other
+#   configs run R CMD check --as-cran with --ignore-vignettes --no-manual (code,
+#   examples and tests are still checked in full).
+# * R CMD check runs with --as-cran and fails on ERRORs and WARNINGs.
+# * Superseded runs of a pull request are cancelled.
+# * The job `CI gate` aggregates all the jobs: make it the only required status
+#   check in the branch protection rules (the matrix differs between pull
+#   requests and pushes, so requiring individual jobs does not work).
 on:
-  workflow_dispatch:
   push:
     branches: [main, master]
+    paths-ignore:
+      - 'README.md'
+      - 'cran-comments.md'
+      - 'share/**'
+      - '.github/dependabot.yml'
+      - '.github/workflows/test-coverage.yaml'
+      - '.github/workflows/lint.yaml'
+      - '.lintr'
   pull_request:
     branches: [main, master]
+    paths-ignore:
+      - 'README.md'
+      - 'cran-comments.md'
+      - 'share/**'
+      - '.github/dependabot.yml'
+      - '.github/workflows/test-coverage.yaml'
+      - '.github/workflows/lint.yaml'
+      - '.lintr'
+  workflow_dispatch:
 
 name: R-CMD-check
 
-jobs:
-  R-CMD-check:
-    runs-on: ${{ matrix.config.os }}
+permissions:
+  contents: read
 
-    name: ${{ matrix.config.os }} (${{ matrix.config.r }})
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  # Choose the matrix: reduced for pull requests, full otherwise.
+  matrix:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      config: ${{ steps.set.outputs.config }}
+    steps:
+      - id: set
+        shell: bash
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+        run: |
+          if [ "$EVENT_NAME" = "pull_request" ]; then
+            config='[
+              {"os":"ubuntu-latest","r":"release","vignettes":true},
+              {"os":"ubuntu-latest","r":"devel","http-user-agent":"release","vignettes":false},
+              {"os":"windows-latest","r":"release","vignettes":false}
+            ]'
+          else
+            config='[
+              {"os":"ubuntu-latest","r":"release","vignettes":true},
+              {"os":"ubuntu-latest","r":"devel","http-user-agent":"release","vignettes":false},
+              {"os":"ubuntu-latest","r":"oldrel-1","vignettes":false},
+              {"os":"windows-latest","r":"release","vignettes":false},
+              {"os":"windows-latest","r":"devel","http-user-agent":"release","vignettes":false},
+              {"os":"macos-latest","r":"release","vignettes":false}
+            ]'
+          fi
+          echo "config=$(echo "$config" | tr -d '\n ')" >> "$GITHUB_OUTPUT"
+
+  R-CMD-check:
+    needs: matrix
+    runs-on: ${{ matrix.config.os }}
+    timeout-minutes: 60
+
+    name: ${{ matrix.config.os }} (${{ matrix.config.r }})${{ matrix.config.vignettes && ' + vignettes' || '' }}
 
     strategy:
       fail-fast: false
       matrix:
-        config:
-          - {os: windows-latest,  r: 'release'}
-          - {os: macOS-latest,    r: 'devel',   http-user-agent: 'release'}
-          - {os: macOS-latest,    r: 'release'}
-          - {os: ubuntu-latest,   r: 'devel',   http-user-agent: 'release'}
-          - {os: ubuntu-latest,   r: 'release'}
+        config: ${{ fromJSON(needs.matrix.outputs.config) }}
 
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       R_KEEP_PKG_SOURCE: yes
+
     steps:
-      - uses: actions/checkout@v4
-      
-      - uses: r-lib/actions/setup-pandoc@v2
+      - uses: actions/checkout@v5
+
+      # pandoc and TinyTeX: only for the PDF vignette (rmarkdown::pdf_document).
+      # Missing LaTeX packages are installed on the fly by tinytex.
+      - if: matrix.config.vignettes
+        uses: r-lib/actions/setup-pandoc@v2
+
+      - if: matrix.config.vignettes
+        uses: r-lib/actions/setup-tinytex@v2
+
+      # qpdf and ghostscript: --compact-vignettes=gs+qpdf and the PDF size checks
+      - name: Install PDF tools
+        if: matrix.config.vignettes && runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y qpdf ghostscript
 
       - uses: r-lib/actions/setup-r@v2
         with:
           r-version: ${{ matrix.config.r }}
           http-user-agent: ${{ matrix.config.http-user-agent }}
           use-public-rspm: true
-          
-      - uses: r-lib/actions/setup-tinytex@v2
-      
-      - name: Install libraries for Linux
-        if: runner.os == 'Linux'
-        run: |
-          sudo apt-get install libcurl4-openssl-dev texlive
-          
-      - name: Install dependencies
-        run: |
-          install.packages("remotes")
-          remotes::install_deps(dependencies = TRUE)
-          remotes::install_cran("rcmdcheck")
-          tinytex::tlmgr_install("amscls")
-          tinytex::parse_install(text = "! LaTeX Error: File `ae.sty' not found.")
-        shell: Rscript {0}
-          
+
+      # Installs the dependencies of DESCRIPTION (Depends, Imports, Suggests),
+      # with a cache keyed on the OS, the R version and the dependencies.
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          pak-version: devel
-          extra-packages: any::rcmdcheck, any::XML, any::quarto
+          extra-packages: any::rcmdcheck
           needs: check
-          # See https://github.com/r-lib/actions/issues/559 for the XML issue
+          cache: true
 
       - uses: r-lib/actions/check-r-package@v2
         with:
-          args: 'c("--no-manual", "--as-cran")'
-          error-on: '"error"'
-          check-dir: '"check"'
+          upload-snapshots: true
+          error-on: '"warning"'
+          build_args: ${{ matrix.config.vignettes && 'c("--no-manual", "--compact-vignettes=gs+qpdf")' || 'c("--no-manual", "--no-build-vignettes")' }}
+          args: ${{ matrix.config.vignettes && 'c("--no-manual", "--as-cran")' || 'c("--no-manual", "--as-cran", "--ignore-vignettes")' }}
+
+  # Single status to require in the branch protection rules: it is red if any
+  # job failed or was cancelled.
+  ci-gate:
+    name: CI gate
+    if: always()
+    needs: [matrix, R-CMD-check]
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: All required jobs succeeded
+        shell: bash
+        env:
+          RESULTS: ${{ join(needs.*.result, ' ') }}
+        run: |
+          echo "job results: ${RESULTS}"
+          for r in ${RESULTS}; do
+            if [ "$r" != "success" ]; then
+              echo "::error::At least one job did not succeed (${r})."
+              exit 1
+            fi
+          done

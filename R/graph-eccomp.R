@@ -1,50 +1,51 @@
-eccomp <- function(ft, xlim, ylim, main, xlab, ylab, do.points=TRUE,
-                    datapch, datacol, fitlty, fitcol, addlegend = TRUE, 
-                   legendtext, xlegend = "bottomright", 
+# File overview: eccomp() plots the empirical exposure curve of the data
+# together with the fitted exposure curves of one or several fitDR objects
+# (same spirit as fitdistrplus::cdfcomp, which compares distribution functions).
+eccomp <- function(ft, xlim, ylim, main, xlab, ylab, do.points = TRUE,
+                    datapch, datacol, fitlty, fitcol, addlegend = TRUE,
+                   legendtext, xlegend = "bottomright",
                     ylegend = NULL, ...)
 {
-  if(inherits(ft, "fitDR"))
+  # accept a single fit or a list of fits, all of class "fitDR"
+  if (inherits(ft, "fitDR"))
   {
     ft <- list(ft)
-  }else if(!is.list(ft))
+  } else if (!is.list(ft))
   {
     stop("argument ft must be a list of 'fitDR' objects")
-  }else
+  } else
   {
-    if(any(sapply(ft, function(x) !inherits(x, "fitDR"))))        
+    if (any(sapply(ft, function(x) !inherits(x, "fitDR"))))
       stop("argument ft must be a list of 'fitDR' objects")
   }
-  
+
+  # default graphical parameters (one color and line type per fit)
   nft <- length(ft)
   if (missing(datapch)) datapch <- 16
   if (missing(datacol)) datacol <- "black"
-  if (missing(fitcol)) fitcol <- 2:(nft+1)
+  if (missing(fitcol)) fitcol <- 2:(nft + 1)
   if (missing(fitlty)) fitlty <- 1:nft
-  fitcol <- rep(fitcol, length.out=nft)
-  fitlty <- rep(fitlty, length.out=nft)
-  
+  fitcol <- rep(fitcol, length.out = nft)
+  fitlty <- rep(fitlty, length.out = nft)
+
   if (missing(xlab))
     xlab <- "data"
   if (missing(ylab)) ylab <- "G(x)"
   if (missing(main)) main <- paste("Emp. and theo. exposure curve(s)")
-  
+
   # check legend parameters if added
-  if(missing(legendtext)) 
+  if (missing(legendtext))
   {
     legendtext <- sapply(ft, function(x) x$distname)
-    if(length(legendtext) != length(unique(legendtext)))
-      legendtext <- paste(legendtext, sapply(ft, function(x) toupper(x$method)), sep="-")
-    if(length(legendtext) != length(unique(legendtext)))
-      legendtext <- paste(legendtext, 1:nft, sep="-")
+    if (length(legendtext) != length(unique(legendtext)))
+      legendtext <- paste(legendtext, sapply(ft, function(x) toupper(x$method)), sep = "-")
+    if (length(legendtext) != length(unique(legendtext)))
+      legendtext <- paste(legendtext, 1:nft, sep = "-")
   }
-  
+
   mydata <- ft[[1]]$data
-  distname <- ft[[1]]$distname
-  n <- length(mydata)
-  s <- sort(mydata)
-  largedata <- (n > 1e4)
-  
-  if(missing(xlim))
+
+  if (missing(xlim))
   {
     xmin <- min(mydata)
     xmax <- max(mydata)
@@ -55,7 +56,8 @@ eccomp <- function(ft, xlim, ylim, main, xlab, ylab, do.points=TRUE,
     xmin <- xlim[1]
     xmax <- xlim[2]
   }
-  
+
+  # all fits must have been obtained on the same data
   verif.ftidata <- function(fti)
   {
     if (any(fti$data != mydata))
@@ -63,30 +65,34 @@ eccomp <- function(ft, xlim, ylim, main, xlab, ylab, do.points=TRUE,
     invisible()
   }
   lapply(ft, verif.ftidata)
-  
+
+  # evaluate the theoretical exposure curve ec<dist>() of each fit on a grid of
+  # 101 points, with the estimated parameters
   # computation of each fitted exposure curve
-  sfin <- seq(xmin, xmax, length.out=101)
+  sfin <- seq(xmin, xmax, length.out = 101)
   comput.fti <- function(i)
   {
     fti <- ft[[i]]
     para <- c(as.list(fti$estimate), as.list(fti$fix.arg))
     distname <- fti$distname
-    ecdistname <- paste("ec",distname,sep="")
-    do.call(ecdistname, c(list(x=sfin), as.list(para)))
-    
+    ecdistname <- paste("ec", distname, sep = "")
+    do.call(ecdistname, c(list(x = sfin), as.list(para)))
+
   }
   fittedec <- sapply(1:nft, comput.fti)
-  
+
+  # empirical exposure curve (see eecf() in util-empiricalfunctions.R), then
+  # one line per fitted curve
   #main plotting
-  resec <- plot(eecf(x = mydata), main=main, xlab=xlab, ylab=ylab, xlim=xlim, 
-                ylim=ylim, col=datacol, do.points=do.points)
+  plot(eecf(x = mydata), main = main, xlab = xlab, ylab = ylab, xlim = xlim,
+       ylim = ylim, col = datacol, do.points = do.points)
   #plot fitted densities
-  for(i in 1:nft)
-    lines(sfin, fittedec[,i], lty=fitlty[i], col=fitcol[i], ...)
-  
-  if(addlegend)
+  for (i in 1:nft)
+    lines(sfin, fittedec[, i], lty = fitlty[i], col = fitcol[i], ...)
+
+  if (addlegend)
   {
-    legend(x=xlegend, y=ylegend, bty="n", legend=legendtext, 
-           lty=fitlty, col=fitcol,...)
+    legend(x = xlegend, y = ylegend, bty = "n", legend = legendtext,
+           lty = fitlty, col = fitcol, ...)
   }
 }

@@ -33,10 +33,10 @@ library("mbbefd")
 #options("citation_format" = "pandoc")
 #bib <- read.bibtex("mbbefd.bib")
 library(lattice)
-my.settings <- canonical.theme(color=FALSE)
-my.settings[['fontsize']] = list(text = 8, points = 4)
-my.settings[['strip.background']]$col <- "darkgrey"
-my.settings[['strip.border']]$col<- "black"  
+my.settings <- canonical.theme(color = FALSE)
+my.settings[["fontsize"]] <- list(text = 8, points = 4)
+my.settings[["strip.background"]]$col <- "darkgrey"
+my.settings[["strip.border"]]$col <- "black"
 ```
 
 
@@ -44,14 +44,14 @@ my.settings[['strip.border']]$col<- "black"
 # Introduction and general notation
 
 Exposure rating is a tool for insurance pricing that allocates premium to bands
-of damage ratios or severity of losses. First ideas were published in [@salzmann1963]. It is often used to price non-proportional
+of damage ratios or severity of losses. First ideas were published in @salzmann1963. It is often used to price non-proportional
 reinsurance contracts, such as excess of loss (XL) reinsurance. 
 
 Exposure rating uses the loss experience of a similar portfolio of policies to estimate the expected losses of the portfolio to be covered. The method is frequently used as a benchmark when there is no sufficient credible claims history from the client.
 
 In this vignette, we first present the general notation and concepts of loss modelling.
 Secondly, we focus on destruction models implemented in the \pkg{mbbefd} package. 
-One popular model uses the MBBEFD distribution introduced by [@bernegger97].
+One popular model uses the MBBEFD distribution introduced by @bernegger97.
 Finally, we provide an example of pricing of XL contract.
 
 
@@ -73,24 +73,24 @@ $f(x)$, cumulative distribution function $F(x)$ and survival function $S(x)=1-F(
 
 ```{r cdfsurv, fig.height=2.5, fig.width=6, echo=FALSE, warning=FALSE, fig.align="center", fig.cap="PDF, CDF and SF of a lognormal distribution"}
 n <- 100
-Loss <- seq(1, 150, length=n)
-mu <- 4.13
-sigma <- 0.29
+Loss <- seq(1, 150, length = n)
+sigma <- sqrt(log(1 + 0.3^2))
+mu <- log(65) - sigma^2 / 2
 CDF <- plnorm(Loss, mu, sigma)
 Density <- dlnorm(Loss, mu, sigma)
 Survival <- 1 - CDF
-dat <- data.frame(Loss=rep(Loss, 3),
-                  Value=c(Density, CDF, Survival),
-                  Type=gl(3, n,
-                         labels=c("PDF: f(x)", 
-                                  "CDF: F(x)", 
+dat <- data.frame(Loss = rep(Loss, 3),
+                  Value = c(Density, CDF, Survival),
+                  Type = gl(3, n,
+                         labels = c("PDF: f(x)",
+                                  "CDF: F(x)",
                                   "SF: S(x)=1-F(x)"),
-                         ordered=TRUE))
-xyplot(Value ~ Loss | Type, data=dat, ylab="", 
-       layout=c(3,1), as.table=TRUE, type="l",
-       par.settings = my.settings, 
-       par.strip.text=list(col="white", font=2), 
-       scales=list(relation="free", alternating=1))
+                         ordered = TRUE))
+xyplot(Value ~ Loss | Type, data = dat, ylab = "",
+       layout = c(3, 1), as.table = TRUE, type = "l",
+       par.settings = my.settings,
+       par.strip.text = list(col = "white", font = 2),
+       scales = list(relation = "free", alternating = 1))
 ```
 
 
@@ -142,30 +142,27 @@ below the limit $\alpha$ was set to 100.
 
 ```{r LEV, fig.height=2.5, fig.width=5, echo=FALSE, fig.align="center", fig.cap="limited expected value"}
 alpha <- 100
-fxy <- function(x,y,...){
-         x1 <- as.numeric(x[x<=alpha])
-         if(panel.number()<2){
-           panel.polygon(c(x1, rev(x1)),
-                          rev(c(rep(1, length(x1)),
-                           rev(y[x<=alpha]))),
-                         col="skyblue", border=NA)
-         }else{
-           panel.polygon(c(x1, rev(x1)),
-                         c(rep(0, length(x1)),
-                           rev(y[x<=alpha])),
-                        col="skyblue", border=NA)
-         }
-         panel.xyplot(x,y,...)
-         #panel.text(x=20, y=0.4, label=paste("LEV[X]", cex=2)
-       }
-xyplot(Value ~ Loss | Type, 
-       data=subset(dat, !Type %in% "PDF: f(x)"), 
-       ylab="", 
-       panel=fxy,
-       layout=c(2,1), as.table=TRUE, type="l",
-       par.settings = my.settings, 
-       par.strip.text=list(col="white", font=2), 
-       scales=list(relation="free", alternating=1))
+fxy <- function(x, y, ...) {
+  x1 <- as.numeric(x[x <= alpha])
+  if (panel.number() < 2) {
+    panel.polygon(c(x1, rev(x1)),
+                  rev(c(rep(1, length(x1)), rev(y[x <= alpha]))),
+                  col = "skyblue", border = NA)
+  } else {
+    panel.polygon(c(x1, rev(x1)),
+                  c(rep(0, length(x1)), rev(y[x <= alpha])),
+                  col = "skyblue", border = NA)
+  }
+  panel.xyplot(x, y, ...)
+}
+xyplot(Value ~ Loss | Type,
+       data = subset(dat, !Type %in% "PDF: f(x)"),
+       ylab = "",
+       panel = fxy,
+       layout = c(2, 1), as.table = TRUE, type = "l",
+       par.settings = my.settings,
+       par.strip.text = list(col = "white", font = 2),
+       scales = list(relation = "free", alternating = 1))
 ```
 
 ## Loss Cost of a Layer 
@@ -176,30 +173,30 @@ Suppose we want to insure the layer of claims between 80 and 100.
 ```{r LEV2, fig.height=2.5, fig.width=5, echo=FALSE, fig.align="center", fig.cap="Loss Cost of a Layer"}
 alpha1 <- 80
 alpha2 <- 100
-xyplot(Value ~ Loss | Type, 
-       data=subset(dat, !Type %in% "PDF: f(x)"), 
-       ylab="", 
-       panel=function(x,y,...){
-         x1 <- c(x[x >= alpha1 & x<=alpha2])
-         if(panel.number()<2){
+xyplot(Value ~ Loss | Type,
+       data = subset(dat, !Type %in% "PDF: f(x)"),
+       ylab = "",
+       panel = function(x, y, ...) {
+         x1 <- c(x[x >= alpha1 & x <= alpha2])
+         if (panel.number() < 2) {
            panel.polygon(
              c(x1, rev(x1)),
-             rev(c(rep(1, length(x[x >= alpha1 & x<=alpha2])),
-               rev(y[x >= alpha1 & x<=alpha2]))),
-              col="skyblue", border=NA)
-         }else{
+             rev(c(rep(1, length(x[x >= alpha1 & x <= alpha2])),
+                   rev(y[x >= alpha1 & x <= alpha2]))),
+             col = "skyblue", border = NA)
+         } else {
            panel.polygon(
              c(x1, rev(x1)),
-             c(rep(0, length(x[x >= alpha1 & x<=alpha2])),
-               rev(y[x >= alpha1 & x<=alpha2])),
-             col="skyblue", border=NA)
+             c(rep(0, length(x[x >= alpha1 & x <= alpha2])),
+               rev(y[x >= alpha1 & x <= alpha2])),
+             col = "skyblue", border = NA)
          }
-         panel.xyplot(x,y,...)
+         panel.xyplot(x, y, ...)
        },
-       layout=c(2,1), as.table=TRUE, t="l",
-       par.settings = my.settings, 
-       par.strip.text=list(col="white", font=2), 
-       scales=list(relation="free", alternating=1))
+       layout = c(2, 1), as.table = TRUE, t = "l",
+       par.settings = my.settings,
+       par.strip.text = list(col = "white", font = 2),
+       scales = list(relation = "free", alternating = 1))
 ```
 
 
@@ -209,8 +206,8 @@ and can be evaluated numerically
 
 ```{r checkEL}
 sigma <- sqrt(log(1 + 0.3^2))
-mu <- log(65) - sigma^2/2
-S <- function(x){ 1 - plnorm(x, mu, sigma) }
+mu <- log(65) - sigma^2 / 2
+S <- function(x) { 1 - plnorm(x, mu, sigma) }
 (lyr <- integrate(S, 80, 100)$value)
 ```
 
@@ -223,14 +220,14 @@ to a limit of 80 is called an increased limit factor (ILF):
 (ILF <- integrate(S, 0, 100)$value / integrate(S, 0, 80)$value)
 ```
 
-Therefore we would expect the LEV to increase by $3.5\%$ as
-the limit increases from 80 to 100.
+Therefore we would expect the LEV to increase by
+`r round(100*(ILF-1), 1)`$\%$ as the limit increases from 80 to 100.
 
 Note ILFs are often used for pricing casualty business.
 
 ## Exposure curves
 
-From the loss distribution we could read of the expected loss for any 
+From the loss distribution we could read off the expected loss for any
 layer. However, often we will not have that level of information about
 the risk. 
 
@@ -269,7 +266,7 @@ as a % of the exposure metric) allows us to compare and benchmarks risks.
 ### Analysing deductibles
 
 Most insurance policies are written with a deductible, so that the
-insured will cover the first $X of the losses.
+insured retains each loss up to the deductible.
 
 Thus, the reinsurer needs to understand, by how much the claims burden is reduced 
 for a given deductible. 
@@ -277,7 +274,7 @@ for a given deductible.
 From the previous section we have learned how to calculate the limited expected 
 value, which is the loss cost to the insured.
 
-The exposure curve (or also called *first loss curve* or *original loss cure* ) 
+The exposure curve (or also called *first loss curve* or *original loss curve*)
 is defined as the proportion of the LEV for a given deductible $d$ compared to 
 the overall expected claims cost $E[X]$
 $$
@@ -290,17 +287,17 @@ For our example, using a log-normal distribution and a MPL of 200 we get
 MPL <- 200
 ExpectedLoss <- 65
 Deductible <- seq(0, MPL, 1)
-G <- sapply(Deductible, function(x){
+G <- sapply(Deductible, function(x) {
   LEVx <- integrate(S, 0, x)$value
-  LEVx/ExpectedLoss
+  LEVx / ExpectedLoss
 })
-plot(Deductible/MPL, G, 
-     t="l", bty="n", lwd=1.5,
-     main="Exposure Curve",
-     xlab="Deductible as % of MPL",
-     ylab="% of expected loss paid by insured",
-     xlim=c(0,1), ylim=c(0,1))
-abline(a=0, b=1, lty=2)
+plot(Deductible / MPL, G,
+     t = "l", bty = "n", lwd = 1.5,
+     main = "Exposure Curve",
+     xlab = "Deductible as % of MPL",
+     ylab = "% of expected loss paid by insured",
+     xlim = c(0, 1), ylim = c(0, 1))
+abline(a = 0, b = 1, lty = 2)
 ```
 
 The steepness of the curve is related to the severity of the loss 
@@ -311,27 +308,33 @@ If all losses were total losses then the exposure curve would be
 identical with the diagonal.
 
 Different perils and exposures will have different exposure curves. 
-Well known exposure curves are those used by Swiss Re and Lloyd's.
+Well known exposure curves are those used by Swiss Re and Lloyd's
+(see Section \ref{sec:swissre}).
 
 <!------------------ SECTION 2 ------------------> 
 # Destruction rate models
 
 ## Classic distributions
 
+From now on, $X$ denotes the destruction rate (or damage ratio), that is the loss
+divided by the exposure metric (TIV, SI or MPL), so that $X$ takes values in $I=[0,1]$:
+$X=1$ is a total loss.
 As already mentioned, the exposure curve function of $X$ is defined as the ratio of the limited expected value and the expectation.
-Since the loss $X$ is a positive random variable, the exposure curve is 
+Since $X$ is a positive random variable bounded by 1, $E[X\wedge d]=\int_0^d (1-F_X(x))dx$
+and $E[X]=E[X\wedge 1]$, so the exposure curve is
 $$
-G_X(d) = \frac{\int_0^d (1-F_X(x))dx }{\int_0^1 (1-F_X(x))dx }.
+G_X(d) = \frac{\int_0^d (1-F_X(x))dx }{\int_0^1 (1-F_X(x))dx }, \quad d\in I.
 $$
-Note that the exposure curve is a concave function for $d\in]0,1[$. 
+$G_X$ is increasing and concave on $I$, with $G_X(0)=0$ and $G_X(1)=1$, see e.g. [@antal03].
+Its derivative at 0 gives the mean: $G_X'(0) = 1/E[X]$.
 
 There is a direct link between the distribution function and the exposure curve.
-Since 
+Since $G_X'(x) = (1-F_X(x))/E[X]$ for $x\in[0,1[$,
 $$
 F_X(x) = \left(1- \frac{G_X'(x)}{G_X'(0)}\right)\ind_{[0,1[}(x) + \ind_{[1,+\infty[}(x),
 $$
 defining the exposure curve or the distribution function is equivalent.
-The exposure curve is also a concave increasing function, see e.g. [@antal03].
+In particular, the probability of a total loss is $P(X=1)=G_X'(1^-)/G_X'(0)$.
 
 ### Uniform distribution
 \label{sec:unif}
@@ -347,18 +350,20 @@ $$
 ### Beta distribution
 \label{sec:beta}
 
-A more interesting example is obtained for the Beta distribution on $I$ 
-(e.g.[@kotzjohnsonbalak94v2]
+A more interesting example is obtained for the Beta distribution on $I$
+(e.g. [@kotzjohnsonbalak94v2])
 for which the density is $f_X(x) = x^{a-1}(1-x)^{b-1}/\beta(a,b)$ for $x\in ]0,1[$ and $a,b>0$
-where $\beta(.,.)$ denotes the 
-beta function, see e.g.[@nist10].
-The distribution function is obtained in terms of the incomplete beta ratio function 
-$F_X(x) = \beta(x;a,b)/\beta(a,b) = I(x;a,b)$.
-We get
+where $\beta(.,.)$ denotes the
+beta function, see e.g. [@nist10].
+The distribution function is obtained in terms of the incomplete beta ratio function
+$F_X(x) = \beta(x;a,b)/\beta(a,b) = I(x;a,b)$, where $\beta(x;a,b)=\int_0^x t^{a-1}(1-t)^{b-1}dt$
+denotes the incomplete beta function.
+Since $E[X]=a/(a+b)$ and $E[X\wedge d] = \frac{a}{a+b} I(d;a+1,b) + d(1-I(d;a,b))$,
+and using $I(d;a+1,b) = I(d;a,b) - \frac{d^a(1-d)^b}{a\beta(a,b)}$ (see (8.17.20) in [@nist10]),
+we get
 $$
-G_X(d) \beta(a,b;x) - \frac{x^a(1-x)^b}{a\beta(a,b)} + x(1-\beta(a,b;x)) \frac{a+b}{a},
+G_X(d) = I(d;a,b) - \frac{d^a(1-d)^b}{a\beta(a,b)} + d(1-I(d;a,b)) \frac{a+b}{a}.
 $$
-where $\beta(.;.,.)$ denotes the incomplete beta function.
 
 
 
@@ -373,7 +378,12 @@ The corresponding distribution function of the one-inflated random variable $X_1
 $$
 F_1(x) = (1-p_1) F_0(x) + p_1 \ind_{[1,+\infty[}(x).
 $$
-There is no density but an improper density $(1-p)F_0'(x)$ and a probability mass $p_1$ at $x=1$.
+There is no density but an improper density $(1-p_1)F_0'(x)$ and a probability mass $p_1$ at $x=1$.
+Denoting by $G_0$ and $E_0$ the exposure curve and the mean of $X_0$,
+$E[X_1\wedge d] = (1-p_1)E_0G_0(d) + p_1 d$ and $E[X_1]=(1-p_1)E_0+p_1$, so that
+$$
+G_1(d) = \frac{(1-p_1)E_0 G_0(d) + p_1 d}{(1-p_1)E_0+p_1}.
+$$
 
 
 
@@ -401,8 +411,8 @@ E(X)
 $$
 The exposure curve is 
 $$
-G_X(d) =  
-\frac{(1-p_1) \left(1 - I(d;a,b) \frac{b}{a+b} - \frac{d^a(1-d)^b}{(a+b)\beta(a,b)}\right) + p_1d
+G_X(d) =
+\frac{(1-p_1) \left(\frac{a}{a+b} I(d;a,b) - \frac{d^a(1-d)^b}{(a+b)\beta(a,b)} + d(1-I(d;a,b)) \right) + p_1d
 }{p_1 + (1-p_1)\frac{a}{a+b}}.
 $$
 
@@ -412,11 +422,18 @@ $$
 We denote this first parametrization by $\mbox{MBBEFD}(a,b)$.
 We define the parameter domain $\calD_{a,b}$ as 
 \begin{equation}
-\calD_{a,b} = \{(a,b)\in\R^2, a+1>0, a(1-b)>0, b>0\}
-\cup \{(a,b), a=+\infty, b<1\}.
+\calD_{a,b} = \{(a,b)\in\R^2, a+1>0, a(1-b)\geq 0, b>0\}
+\cup \{(a,b)\in\R^2, a<-1, 0<b<1\}
+\cup \{(a,b), a=+\infty, 0<b<1\}.
 \label{eq:paramdomain:mbbefd:ab}
 \end{equation}
-Let us note that this domain includes two particular sets $\calD_{a,1}=\{(a,1), a+1>0\}$ and $\calD_{0,b}=\{(0,b), b>0\}$.
+Let us note that this domain includes two particular sets $\calD_{a,1}=\{(a,1), a+1>0\}$ and $\calD_{0,b}=\{(0,b), b>0\}$,
+for which $a(1-b)=0$.
+The set $\{a<-1, 0<b<1\}$ is part of the parameter space
+of @bernegger97: it corresponds to $b<1$ and $gb>1$ in the second parametrization
+(see Section \ref{sec:mbbefd2p}), where the density is decreasing on $[0,1[$.
+The formulas below are the same for $a(1-b)>0$ and for $a<-1$, $0<b<1$,
+because the factors $a$, $a+1$, $a+b^x$ and $\ln(b)$ change sign consistently.
 
 
 ### Characterization by the exposure curve
@@ -425,7 +442,7 @@ The MBBEFD distribution is defined by the following exposure curve for $(a,b)\in
 \forall x\in I,~
 G_X(x) = 
 \systL
-\frac{\ln(\frac{a+b^x}{a+1})}{\ln(\frac{a+b}{a+1})} & \text{if } a(1-b) >0 \\
+\frac{\ln(\frac{a+b^x}{a+1})}{\ln(\frac{a+b}{a+1})} & \text{if } a(1-b) >0 \text{ or } a<-1 \\
 \frac{1-b^x}{1-b} & \text{if } a=+\infty \text{ and } b<1 \\
 x & \text{if } a=0 \text{ or } b=1. \\
 \systR
@@ -444,7 +461,7 @@ Differentiating $G_X$, we obtain the following distribution function
 \forall x\in I,~
 F_X(x) = 
 \systL
-\left(1-\frac{(a+1)b^x}{a+b^x}\right)\ind_{[0,1[}(x) + \ind_{[1,+\infty[}(x) & \text{if } a(1-b) >0 \\
+\left(1-\frac{(a+1)b^x}{a+b^x}\right)\ind_{[0,1[}(x) + \ind_{[1,+\infty[}(x) & \text{if } a(1-b) >0 \text{ or } a<-1 \\
 (1-b^x)\ind_{[0,1[}(x) + \ind_{[1,+\infty[}(x) & \text{if } a=+\infty \text{ and } b<1 \\
 \ind_{[1,+\infty[}(x) & \text{if } a=0 \text{ or } b=1. \\
 \systR
@@ -458,11 +475,11 @@ P(X=1)  = \frac{(a+1)b}{a+b} = p_{a,b},
 which equals to 1 when $a(1-b)=0$. In other words, for $\calD_{a,1}$ and $\calD_{0,b}$, $X$ has a Dirac distribution at $x=1$.
 When $a=+\infty$, the total loss probability is $P(X=1)=b$.
 
-For $a(1-b)>0$, the improper density function is 
+The improper density function is
 \begin{equation}
-\tilde f_X(x) 
+\tilde f_X(x) =
 \systL
--\frac{a(a+1)b^x\ln(b)}{(a+b^x)^2}\ind_{[0,1[}(x) & \text{if } a(1-b) >0 \\
+-\frac{a(a+1)b^x\ln(b)}{(a+b^x)^2}\ind_{[0,1[}(x) & \text{if } a(1-b) >0 \text{ or } a<-1 \\
 -\ln(b)b^x\ind_{[0,1[}(x)  & \text{if } a=+\infty \text{ and } b<1 \\
 0 & \text{if } a=0 \text{ or } b=1. \\
 \systR
@@ -473,7 +490,7 @@ The quantile function is
 \forall p\in [0,1],~
 q_X(p) = 
 \systL
-\frac{\ln\left(\frac{(1-p)a}{a+p}\right)}{\ln(b)} \ind_{[0,1-p_{a,b}[}(p) + \ind_{[1-p_{a,b},1]}(p)  & \text{if } a(1-b) >0 \\
+\frac{\ln\left(\frac{(1-p)a}{a+p}\right)}{\ln(b)} \ind_{[0,1-p_{a,b}[}(p) + \ind_{[1-p_{a,b},1]}(p)  & \text{if } a(1-b) >0 \text{ or } a<-1 \\
 \frac{\ln(1-p)}{\ln(b)}\ind_{[0,1-b[}(p) + \ind_{[1-b,1]}(p)   & \text{if } a=+\infty \text{ and } b<1 \\
 \ind_{]0,1]}(p) & \text{if } a=0 \text{ or } b=1. \\
 \systR
@@ -499,7 +516,7 @@ When $a=0$ or $b=1$, the expectation is simply $E(X)=1$.
 ### Parameter domain
 
 For fitting purposes and for verifying parameter constraints, 
-[@bernegger97] proposed a second parametrization $\mbox{MBBEFD}(g,b)$.
+@bernegger97 proposed a second parametrization $\mbox{MBBEFD}(g,b)$.
 Using the following parameter $g=1/p_{a,b}$, it is possible to reformulate the $\mbox{MBBEFD}(a,b)$.
 That is
 $$
@@ -507,7 +524,7 @@ g= \frac{a+b}{(a+1)b}
 \Leftrightarrow
 a=\frac{(g-1)b}{1-gb}.
 $$
-So $g\geq 1$ guarantees that $\frac{a+b}{(a+1)b}\in [0,1]$, in addition to $b>0$.
+So $g\geq 1$ guarantees that the total loss probability $P(X=1)=\frac{(a+1)b}{a+b}=1/g$ belongs to $]0,1]$, in addition to $b>0$.
 The special case $g=1$ leading to a Dirac distribution at $x=1$ corresponds to $a(1-b)=0$ in the previous parametrization.
 The parameter domain is
 $$
@@ -515,6 +532,21 @@ $$
 (g,b)\in\R^2, b>0, g\geq 1
 \right\}.
 $$
+This domain is simpler than $\calD_{a,b}$, which makes the second parametrization
+convenient for fitting.
+For $g>1$, it splits into three regions, separated by the special cases $b=1$ and $gb=1$
+[see also @gattiwuthrich24, Section 3.1]:
+
+* $D_1=\{b>1\}$, which corresponds to $-1<a<0$;
+* $D_2=\{b<1, gb<1\}$, which corresponds to $a>0$;
+* $D_3=\{b<1, gb>1\}$, which corresponds to $a<-1$.
+
+The improper density below is decreasing on $[0,1[$ in $D_1$ and $D_3$.
+In $D_2$, it is increasing on $[0,1[$ when $g(1+b)\leq 2$, decreasing when $b(2g-1)\geq 1$,
+and unimodal otherwise (the sign of its derivative is the sign of $1-gb-(g-1)b^{1-x}$).
+On the boundaries, $b=1$ and $gb=1$ give the one-parameter subfamilies
+(sometimes called "$g$ only" and "$b$ only") whose formulas are listed below:
+they are the limits of the general formulas, so that the distribution is continuous in $(g,b)$.
 
 
 ### Characterization by the exposure curve
@@ -579,7 +611,7 @@ q_X(p) =
 
 ### Moments
 
-Let us compute the first two moments.
+The first moment follows from the exposure curve.
 $$
 E(X) = 1/G_X'(0) = 
 \systL
@@ -589,10 +621,50 @@ E(X) = 1/G_X'(0) =
 1 & \text{ if } g=1 \text{ or } b= 0
 \systR
 $$
+For $g>1$, the mean is decreasing in $b$, from 1 when $b\to 0$ to $1/g$ when $b\to+\infty$
+(the mean is then the total loss probability, as $X$ is concentrated on 0 and 1).
+Higher moments have no simple closed form; since $X\in[0,1]$, they are computed numerically
+by `mMBBEFD()` as
+$$
+E(X^k) = \int_0^1 P(X^k>y)dy = \int_0^1 \left(1-F_X(y^{1/k})\right)dy.
+$$
+
+## The Swiss Re exposure curves
+\label{sec:swissre}
+
+@bernegger97 (Section 4.3) showed that the Swiss Re exposure curves $Y_1$ to $Y_4$,
+used in property per risk exposure rating, and the Lloyd's curve for industrial risks
+are very well approximated by $\mbox{MBBEFD}(g,b)$ curves whose parameters lie on a
+curve indexed by a single parameter $c$:
+$$
+b(c) = e^{3.1-0.15c(1+c)}, \quad g(c) = e^{c(0.78+0.12c)},
+$$
+with $c=1.5, 2, 3, 4$ for $Y_1$ to $Y_4$ and $c=5$ for the Lloyd's curve.
+The larger $c$, the smaller the total loss probability $1/g$ and the more concave
+the exposure curve (small losses are more frequent).
+The function `swissRe()` returns $b(c)$ and $g(c)$; note that $b$ comes first,
+so the parameters should be selected by name.
+
+```{r swissre}
+swissRe(c(1.5, 2, 3, 4, 5))
+```
+
+```{r swissreplot, echo=FALSE, fig.height=3, fig.width=3, fig.align="center", fig.cap="Swiss Re exposure curves"}
+par(cex = 0.8, mar = c(4, 4, 1, 1))
+d <- seq(0, 1, length = 201)
+cc <- c(1.5, 2, 3, 4, 5)
+plot(d, d, type = "l", lty = 2, xlab = "Deductible as % of MPL",
+     ylab = "% of expected loss paid by insured", bty = "n")
+for (i in seq_along(cc))
+{
+  p <- swissRe(cc[i])
+  lines(d, ecMBBEFD(d, g = p["g"], b = p["b"]), col = i)
+}
+legend("bottomright", legend = paste0("c=", cc), col = seq_along(cc), lty = 1, bty = "n")
+```
 
 
-
-<!------------------ SECTION 3 ------------------> 
+<!------------------ SECTION 3 ------------------>
 # Fitting methods and pricing examples
 
 ## Fitting methods: MLE and TLMME
@@ -610,14 +682,44 @@ $$
 where $f_X$ denotes the density of the loss random variable $X$ and
 $\theta$ is the parameter vector.
 When $X$ is a continuous non-inflated distribution, $f_X$ is the usual
-density function (obtained by differentiating the distribution function)
-when $X$ is a mixed-type distribution with a non-null probability $P(X=1)$,
-$f_X$ is the product of $P(X=x)\ind_{x=1}$ and $F_X'(x)\ind_{x\neq 1}$.
+density function (obtained by differentiating the distribution function).
+When $X$ is a mixed-type distribution with a non-null probability $P(X=1)$,
+$f_X(x)$ is $F_X'(x)$ for $x\neq 1$ and $P(X=1)$ for $x=1$, i.e. the density
+with respect to the sum of the Lebesgue measure and the Dirac mass at 1
+[see e.g. @coxwermuth98].
 
 For example when considering the beta distribution, the likelihood function to be maximized is
 $$
 \calL((a,b), x_1,\dots,x_n)= \prod_{i=1}^n \frac{x_i^{a-1}(1-x_i)^{b-1}}{\beta(a,b)}.
 $$
+For the MBBEFD distribution, with $n_1$ the number of total losses, the log-likelihood is
+$$
+\log\calL((g,b), x_1,\dots,x_n) = -n_1\log(g) + \sum_{i: x_i<1} \log \tilde f_X(x_i),
+$$
+where $\tilde f_X$ is the improper density of Section \ref{sec:mbbefd2p}.
+Since $g$ drives both the total loss probability and the shape of $\tilde f_X$,
+the estimate exists even if there is no total loss in the data ($n_1=0$), but $1/g$
+is then identified only through the shape of the distribution below 1:
+`fitDR()` raises a warning in that case, as total losses may have been removed or capped.
+
+For one-inflated distributions, the likelihood factorizes: the maximum likelihood estimator of $p_1$
+is the proportion of total losses $n_1/n$, and the parameters of $F_0$ are estimated
+on the observations below 1 only.
+
+For the MBBEFD distribution, `fitDR()` maximizes the log-likelihood with the analytical
+gradient in four steps:
+
+1. starting values are obtained by an unconstrained fit on transformed parameters;
+2. the log-likelihood is maximized separately on the three regions $D_1$, $D_2$ and $D_3$
+of Section \ref{sec:mbbefd2p}, under inequality constraints (the constraints differ between
+regions, notably in the first parametrization);
+3. each of these fits is refined by an unconstrained maximization in $(\log(g-1), \log(b))$,
+which covers the whole parameter space: the log-likelihood is continuous across
+the boundaries $b=1$ and $gb=1$, which constrained optimizers cannot reach;
+4. the fit with the highest log-likelihood is retained.
+
+Standard errors are obtained from the observed information matrix, i.e. the inverse of the
+Hessian of the negative log-likelihood at the estimate.
 
 The total-loss-moment matching estimation consists in matching the
 total loss and the first moments of a distribution.
@@ -637,12 +739,18 @@ m_{n,k} = \frac{1}{n}\sum_{i=1}^n (x_i)^k.
 \systR
 $$
 The number of equation $k+1$ equals the number of parameters.
-This methods is relevant only for one-inflated distributions as for classic
+This method is relevant only for distributions with a probability mass at 1
+(one-inflated and MBBEFD distributions), as for classic
 continuous distributions such as the beta distribution we know that $P(X=1)=0$.
 
+For the MBBEFD distribution, the system has an explicit solution [@bernegger97, Section 4.1]:
+the first equation gives $g=1/tl_n$, and since the mean is decreasing in $b$ from 1 to $1/g$
+(Section \ref{sec:mbbefd2p}), the second equation has a unique root $b$ if and only if
+$0 < tl_n < \bar x_n < 1$. It is computed by a one-dimensional root search.
+When this condition does not hold, `fitDR()` returns `NA` with a warning.
 
 The \pkg{fitDR} function of the \pkg{mbbefd} package returns an object of class
-\pkg{"DR"} inheriting from the \pkg{"fitdist"} class for which generic functions
+\pkg{"fitDR"} inheriting from the \pkg{"fitdist"} class for which generic functions
 are available \pkg{print, plot, summary, gofstat}.
 There is also a bootstrap procedure implemented in the \pkg{bootDR} function.
 
@@ -653,181 +761,221 @@ of two distributions (regular beta and mbbefd).
 
 ```{r simufit, echo=TRUE, warning=FALSE}
 set.seed(123456)
-x <- c(rbeta(50, 3, 1/2), rmbbefd(50, 1/2, 1/10))
-f1 <- fitDR(x, "mbbefd", method="mle")
+x <- c(rbeta(50, 3, 1 / 2), rmbbefd(50, 1 / 2, 1 / 10))
+f1 <- fitDR(x, "mbbefd", method = "mle")
 summary(f1)
-b1 <- bootDR(f1, niter=25)
+b1 <- bootDR(f1, niter = 25)
 summary(b1)
 ```
 
 ```{r denplot, echo=FALSE, fig.height=4, fig.width=4, fig.align="center", fig.cap="Histogram, fitted density"}
-par(cex.main=0.8,  cex.lab=0.8, cex.axis=0.8, cex=0.8)
-denscomp(f1, demp=TRUE, main="Histogram and fitted density", xlegend="topright")
+par(cex.main = 0.8,  cex.lab = 0.8, cex.axis = 0.8, cex = 0.8)
+denscomp(f1, demp = TRUE, main = "Histogram and fitted density", xlegend = "topright")
 ```
 
 ```{r bootstrapplot,echo=FALSE, fig.height=6, fig.width=6, fig.align="center", fig.cap="Bootstrap heatmap and scatter plot"}
-par(cex.main=0.8,  cex.lab=0.8, cex.axis=0.8, mar=c(2,2,2,2))
-plot(b1, enhance=TRUE, main="Bootstrapped value of parameters")
+par(cex.main = 0.8,  cex.lab = 0.8, cex.axis = 0.8, mar = c(2, 2, 2, 2))
+plot(b1, enhance = TRUE, main = "Bootstrapped value of parameters")
 ```
 
 
-The graph correspond respectively to the histogram (and empirical density)
+The estimated total loss probability $1/g = (a+1)b/(a+b)$ is
+`r round(tlmbbefd(f1$estimate["a"], f1$estimate["b"]), 3)`, to be compared with the
+empirical proportion of total losses `r etl(x)`: the maximum likelihood estimator does not
+match the total losses exactly, because both parameters also determine the continuous part.
+The bootstrap summary reports the number of bootstrap samples for which the optimization
+converged.
+
+The graphs correspond respectively to the histogram (and empirical density)
 against the fitted density and a two-dimensional level curve and scatter plot
 for bootstrap parameters.
 
-As in the \pkg{fitdistrplus} package, we can compare multiple fits on the 
+As in the \pkg{fitdistrplus} package, we can compare multiple fits on the
 same graph or with the same statistics. We just have to pass a list of
-\pkg{"DR"} objects.
+\pkg{"fitDR"} objects.
 
 ```{r simufit1}
-f2 <- fitDR(x, "oibeta", method="mle")
+f2 <- fitDR(x, "oibeta", method = "mle")
 gofstat(list(f1, f2))
 ```
+
+The Anderson-Darling statistic is infinite for both fits: its computational formula
+involves $\log(1-F(x_i))$, which is infinite at the total losses since $F(1)=1$, so this
+statistic is not suited to data with total losses. The information criteria favour the one-inflated beta
+distribution on this mixture.
 
 
 
 ```{r simufit2, echo=FALSE, fig.height=4, fig.width=7, warning=FALSE, fig.align="center", fig.cap="comparison on cdf and pdf plots"}
-par(mfrow=c(1, 2), cex.main=0.8,  cex.lab=0.8, cex.axis=0.8, mar=c(2,2,2,2))
-cdfcomp(list(f1, f2), leg=c("mbbefd", "oibeta"))
-denscomp(list(f1, f2), leg=c("mbbefd", "oibeta"), 
-         ylim=c(0,4), xleg="topleft")
+par(mfrow = c(1, 2), cex.main = 0.8,  cex.lab = 0.8, cex.axis = 0.8, mar = c(2, 2, 2, 2))
+cdfcomp(list(f1, f2), leg = c("mbbefd", "oibeta"))
+denscomp(list(f1, f2), leg = c("mbbefd", "oibeta"),
+         ylim = c(0, 4), xleg = "topleft")
 ```
 
 Of course, we can also compare the different fitted exposure curves
 using the function \pkg{eccomp}. That is
 
 ```{r simufit3, echo=FALSE, fig.height=4, fig.width=4, warning=FALSE, fig.align="center", fig.cap="Comparison on exposure curves"}
-par(cex=0.8)
-eccomp(list(f1, f2), leg=c("mbbefd", "oibeta"), do.points=FALSE)
+par(cex = 0.8)
+eccomp(list(f1, f2), leg = c("mbbefd", "oibeta"), do.points = FALSE)
 ```
 
 
 
 ## Computation of premium rate (example)
 
-The following example data is taken from the earlier Swiss Re
-technical paper above. 
+### Exposure rating of a risk profile
+
+Let us consider a risk with MPL $M$ and premium $P$, with an expected loss ratio $ELR$, 
+and a layer $L$ xs $D$. If the destruction rate $X$ of the risk has exposure curve $G_X$, 
+the expected loss of the layer is
+$$
+ELR \cdot P \cdot \left( G_X\left(\min\left(\frac{D+L}{M},1\right)\right) - G_X\left(\min\left(\frac{D}{M},1\right)\right) \right),
+$$
+since $E[\min(\max(MX-D,0),L)] = M\left(E[X\wedge \frac{D+L}{M}] - E[X\wedge \frac{D}{M}]\right)$.
+In practice, the cedant provides a risk profile, i.e. risks grouped in MPL bands 
+with their premium, and the formula is applied to each band with its mean MPL [@ExposureRating2004].
+
+### The Swiss Re example
+
+The following example is taken from the Swiss Re technical publication [@ExposureRating2004].
 It is the aim to find the risk premium for a per risk WXL cover 
 (fire only) with the limits
 $$
 \mbox{CHF } 3,500,000 \mbox{ xs CHF } 1,500,000.
 $$
+The cover protects the retention of a proportional (surplus) treaty with a maximum 
+retention of CHF 5,000,000 MPL: for larger risks, the cedant keeps only this amount 
+and the same proportion of the premium.
 
-The total gross net premium income (GNPI) is CHF $95,975,000$ in 2004, 
+The gross net premium income (GNPI) is CHF $95,975,000$ in 2004, 
 with an expected loss ratio of 55%. Therefore we have a view on the 
 mean expected loss cost.
 
 The risk profile given by the cedant is from the year 2002.
 However, instead of re-indexing the historical data to 2004, we back-index
-the data to 2002 with a factor of $457/550=0.83$:
-
+the layer to 2002 with a factor of $457/550=0.83$ (construction cost index):
 $$
 \mbox{CHF } 2,908,182
-\mbox{ xs CHF } 1,246,364
+\mbox{ xs CHF } 1,246,364,
 $$
+and the maximum retention becomes CHF 4,154,545, which is also the exhaustion 
+point of the layer.
  
 The data presented below is from the client, with pre-selected
-exposure curves, in this case the parameter $c$ of the MBBEFD curve.
-
+exposure curves: the Swiss Re curves $Y_1$ to $Y_4$, approximated by the MBBEFD 
+curves with parameter $c$ of Section \ref{sec:swissre}.
 The policies have been grouped into different exposure bands. 
 The mean MPL is simply the average of the lower and upper band.
+Amounts are in CHF thousands.
 
 ```{r SwissReExample, message=FALSE, echo=FALSE, warning=FALSE}
-Client <- scan(textConnection(
-'150 75 250 200 400 325 600 500 800 700 1000 900 1250 1125 1500 1375 1750 1625 2000 1875 2500 2250 3000 2750 4000 3500 5500 4750 9000 7250 12500 10750 18000 15250 24000 21000 36000 30000 48000 42000 72000 60000 90000 81000'))
-MaxMPL <- Client[seq(from=1, to=length(Client),by = 2)]
-MeanMPLGrossLoss <- Client[seq(from=2, to=length(Client),by = 2)]
+Client <- scan(textConnection(paste(
+  "150 75 250 200 400 325 600 500 800 700 1000 900 1250 1125 1500 1375 1750 1625",
+  "2000 1875 2500 2250 3000 2750 4000 3500 5500 4750 9000 7250 12500 10750 18000 15250",
+  "24000 21000 36000 30000 48000 42000 72000 60000 90000 81000")), quiet = TRUE)
+MaxMPL <- Client[seq(from = 1, to = length(Client), by = 2)]
+MeanMPLGrossLoss <- Client[seq(from = 2, to = length(Client), by = 2)]
 GrossPremium <- scan(textConnection(
-  '33434 14568 6324 4584 3341 1405 1169 683 613 554 700 552 1194 1490 4177 3527 3249 2712 2588 1988 657 1918'
-))
-ExposureCurve <- c(rep(1.5,3), rep(2.0,3), rep(3.0, 4), rep(4.0, 12))
-ClientData <- data.frame(MaxMPL, MeanMPLGrossLoss, 
+  "33434 14568 6324 4584 3341 1405 1169 683 613 554 700 552 1194 1490 4177 3527 3249 2712 2588 1988 657 1918"
+), quiet = TRUE)
+ExposureCurve <- c(rep(1.5, 3), rep(2.0, 3), rep(3.0, 4), rep(4.0, 12))
+ClientData <- data.frame(MaxMPL, MeanMPLGrossLoss,
                          GrossPremium, ExposureCurve)
 ClientData2 <- ClientData
-names(ClientData2) <- c("Max MPL '000", "Mean MPL Gross Loss '000",
-                        "Gross Premium '000", "Exposure Curve Parameter c")
+names(ClientData2) <- c("Max MPL", "Mean MPL",
+                        "Gross Premium", "Exposure Curve Parameter c")
 library(pander)
-panderOptions('big.mark', ',')
-panderOptions('table.split.cells', 8)
-pander(ClientData2, justify = rep('right', ncol(ClientData2)))
-## Example layer
-D <- 1.5e3*457/550
-L <- 5e3*457/550
-MPLoss <- 3.5e6
-retainedDed <- D/MPLoss*1000
-retainedLoss <- ecMBBEFD(retainedDed, b=swissRe(4)['b'], g=swissRe(4)['g'])
-prem <- 1194 * (1 - retainedLoss)
+panderOptions("big.mark", ",")
+panderOptions("table.split.cells", 8)
+pander(ClientData2, justify = rep("right", ncol(ClientData2)))
 ```
 
-In order to use the exposure curves we need the expected loss and the deductible as % of the MPL. 
+The premium of each band is computed in three steps:
 
-We consider three scenarios in the following subsections.
+1. the net MPL is the mean MPL capped at the retention, and the net premium is the 
+gross premium multiplied by net MPL / mean MPL;
+2. the deductible is expressed as a proportion $d$ of the net MPL, capped at 100%;
+3. the share of the losses in the layer is $1-G_X(d)$, since the layer covers the 
+net MPL above the deductible, and the XL premium is the net premium times this share.
 
-### Losses below deductible
+```{r SwissRe2}
+#exposure curve of the Swiss Re curve with parameter c
+ecSwissRe <- function(d, c)
+{
+  p <- swissRe(c)
+  ecMBBEFD(d, g = p["g"], b = p["b"])
+}
+#XL premium by band
+XLPremiumByBand <- function(Deductible, Retention, MeanMPL, GrossPremium, C)
+{
+  NetMPL <- pmin(MeanMPL, Retention)
+  NetPremium <- GrossPremium * NetMPL / MeanMPL
+  DedPerMPL <- pmin(Deductible / NetMPL, 1)
+  XLShare <- 1 - mapply(ecSwissRe, DedPerMPL, C)
+  data.frame(NetMPL, NetPremium, DedPerMPL, XLShare, XLPremium = NetPremium * XLShare)
+}
+D <- 1500 * 457 / 550 #deductible
+R <- 5000 * 457 / 550 #retention = exhaustion point of the layer
+bands <- XLPremiumByBand(Deductible = D, Retention = R,
+                         MeanMPL = ClientData$MeanMPLGrossLoss,
+                         GrossPremium = ClientData$GrossPremium,
+                         C = ClientData$ExposureCurve)
+```
 
-Losses with a maximum MPL below the deductible are not relevant and hence 
-no reinsurance premium needs to be calculated.
+```{r SwissRe3, echo=FALSE}
+bands2 <- cbind(ClientData[, c("MaxMPL", "MeanMPLGrossLoss")],
+                round(bands$NetMPL), round(bands$NetPremium),
+                round(100 * bands$DedPerMPL, 1), round(100 * bands$XLShare, 1),
+                round(bands$XLPremium, 1))
+names(bands2) <- c("Max MPL", "Mean MPL", "Net MPL", "Net Premium",
+                   "Deductible % of MPL", "XL share %", "XL premium")
+pander(bands2, justify = rep("right", ncol(bands2)))
+i1 <- which(ClientData$MaxMPL == 4000)
+i2 <- which(ClientData$MaxMPL == 90000)
+```
 
-### Losses above deductible, but below limit
+Let us detail three types of bands.
 
-As an example we use the band that has a maximum MPL of CHF 4m, 
-with a mean MPL gross loss of CH 3.5m and gross premium of CH 1.194m.
-
-The client would retain $1,246/3,500=35.6\%$ of the 
-maximum MPL. Using our exposure curve we can read of that this would reduce our 
-expected claims burden by $35.6\%$.
-
-Therefore the reinsurance premium for this band is 1,194k 
-$\cdot 20.5\% =244.8k$. 
-
-### Losses above limit
-
-Here we  select the band with a maximum MPL of CHF 90m and a mean gross
-MPL of  CHF 81m. Because of the limit of CHF $4154.5$ only that 
-amount matters. From the exposure curve we can read
-of again the average proportion of loss paid by the cedant
-$0.8\%$. 
-
-To calculate the premium we first have to derive the proportion of
-premium that is attached to the risk below the limit: 4,155k/8,100k 
-$\cdot 1,918k=98.4k$.
-
-Multiplying the premium with the reinsurer's share of the loss gives
-us a premium of CHF 
-$23.4k$.
+* **Bands below the deductible.** When the mean MPL is below the deductible, 
+the losses never reach the layer: $d=100\%$, $G_X(d)=1$ and no reinsurance premium 
+is needed.
+* **Bands between the deductible and the retention.** For the band with a maximum MPL 
+of CHF 4m, a mean MPL of CHF 3.5m and a gross premium of CHF 1,194k, the deductible is 
+$1{,}246/3{,}500=`r round(100*bands$DedPerMPL[i1], 1)`\%$ of the MPL. 
+From the exposure curve with $c=4$, the cedant keeps $G_X(d)=`r round(100*(1-bands$XLShare[i1]), 1)`\%$ 
+of the expected losses, so the share of the layer is `r round(100*bands$XLShare[i1], 1)`$\%$ 
+and the reinsurance premium for this band is CHF 1,194k $\cdot$ 
+`r round(100*bands$XLShare[i1], 1)`$\% =$ `r round(bands$XLPremium[i1], 1)`k.
+* **Bands above the retention.** For the band with a maximum MPL of CHF 90m and a mean MPL 
+of CHF 81m, the cedant keeps CHF 4,155k of each risk, so the net premium is 
+CHF 4,155k/81,000k $\cdot$ 1,918k $=$ `r round(bands$NetPremium[i2], 1)`k.
+The deductible is $1{,}246/4{,}155=`r round(100*bands$DedPerMPL[i2], 1)`\%$ of the net MPL, 
+the cedant keeps $G_X(d)=`r round(100*(1-bands$XLShare[i2]), 1)`\%$ of the losses, and the reinsurance 
+premium is `r round(bands$NetPremium[i2], 1)`k $\cdot$ `r round(100*bands$XLShare[i2], 1)`$\% =$ 
+`r round(bands$XLPremium[i2], 1)`k.
 
 ### Premium Rate
 
-For the overall portfolio we can calculate the premium rate, using the expected loss ratio of 55%:
+For the overall portfolio, the risk premium rate is the sum of the XL premiums 
+multiplied by the expected loss ratio of 55%, divided by the net premium volume:
 
-```{r SwissRe2}
-Premium_rate <- function(Deductible, Limit, MaxMPL, 
-                   MeanMPL, GrossPremium, C, ULR){
-  DedPerMPL <- Deductible / ifelse(MaxMPL < Deductible, Deductible, 
-                                   ifelse(MaxMPL<Limit, MeanMPL, Limit))
-  LossShare <- 1 - apply(cbind(DedPerMPL, C), 1, 
-                         function(x){ 
-                           ecMBBEFD(x[1], 
-                                          b=swissRe(x[2])['b'], 
-                                          g=swissRe(x[2])['g'])
-                           })
-  NetPremium <- GrossPremium * ifelse(MaxMPL < Limit, 1, 
-                                      Limit/MaxMPL)
-  XL_Premium <- NetPremium * LossShare
-  # Rate on Line
-  sum(XL_Premium)/sum(NetPremium)*ULR
-}
-
-pr <- Premium_rate(Deductible = D,
-                   Limit = L,
-                   MaxMPL = ClientData$MaxMPL,
-                   MeanMPL = ClientData$MeanMPLGrossLoss,
-                   GrossPremium = ClientData$GrossPremium,
-                   C=ClientData$ExposureCurve, ULR=0.55)
+```{r SwissRe4}
+ULR <- 0.55
+(pr <- ULR * sum(bands$XLPremium) / sum(bands$NetPremium))
+#risk premium for 2004 and rate on line
+(riskprem <- pr * 95975000)
+riskprem / 3.5e6
 ```
 
-Applying the function to our data we get a premium rate of $1.47\%$.
-Differences to the Swiss Re paper result from rounding errors.
+We get a premium rate of `r round(100*pr, 2)`$\%$ of the net premium volume 
+(CHF `r format(round(sum(bands$NetPremium)), big.mark=",")`k in 2002), that is a risk premium of 
+CHF `r format(round(riskprem), big.mark=",")` for 2004 and a rate on line of `r round(100*riskprem/3.5e6, 1)`$\%$.
+@ExposureRating2004 obtains $1.636\%$, CHF 1,570,151 and $44.9\%$ with the 
+tabulated Swiss Re curves: the small differences come from the MBBEFD approximation 
+of the curves $Y_1$ to $Y_4$ and from rounding (for instance, the publication reads 
+$21\%$ and $25\%$ for the two bands detailed above).
 
 
 # References

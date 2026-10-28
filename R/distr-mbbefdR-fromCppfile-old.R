@@ -1,29 +1,34 @@
+# File overview: deprecated functions of the very first versions of the package
+# (when MBBEFD was computed with C++ code). They only raise an error and are kept
+# so that old internal references fail with a clear message; none is exported.
+# Note: dmbbefd2() below is overwritten by the function of the same name in
+# fitDR-prefit.R, which is sourced later (files are collated alphabetically).
 
 
 #exposure curve
 
-.G<-function(x, a, b, g)
+.G <- function(x, a, b, g)
 {
   stop("deprecated.")
 }
 
 #its derivative
-dG<-function(x,a,b,g)
+dG <- function(x, a, b, g)
 {
   stop("deprecated.")
 }
 
 #the survival function
-.Sx<-function(x,a,b,g)
+.Sx <- function(x, a, b, g)
 {
   stop("deprecated.")
 }
 
 #the function to compute the exposure function
 #could add the following line mbbefdExposure <- ecmbbefdR in mbbefdR-1stparam.R ?
-mbbefdExposure<-function(x, a, b, g)
+mbbefdExposure <- function(x, a, b, g)
 {
- stop("deprecated.")
+  stop("deprecated.")
 }
 
 
@@ -31,22 +36,20 @@ mbbefdExposure<-function(x, a, b, g)
 ####################################
 #classical functions
 #distribution function
-pmbbefd2<-function(q,a,b,g)
+pmbbefd2 <- function(q, a, b, g)
 {
   stop("deprecated.")
 }
 
 #random generation function (now using the Rcpp version)
-#.f4Random<-function(x,a,b) ifelse( ( x>= 1-(a+1)*b/(a+b) ),1,log( (a*(1-x)) / (a+x) ) /log(b))  
+#.f4Random<-function(x,a,b) ifelse( ( x>= 1-(a+1)*b/(a+b) ),1,log( (a*(1-x)) / (a+x) ) /log(b))
 
 
 
 
 #density functio
 
-dmbbefd2<-function(x,a,b,g)
+dmbbefd2 <- function(x, a, b, g)
 {
   stop("deprecated.")
 }
-
-

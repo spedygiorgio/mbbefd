@@ -1,0 +1,90 @@
+# Test coverage of the package (covr), computed on the unit tests in tests/.
+# The HTML report is uploaded as an artifact of the run, and the summary by
+# file is written to the job summary. No external service (e.g. Codecov) is
+# used, so no token is needed.
+name: test-coverage
+
+on:
+  push:
+    branches: [main, master]
+    paths:
+      - 'R/**'
+      - 'src/**'
+      - 'tests/**'
+      - 'data/**'
+      - 'DESCRIPTION'
+      - 'NAMESPACE'
+      - '.github/workflows/test-coverage.yaml'
+  pull_request:
+    branches: [main, master]
+    paths:
+      - 'R/**'
+      - 'src/**'
+      - 'tests/**'
+      - 'data/**'
+      - 'DESCRIPTION'
+      - 'NAMESPACE'
+      - '.github/workflows/test-coverage.yaml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: coverage-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  test-coverage:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          # release (not devel): binary packages from RSPM
+          r-version: release
+          use-public-rspm: true
+
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          extra-packages: |
+            any::covr
+            any::DT
+            any::htmltools
+          needs: coverage
+          cache: true
+
+      - name: Test coverage
+        shell: Rscript {0}
+        run: |
+          # Build the package first so that .Rbuildignore is honoured, as in
+          # R CMD check: tests/ also contains old scripts that are excluded
+          # from the package (they need packages that are no longer used).
+          stopifnot(system2(file.path(R.home("bin"), "R"),
+                            c("CMD", "build", "--no-build-vignettes", "--no-manual", ".")) == 0)
+          tarball <- list.files(pattern = "^mbbefd_.*\\.tar\\.gz$")[1]
+          exdir <- tempfile("pkg")
+          untar(tarball, exdir = exdir)
+          cov <- covr::package_coverage(file.path(exdir, "mbbefd"), type = "tests", quiet = FALSE)
+          print(cov)
+          covr::report(cov, file = "coverage.html", browse = FALSE)
+          # summary in the job page
+          bf <- covr::coverage_to_list(cov)
+          lines <- c("### Test coverage",
+                     sprintf("Total: **%.1f%%**", bf$totalcoverage), "",
+                     "| File | Coverage |", "|---|---|",
+                     sprintf("| %s | %.1f%% |", names(bf$filecoverage), bf$filecoverage))
+          cat(lines, sep = "\n", file = Sys.getenv("GITHUB_STEP_SUMMARY"), append = TRUE)
+
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage.html
+          if-no-files-found: ignore

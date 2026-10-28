@@ -56,14 +56,24 @@ fitDR(x, dist, method="mle", start=NULL, optim.method="default",
     to find the best values (see \code{\link[fitdistrplus]{mledist}} for details).
     For one-inflated distributions, the probability parameter is estimated
     by a closed-form formula and other parameters use a two-optimization procedures.
+    For the MBBEFD distribution, the log-likelihood is maximized separately 
+    on the three domains of the parameter space (\eqn{b>1}; \eqn{b<1, gb<1}; 
+    \eqn{b<1, gb>1}) via \code{\link[alabama]{constrOptim.nl}};
+    each fit is then refined by an unconstrained maximization in
+    \eqn{(\log(g-1), \log(b))}, where the log-likelihood is continuous across
+    the boundaries \eqn{b=1} and \eqn{gb=1}, and the best fit is retained.
     }
     \item{When \code{method="tlmme"}}{
     Total loss and moment matching estimation consists in equalizing theoretical and empirical 
     total loss as well as theoretical and empirical moments.
-    The theoretical and the empirical moments are matched numerically, 
+    For one-inflated distributions,
+    the theoretical and the empirical moments are matched numerically, 
     by minimization of the sum of squared differences between observed and theoretical 
-    quantities via \code{\link[alabama]{constrOptim.nl}}
-    as in \code{\link[fitdistrplus]{mmedist}}.
+    quantities as in \code{\link[fitdistrplus]{mmedist}}.
+    For the MBBEFD distribution, the equations are solved exactly as in Bernegger (1997):
+    \eqn{g} is the inverse of the empirical total loss and \eqn{b} is the unique root 
+    of the mean equation (the mean is decreasing in \eqn{b} for a given \eqn{g}).
+    This requires \code{0 < etl(x) < mean(x) < 1}.
     }
     
 }

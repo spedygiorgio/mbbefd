@@ -11,6 +11,7 @@
 
 \alias{dmbbefd1}
 \alias{dmbbefd2}
+\alias{dmbbefd3}
 
 
 \alias{MBBEFD}
@@ -24,6 +25,7 @@
 
 \alias{dMBBEFD1}
 \alias{dMBBEFD2}
+\alias{dMBBEFD3}
 
 
 \title{
@@ -83,6 +85,11 @@ logical; if \code{TRUE} (default), probabilities are \eqn{P[X <= x]}, otherwise,
 }
 \details{
 it shall be remebered that \eqn{g=\frac{1}{p_1}=\frac{a+b}{\left(a+1\right)*b}}.
+
+The parameter space of MBBEFD(g,b) is \eqn{g \geq 1, b \geq 0}.
+For MBBEFD(a,b), the main domain is made of \eqn{-1 < a < 0, b > 1}, 
+\eqn{a > 0, 0 < b < 1} and \eqn{a < -1, 0 < b < 1}: the latter corresponds to
+\eqn{b < 1, gb > 1} in the second parametrization.
 }
 \value{
 A numeric value or a vector.

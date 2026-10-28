@@ -1,3 +1,6 @@
+# File overview: legacy roxygen documentation of two datasets ("aon" and "loss")
+# that are no longer shipped under these names. The file is excluded from the
+# package build (see .Rbuildignore); the current datasets are documented in man/.
 # ciao<-read.table(file="Z:/aon.txt",header=FALSE,sep=" ")
 # names(ciao)<-c("class","loss","sumInsured")
 # aon<-transform(ciao, sumInsured=sumInsured*1000)

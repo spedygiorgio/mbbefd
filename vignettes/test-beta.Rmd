@@ -29,11 +29,11 @@ E(X) = \frac{\Gamma(a+b)\Gamma(a+1)}{\Gamma(a)\Gamma(a+b+1)}
 $$
 and
 $$
-E(\min(X,d)) = \frac{a}{a+b}\beta(a+1,b;x) + x(1-\beta(a,b;x))
+E(\min(X,x)) = \frac{a}{a+b}\beta(a+1,b;x) + x(1-\beta(a,b;x))
 $$
 where $\beta(.,.;.)$ denotes the incomplete beta function
 $$
-\beta(a,b;x)= \frac{\Gamma(a)\Gamma(b)}{\Gamma(a+b)} \int_0^x t^{a-1}(1-t)^{b-1}dt
+\beta(a,b;x)= \frac{\Gamma(a+b)}{\Gamma(a)\Gamma(b)} \int_0^x t^{a-1}(1-t)^{b-1}dt
 = \frac{\int_0^x t^{a-1}(1-t)^{b-1}dt}{\beta(a,b)}.
 $$
 Using (8.17.20) of NIST and recurrence relation of the beta function,

@@ -240,29 +240,31 @@ rMBBEFDR <- function(n, g, b)
 
   # degenerate case: total loss only (g = 1)
   #unit indicator -
-  idDirac <- g == Inf & b > 0 & b != 1
+  # (comparisons with NA give NA: %in% TRUE turns them into FALSE, so that
+  # missing parameters give NaN)
+  idDirac <- (g == Inf & b > 0 & b != 1) %in% TRUE
   res[idDirac] <- 1
 
   # degenerate case: total loss only (b = 0, b = +Inf or g = 1)
   #identity function
-  ididentity <- (g > 1 & b == 0) | (g > 1 & b == Inf) | (g == 1 & b > 0 & b != 1)
+  ididentity <- ((g > 1 & b == 0) | (g > 1 & b == Inf) | (g == 1 & b > 0 & b != 1)) %in% TRUE
   res[ididentity] <- 1
 
   # special case gb = 1: F(x) = 1 - b^x, P(X = 1) = b
   #b only
-  idbonly <- g > 1 & b < 1 & b > 0 & b * g == 1 & is.finite(b)
+  idbonly <- (g > 1 & b < 1 & b > 0 & b * g == 1 & is.finite(b)) %in% TRUE
   if (sum(idbonly) > 0)
     res[idbonly] <- qMBBEFDR(runif(sum(idbonly)), g[idbonly], b[idbonly])
 
   # special case b = 1: F(x) = 1 - 1/(1 + (g-1) x), P(X = 1) = 1/g
   #g only
-  idgonly <- g > 1 & b == 1 & is.finite(g)
+  idgonly <- (g > 1 & b == 1 & is.finite(g)) %in% TRUE
   if (sum(idgonly) > 0)
     res[idgonly] <- qMBBEFDR(runif(sum(idgonly)), g[idgonly], b[idgonly])
 
   # general case b != 1, gb != 1
   #main case
-  idmain <- g > 1 & b > 0 & b != 1 & b * g != 1 & is.finite(g) & is.finite(b)
+  idmain <- (g > 1 & b > 0 & b != 1 & b * g != 1 & is.finite(g) & is.finite(b)) %in% TRUE
   if (sum(idmain) > 0)
     res[idmain] <- qMBBEFDR(runif(sum(idmain)), g[idmain], b[idmain])
 

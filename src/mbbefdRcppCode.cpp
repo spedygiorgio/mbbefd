@@ -10,9 +10,35 @@
 // are exported with a leading dot (.rmbbefdC, .rMBBEFDC) and called from
 // R/distr-mbbefdCpp.R. unif_rand() uses R's random number generator, so
 // set.seed() makes the draws reproducible.
+// The parameter domains, special cases and quantile formulas are the same as in
+// the R generators rmbbefdR() and rMBBEFDR() (R/distr-mbbefdR-*.R): for the same
+// seed, both give the same variates (up to rounding) and consume the same
+// number of uniforms (none for degenerate or invalid parameters).
+// Memory: the only buffer is the output vector, allocated by Rcpp and written
+// at indices 0, ..., n-1; n is checked before the allocation, and errors are
+// raised with Rcpp::stop() (a C++ exception converted into an R error by the
+// code generated in RcppExports.cpp).
 #include <Rcpp.h>
-#include <math.h>  
+#include <cmath>
+#include <algorithm>
 using namespace Rcpp;
+
+// The number of variates must be a non-negative integer, as for the r*()
+// functions of base R (NA_INTEGER is negative). Without this check, a negative
+// length made Rf_allocVector() raise an R error from inside C++ code.
+static void check_n(int n)
+{
+  if (n < 0)
+    Rcpp::stop("invalid arguments");
+}
+
+// a vector of n identical values, without any random draw
+static NumericVector constant_vector(int n, double value)
+{
+  NumericVector out = no_init(n);
+  std::fill(out.begin(), out.end(), value);
+  return out;
+}
 
 
 //' Get a parameter known g and b
@@ -56,53 +82,46 @@ double g2a(double g, double b) {
 // [[Rcpp::export(.rmbbefdC)]]
 NumericVector rmbbefdC(int n, double a, double b) {
   
-  NumericVector out(n);
-  double u, pab;
-  // degenerate parameters: all the mass is at 1 (total loss only)
-  if(a == 0 || b == 1 || !R_FINITE(b) || b == 0 || a == -1) //Dirac
+  check_n(n);
+  // missing parameters: NaN
+  if (ISNAN(a) || ISNAN(b))
+    return constant_vector(n, R_NaN);
+  // degenerate parameters: all the mass at 1 (total loss only), same cases as
+  // in rmbbefdR(), no random draw
+  if ((b == 0 && a > 0) || (a == -1 && b > 1) || (b == 1 && a != -1) ||
+      (b == R_PosInf && a > -1 && a < 0) || (a == 0 && b > 0))
+    return constant_vector(n, 1.0);
+  
+  NumericVector out = no_init(n); // every element is written below
+  double u;
+  // a = +Inf (gb = 1 in the 2nd param.): P(X = 1) = b and, below the total loss,
+  // the quantile of the continuous part is log(1-U)/log(b)
+  if (a == R_PosInf && b > 0 && b < 1)
   {
-    for(int i=0; i<n; i++)
+    // constants computed once (log() cannot be moved out of the loop by the
+    // compiler, as it may set errno)
+    const double thr = 1 - b, ilogb = 1 / std::log(b);
+    for (int i = 0; i < n; i++)
     {
       u = unif_rand();
-      if(u > 0)
-        out[i] = 1.0;
-      else
-        out[i] = 0.0;
-    }
-  // a = +Inf: P(X = 1) = 1 - b and X = log(1-U)/log(b) otherwise
-  }else if(!R_FINITE(a))
-  {
-    for(int i=0; i<n; i++)
-    {
-      u = unif_rand();
-      if(u > 1-b)
-        out[i] = 1.0;
-      else
-        out[i] = log(1-u)/log(b);
+      out[i] = (u >= thr) ? 1.0 : std::log(1 - u) * ilogb;
     }
   // main domain: -1 < a < 0 with b > 1, a > 0 with 0 < b < 1, or a < -1 with
   // 0 < b < 1 (the last one corresponds to b < 1 and gb > 1 in the 2nd param.).
   // P(X = 1) = (a+1) b / (a + b) and the quantile of the continuous part is
   // log((1-U) a / (a + U)) / log(b).
-  }else if( (a +1 >0 && b > 0 && a*(1-b) > 0) || (a < -1 && b > 0 && b < 1) ) //main domain incl. b < 1 and gb > 1
+  } else if (R_FINITE(a) && R_FINITE(b) &&
+             ((-1 < a && a < 0 && b > 1) || (0 < a && b > 0 && b < 1) || (a < -1 && b > 0 && b < 1)))
   {
-    pab = (a+1)*b/(a+b);
-    for(int i=0; i<n; i++)
+    const double thr = 1 - (a + 1) * b / (a + b), ilogb = 1 / std::log(b);
+    for (int i = 0; i < n; i++)
     {
       u = unif_rand();
-      if(u > 1-pab)
-        out[i] = 1.0;
-      else
-        out[i] = log((1-u)*a/(a+u))/log(b);
+      out[i] = (u >= thr) ? 1.0 : std::log((1 - u) * a / (a + u)) * ilogb;
     }
   // invalid parameters
-  }else 
-  {
-    for(int i=0; i<n; i++)
-    {
-      out[i] = R_NaN;
-    }
-  } 
+  } else
+    return constant_vector(n, R_NaN);
   
   return out;
 }
@@ -127,61 +146,50 @@ NumericVector rmbbefdC(int n, double a, double b) {
 // [[Rcpp::export(.rMBBEFDC)]]
 NumericVector rMBBEFDC(int n, double g, double b) {
   
-  NumericVector out(n);
-  double u;
+  check_n(n);
+  // missing parameters: NaN
+  if (ISNAN(g) || ISNAN(b))
+    return constant_vector(n, R_NaN);
+  // degenerate parameters: all the mass at 1 (total loss only), same cases as
+  // in rMBBEFDR(), no random draw
+  if ((g == R_PosInf && b > 0 && b != 1) || (g > 1 && b == 0) || (g > 1 && b == R_PosInf) ||
+      (g == 1 && b > 0 && b != 1))
+    return constant_vector(n, 1.0);
   
-  // degenerate parameters: total loss only
-  if(g == 1 || !R_FINITE(g) || b == 0 || !R_FINITE(b)) //Dirac
+  NumericVector out = no_init(n); // every element is written below
+  double u;
+  // special case gb = 1: P(X = 1) = b, X = log(1-U)/log(b) below the total loss
+  if (g > 1 && b > 0 && b < 1 && b * g == 1)
   {
-    for(int i=0; i<n; i++)
+    const double thr = 1 - b, ilogb = 1 / std::log(b);
+    for (int i = 0; i < n; i++)
     {
       u = unif_rand();
-      if(u > 0)
-        out[i] = 1.0;
-      else
-        out[i] = 0.0;
-    }
-  // special case gb = 1: X = log(1-U)/log(b) below the total loss
-  }else if(b*g == 1 && b < 1) //bg=1
-  {
-    for(int i=0; i<n; i++)
-    {
-      u = unif_rand();
-      if(u > 1-b)
-        out[i] = 1.0;
-      else
-        out[i] = log(1-u)/log(b);
+      out[i] = (u >= thr) ? 1.0 : std::log(1 - u) * ilogb;
     }
   // special case b = 1: X = U / ((1-U)(g-1)) below the total loss
-  }else if(g > 1 && b == 1) //b=1
+  } else if (g > 1 && b == 1 && R_FINITE(g))
   {
-    for(int i=0; i<n; i++)
+    const double thr = 1 - 1 / g, gm1 = g - 1;
+    for (int i = 0; i < n; i++)
     {
       u = unif_rand();
-      if(u > 1-1/g)
-        out[i] = 1.0;
-      else
-        out[i] = u/((1-u)*(g-1));
+      out[i] = (u >= thr) ? 1.0 : u / (1 - u) / gm1;
     }
-  // general case (b != 1, gb != 1): inverse of F(x) = 1 - (1-b)/((g-1) b^(1-x) + 1 - gb)
-  }else if(b > 0 && g > 1)
+  // general case (b != 1, gb != 1): inverse of F(x) = 1 - (1-b)/((g-1) b^(1-x) + 1 - gb),
+  // X = 1 - log((gb-1)/(g-1) + (1-b)/((1-U)(g-1))) / log(b) below the total loss
+  } else if (g > 1 && b > 0 && b != 1 && b * g != 1 && R_FINITE(g) && R_FINITE(b))
   {
-    for(int i=0; i<n; i++)
+    const double thr = 1 - 1 / g, c1 = (g * b - 1) / (g - 1), c2 = (1 - b) / (g - 1);
+    const double ilogb = 1 / std::log(b);
+    for (int i = 0; i < n; i++)
     {
       u = unif_rand();
-      if(u > 1-1/g)
-        out[i] = 1.0;
-      else
-        out[i] = 1-log((g*b-1)/(g-1) + (1-b)/((1-u)*(g-1)))/log(b);
+      out[i] = (u >= thr) ? 1.0 : 1 - std::log(c1 + c2 / (1 - u)) * ilogb;
     }
   // invalid parameters
-  }else 
-  {
-    for(int i=0; i<n; i++)
-    {
-      out[i] = R_NaN;
-    }
-  }
+  } else
+    return constant_vector(n, R_NaN);
   
   return out;
 }

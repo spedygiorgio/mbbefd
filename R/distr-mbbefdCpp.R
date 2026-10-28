@@ -30,6 +30,10 @@ rmbbefd <- function(n, a, b)
   stopifnot(is.numeric(n))
   stopifnot(is.numeric(a))
   stopifnot(is.numeric(b))
+  # a single n must be a non-negative integer (n > 2^31 - 1 cannot be passed to
+  # the C++ generators), as in the r*() functions of base R
+  if (length(n) == 1 && (is.na(n) || n < 0 || n > .Machine$integer.max))
+    stop("invalid arguments")
 
   # an empty argument gives an empty result
   if (min(length(a), length(b), length(n)) <= 0)
@@ -51,6 +55,10 @@ rMBBEFD <- function(n, g, b)
   stopifnot(is.numeric(n))
   stopifnot(is.numeric(g))
   stopifnot(is.numeric(b))
+  # a single n must be a non-negative integer (n > 2^31 - 1 cannot be passed to
+  # the C++ generators), as in the r*() functions of base R
+  if (length(n) == 1 && (is.na(n) || n < 0 || n > .Machine$integer.max))
+    stop("invalid arguments")
 
   if (min(length(g), length(b), length(n)) <= 0)
     return(numeric(0))

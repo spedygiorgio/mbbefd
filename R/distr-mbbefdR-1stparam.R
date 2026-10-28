@@ -228,23 +228,28 @@ rmbbefdR <- function(n, a, b)
 
   # degenerate case: total loss only
   #unit indicator -
-  idDirac <- (b == 0 & a > 0) | (a == -1 & b > 1)
+  # (comparisons with NA give NA: %in% TRUE turns them into FALSE, so that
+  # missing parameters give NaN)
+  idDirac <- ((b == 0 & a > 0) | (a == -1 & b > 1)) %in% TRUE
   res[idDirac] <- 1
 
   # degenerate case: total loss only (b = 1 or a = 0 gives g = 1)
   #identity function
-  ididentity <- (b == 1 & a > -1) | (b == 1 & a < -1) | (b == Inf & a > -1 & a < 0) | (a == 0 & b > 0)
+  ididentity <- ((b == 1 & a > -1) | (b == 1 & a < -1) | (b == Inf & a > -1 & a < 0) |
+                   (a == 0 & b > 0)) %in% TRUE
   res[ididentity] <- 1
 
   # a = +Inf (gb = 1): F(x) = 1 - b^x, P(X = 1) = b
   #b only
-  idbonly <- a == Inf & b > 0 & b < 1 & is.finite(b)
+  idbonly <- (a == Inf & b > 0 & b < 1 & is.finite(b)) %in% TRUE
   if (sum(idbonly) > 0)
     res[idbonly] <- qmbbefdR(runif(sum(idbonly)), a[idbonly], b[idbonly])
 
   # regular domain
   #main case
-  idmain <- ((-1 < a & a < 0 & b > 1) | (0 < a & 0 < b & b < 1) | (a < -1 & 0 < b & b < 1)) & is.finite(b)
+  # (a must be finite: a = +Inf is the case above, which used to be drawn twice)
+  idmain <- (((-1 < a & a < 0 & b > 1) | (0 < a & 0 < b & b < 1) | (a < -1 & 0 < b & b < 1)) &
+               is.finite(a) & is.finite(b)) %in% TRUE
   if (sum(idmain) > 0)
     res[idmain] <- qmbbefdR(runif(sum(idmain)), a[idmain], b[idmain])
 

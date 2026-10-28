@@ -63,12 +63,25 @@
     data containing a zero destruction rate was `-Inf`).
   * `bootDR()` uses scalar logical operators (`&&`, `||`) in its argument checks.
   * Import `uniroot()` from `stats` (used by the exact `tlmme` estimator; `R CMD check` NOTE).
+  * C++ random generators (`rmbbefd()`, `rMBBEFD()` with scalar parameters) now follow exactly the 
+    parameter domains of the R generators: invalid or missing parameters give `NaN` (previously, 
+    e.g., `rmbbefd(n, 0.5, NA)`, `rmbbefd(n, -1, 0.5)` or `rMBBEFD(n, 0.5, 0)` returned 1 and 
+    `rmbbefd(n, -Inf, 0.5)` or `rmbbefd(n, NaN, 0.5)` returned random values), and degenerate 
+    parameters no longer consume random numbers, as in R. For the same seed, the C++ and R generators 
+    give the same variates and leave the same random number generator state.
+  * `rmbbefd()` and `rMBBEFD()` raise the error `invalid arguments` for a negative, missing, infinite or 
+    too large `n`, as base R (previously, the error came from the allocation inside the C++ code).
+  * The R generators `rmbbefdR()` / `rMBBEFDR()` (used for vector parameters) return `NaN` for missing 
+    parameters instead of failing, and `rmbbefdR()` no longer draws the case `a = Inf` twice.
 
 ### MISC
 
   * Raise the minimal required version of `fitdistrplus` to 1.2-2: `fitDR()` and `bootDR()` rely on the `calcvcov` argument and on `density.bootdist()` (introduced in 1.2-1; before: `unused argument (calcvcov = TRUE)`), and the standard errors of one-inflated fits assume that `mledist()` minimizes the average negative log-likelihood (since 1.2-2).
   * Remove the obsolete `src/Makevars*` files (`RCPP_USE_UNWIND_PROTECT` is the default of `Rcpp >= 0.12.18`) and the unneeded `SystemRequirements: GNU make`.
   * The `LICENCE` file and the README badge now state GPL-2, as `DESCRIPTION` (they said GPL-3).
+  * C++ generators: constants (`1/log(b)`, thresholds) computed once outside the loops and the output 
+    vector is not zero-filled before being written (`no_init`): 15-40% faster on the main cases. Checked 
+    with valgrind and UndefinedBehaviorSanitizer (no error).
   * Code style checked with `lintr` (configuration in `.lintr`, new GitHub Actions workflow `lint`): 
     spaces around operators and after commas, `if (`, double quotes, `<-` for assignment, no semicolons, 
     lines of at most 120 characters, no trailing whitespace. These changes are whitespace and quoting 

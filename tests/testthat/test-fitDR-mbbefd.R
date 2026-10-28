@@ -189,3 +189,33 @@ test_that("MBBEFD density at x = 0", {
   expect_equal(dMBBEFD(0, 5, 0.1), dMBBEFD(1e-10, 5, 0.1), tolerance = 1e-8)
   expect_true(is.finite(sum(dMBBEFD(c(0, 0.5, 1), 5, 0.1, log = TRUE))))
 })
+
+test_that("C++ and R generators agree, including invalid and degenerate parameters", {
+  ns <- asNamespace("mbbefd")
+  vals <- c(-2, -1, -0.5, 0, 0.1, 0.5, 1, 2, Inf, -Inf, NA, NaN)
+  for (p in vals) for (q in vals) {
+    set.seed(1)
+    c1 <- ns$rmbbefdCpp(20, p, q)
+    s1 <- .Random.seed
+    set.seed(1)
+    r1 <- ns$rmbbefdR(20, p, q)
+    expect_equal(c1, r1, info = paste("mbbefd", p, q))
+    expect_identical(s1, .Random.seed, info = paste("mbbefd", p, q))
+    set.seed(1)
+    c2 <- ns$rMBBEFDCpp(20, p, q)
+    s2 <- .Random.seed
+    set.seed(1)
+    r2 <- ns$rMBBEFDR(20, p, q)
+    expect_equal(c2, r2, info = paste("MBBEFD", p, q))
+    expect_identical(s2, .Random.seed, info = paste("MBBEFD", p, q))
+  }
+})
+
+test_that("invalid numbers of variates raise an error, as in base R", {
+  for (n in list(-1, NA_real_, Inf, 3e9)) {
+    expect_error(rmbbefd(n, 0.5, 0.1), "invalid arguments")
+    expect_error(rMBBEFD(n, 5, 0.1), "invalid arguments")
+  }
+  expect_length(rmbbefd(0, 0.5, 0.1), 0)
+  expect_length(rMBBEFD(2.7, 5, 0.1), 2)
+})

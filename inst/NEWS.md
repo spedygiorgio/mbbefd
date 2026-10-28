@@ -1,6 +1,8 @@
 # `mbbefd` NEWS
 
-## CHANGES IN `mbbefd` VERSION 0.8.15
+## CHANGES IN `mbbefd` VERSION 0.8.16
+
+(0.8.15 was a development version only; the last release on CRAN is 0.8.14, so the changes of both are listed here.)
 
 ### NEW
 
@@ -95,6 +97,8 @@
     the risks above the retention of the surplus treaty are apportioned with the mean MPL (not the 
     maximum MPL), and the premium rate (1.65%, against 1.636% in the publication) is computed in the 
     vignette instead of being typed (the code returned `NaN`).
+  * Comments added to the code and to the unit tests: each file starts with an overview of what it does, and 
+    each function and test explains its role, its arguments and the formula it implements.
 
 ## CHANGES IN `mbbefd` VERSION 0.8.14
 

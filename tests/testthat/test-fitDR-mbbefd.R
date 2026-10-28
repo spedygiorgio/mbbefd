@@ -1,4 +1,6 @@
-#unit tests for the fitting of the MBBEFD distribution (both parametrizations)
+# Unit tests for the fitting of the MBBEFD distribution, in both parametrizations
+# (a,b) = "mbbefd" and (g,b) = "MBBEFD", with g = 1/P(X = 1).
+# Each test_that() block checks one property, named in its title.
 library(testthat)
 library(mbbefd)
 
@@ -14,6 +16,8 @@ numjac <- function(f, x, h = 1e-6) #rows = components of f, columns = components
 numhess <- function(f, x) numjac(function(t) numgrad(f, t, h = 1e-5), x, h = 1e-5)
 
 test_that("analytical gradient of the log-likelihood", {
+  # compare grLLfunc() with finite differences of LLfunc(), at parameters in
+  # each of the three domains (b > 1, b < 1 with gb < 1, b < 1 with gb > 1)
   set.seed(1)
   for (z in list(list("mbbefd", c(.5, .1)), list("mbbefd", c(-.5, 3)), list("mbbefd", c(-4 / 3, .5)),
                 list("MBBEFD", c(5, 2)), list("MBBEFD", c(5, .1)), list("MBBEFD", c(5, .5))))
@@ -27,6 +31,8 @@ test_that("analytical gradient of the log-likelihood", {
 })
 
 test_that("jacobians of the constraints", {
+  # each constr*() returns the constraints h(theta) >= 0 used by constrOptim.nl;
+  # constr*jac() must be their jacobian (checked by finite differences)
   for (z in list(list("constrmbbefd1", c(-.5, 3)), list("constrmbbefd2", c(.5, .1)),
                 list("constrmbbefd3", c(-2, .5)), list("constrMBBEFD1", c(5, 2)),
                 list("constrMBBEFD2", c(5, .1)), list("constrMBBEFD3", c(5, .5))))
@@ -38,6 +44,7 @@ test_that("jacobians of the constraints", {
 })
 
 test_that("both parametrizations agree in the region b < 1, gb > 1 (a < -1)", {
+  # g = 5, b = 1/2 gives gb = 2.5 > 1, i.e. a = (g-1) b / (1-gb) = -8/3 < -1
   g <- 5
   b <- 1 / 2
   a <- (g - 1) * b / (1 - g * b)
@@ -49,12 +56,15 @@ test_that("both parametrizations agree in the region b < 1, gb > 1 (a < -1)", {
   expect_equal(ecmbbefd(x, a, b), ecMBBEFD(x, g, b))
   expect_equal(mmbbefd(1:2, a, b), mMBBEFD(1:2, g, b))
   expect_equal(tlmbbefd(a, b), tlMBBEFD(g, b))
+  # the generators accept a < -1 (scalar parameters: C++ code; vectors: R code)
   set.seed(2)
   expect_false(any(is.nan(rmbbefd(100, a, b))))
   expect_false(any(is.nan(rmbbefd(100, rep(a, 2), rep(b, 2)))))
 })
 
 test_that("tlmme solves exactly the mean and total loss equations", {
+  # tlmme = total loss and mean matching: 1/g = share of total losses in the
+  # sample, and the theoretical mean equals the sample mean
   set.seed(3)
   for (th in list(c(5, .1), c(10, 3), c(5, .5)))
   {
@@ -66,11 +76,13 @@ test_that("tlmme solves exactly the mean and total loss equations", {
     expect_equal(tlmbbefd(fa$estimate["a"], fa$estimate["b"]), etl(x), tolerance = 1e-8)
     expect_equal(mmbbefd(1, fa$estimate["a"], fa$estimate["b"]), mean(x), tolerance = 1e-8)
   }
+  # no total loss: the equations have no solution, hence a warning and NA
   expect_warning(f <- fitDR(c(.1, .2, .3), "MBBEFD", method = "tlmme"))
   expect_true(all(is.na(f$estimate)))
 })
 
 test_that("mle reaches the region b < 1, gb > 1", {
+  # data simulated with b < 1 and gb = 2.5 > 1: the fit must end in that domain
   set.seed(4)
   x <- rMBBEFD(1000, 5, 1 / 2)
   f <- fitDR(x, "MBBEFD")
@@ -84,6 +96,8 @@ test_that("mle reaches the region b < 1, gb > 1", {
 })
 
 test_that("standard errors match the observed information", {
+  # standard errors = sqrt(diag(inverse of the observed information)), the
+  # information being the numerical Hessian of the log-likelihood
   set.seed(5)
   for (th in list(c(5, .1), c(10, 3)))
   {
@@ -102,12 +116,15 @@ test_that("standard errors match the observed information", {
 })
 
 test_that("a warning is raised without total losses", {
+  # remove the total losses from the data: fitDR() must warn about it
   set.seed(6)
   x <- rMBBEFD(200, 5, .1)
   expect_warning(fitDR(x[x < 1], "MBBEFD"), "no total loss")
 })
 
 test_that("standard errors of one-inflated fits match the observed information", {
+  # one-inflated beta: the beta shapes are estimated on the observations below 1
+  # only, and p1 is the share of total losses (binomial standard error)
   set.seed(7)
   x <- roibeta(1000, 2, 5, 1 / 10)
   f <- fitDR(x, "oibeta")
@@ -118,6 +135,7 @@ test_that("standard errors of one-inflated fits match the observed information",
 })
 
 test_that("point mass at 1 in the special case gb = 1 (a = Inf)", {
+  # gb = 1 <=> a = Inf: P(X = 1) = b must be the same in d, p and tl functions
   b <- 0.3
   expect_equal(dmbbefd(1, Inf, b), tlmbbefd(Inf, b))
   expect_equal(dMBBEFD(1, 1 / b, b), tlMBBEFD(1 / b, b))
@@ -134,6 +152,8 @@ test_that("MLE close to the domain boundary b = 1 (Swiss Re curve c = 4)", {
     max(sapply(list(c(0, 0), c(2, 1), c(5, 0), c(5, -1), c(4, 1)), function(s)
       -optim(s, nll, method = "BFGS", control = list(maxit = 1000, reltol = 1e-13))$value))
   }
+  # Swiss Re curve c = 4 has b close to 1; the optimum must be reached in both
+  # parametrizations, with finite standard errors
   th <- swissRe(4)
   set.seed(42)
   for (r in 1:5)
@@ -153,6 +173,8 @@ test_that("MLE close to the domain boundary b = 1 (Swiss Re curve c = 4)", {
 })
 
 test_that("dgbeta(log = FALSE) is exp(dgbeta(log = TRUE)) with vectorized parameters", {
+  # some shape0 are invalid (< 0) and some x are outside [0, 1]: the two code
+  # paths (log = TRUE / FALSE) must still be consistent
   x <- c(0.2, 0.5, 0.7, 1.5, -0.1)
   shape0 <- c(2, -1, 3, 2, 2)
   d1 <- suppressWarnings(dgbeta(x, shape0, 2, 3))
@@ -166,6 +188,7 @@ test_that("swissRe() for a scalar and a vector c", {
   expect_named(p, c("b", "g"))
   #Bernegger (1997), Section 4.3: b(3) = 3.669, g(3) = 30.569
   expect_equal(unname(round(p, 3)), c(3.669, 30.569))
+  # a vector c gives a matrix, one row per value of c
   m <- swissRe(c(1.5, 2, 3, 4, 5))
   expect_equal(dim(m), c(5L, 2L))
   expect_equal(colnames(m), c("b", "g"))
@@ -173,6 +196,8 @@ test_that("swissRe() for a scalar and a vector c", {
 })
 
 test_that("exposure curves of one-inflated distributions with x outside [0, 1]", {
+  # values outside [0, 1] or missing must not shift the results of the other
+  # elements: compare with the same call restricted to the values inside [0, 1]
   x <- c(-0.1, 0, 0.5, 1, 1.1, NA)
   inside <- c(0, 0.5, 1)
   expect_equal(ecoibeta(x, 2, 3, 0.1)[2:4], ecoibeta(inside, 2, 3, 0.1))
@@ -191,6 +216,9 @@ test_that("MBBEFD density at x = 0", {
 })
 
 test_that("C++ and R generators agree, including invalid and degenerate parameters", {
+  # internal C++ (rmbbefdCpp, rMBBEFDCpp) and R (rmbbefdR, rMBBEFDR) generators on
+  # a grid of 12 x 12 parameter values: same variates and same state of the
+  # random number generator afterwards (degenerate cases draw nothing)
   ns <- asNamespace("mbbefd")
   vals <- c(-2, -1, -0.5, 0, 0.1, 0.5, 1, 2, Inf, -Inf, NA, NaN)
   for (p in vals) for (q in vals) {
@@ -212,6 +240,7 @@ test_that("C++ and R generators agree, including invalid and degenerate paramete
 })
 
 test_that("invalid numbers of variates raise an error, as in base R", {
+  # n must be a non-negative number below 2^31; a non-integer n is truncated
   for (n in list(-1, NA_real_, Inf, 3e9)) {
     expect_error(rmbbefd(n, 0.5, 0.1), "invalid arguments")
     expect_error(rMBBEFD(n, 5, 0.1), "invalid arguments")
